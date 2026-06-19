@@ -46,6 +46,7 @@ html{scroll-behavior:smooth;}
   *,*::before,*::after{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
 }
 
+html,body{overflow-x:hidden;max-width:100%;}
 body{
   margin:0;
   background:var(--bg);
@@ -393,21 +394,21 @@ footer.page-foot{
 
 /* ===== Mobile ===== */
 @media (max-width:980px){
-  .content-wrap{grid-template-columns:1fr;}
+  .content-wrap{grid-template-columns:minmax(0,1fr);}
   .toc{display:none;}
 }
 @media (max-width:840px){
   .topbar{display:flex;}
-  .shell{grid-template-columns:1fr;}
+  .shell{grid-template-columns:minmax(0,1fr);}
   .sidebar{
     position:fixed;inset:0 25% 0 0;z-index:50;
     transform:translateX(-100%);transition:transform .25s ease;
     box-shadow:20px 0 40px rgba(0,0,0,0.4);
   }
   .sidebar.open{transform:translateX(0);}
-  main{padding:2rem 1.2rem 4rem;}
+  main{padding:2rem 1.2rem 4rem;min-width:0;overflow-x:hidden;}
   .hero h1{font-size:2.2rem;}
-  .grid.cols-2,.grid.cols-3,.compare{grid-template-columns:1fr;}
+  .grid.cols-2,.grid.cols-3,.compare{grid-template-columns:minmax(0,1fr);}
 }
 
 </style>
