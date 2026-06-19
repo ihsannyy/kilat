@@ -279,8 +279,8 @@ main{padding:3.4rem 2.4rem 6rem;min-width:0;}
 
 /* ===== Feature / card grids ===== */
 .grid{display:grid;gap:1rem;margin:1.6rem 0 2rem;}
-.grid.cols-2{grid-template-columns:1fr 1fr;}
-.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+.grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
 .card{
   background:var(--surface);border:1px solid var(--line);
   border-radius:8px;padding:1.1rem 1.2rem;
@@ -374,6 +374,22 @@ footer.page-foot{
 .pager .dir{font-family:var(--font-mono);font-size:.68rem;color:var(--faint);display:block;margin-bottom:.3rem;}
 .pager .lbl{font-weight:600;}
 .pager .next{text-align:right;}
+
+/* ===== Sidebar Overlay ===== */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 45;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 /* ===== Mobile ===== */
 @media (max-width:980px){
@@ -518,7 +534,7 @@ footer.page-foot{
         </div>
 
         <footer class="page-foot">
-          <span>Jolt Docs — dibuat dengan <svg width="12" height="12" viewBox="0 0 24 24" fill="#ff5f56" stroke="#ff5f56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; display: inline-block; margin: 0 2px;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> dan <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffb100" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; display: inline-block; margin: 0 2px;"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg> di Termux</span>
+          <span>Dibuat dengan <svg width="12" height="12" viewBox="0 0 24 24" fill="#ff5f56" stroke="#ff5f56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; display: inline-block; margin: 0 2px;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> dan <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffb100" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; display: inline-block; margin: 0 2px;"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg> untuk komunitas Termux</span>
           <span>MIT License © 2024</span>
         </footer>
       </article>
@@ -536,18 +552,28 @@ footer.page-foot{
     if(a.getAttribute('data-key') === page){ a.classList.add('active'); }
   });
 
-  // Mobile sidebar toggle
+  // Mobile sidebar toggle with overlay
   var menuBtn = document.getElementById('menu-btn');
   var sidebar = document.querySelector('.sidebar');
   if(menuBtn && sidebar){
+    var overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    document.body.appendChild(overlay);
     menuBtn.addEventListener('click', function(){
-      sidebar.classList.toggle('open');
+      var open = sidebar.classList.toggle('open');
+      overlay.classList.toggle('active', open);
     });
+    var closeSidebar = function(){
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    };
+    overlay.addEventListener('click', closeSidebar);
     document.addEventListener('click', function(e){
       if(sidebar.classList.contains('open') &&
          !sidebar.contains(e.target) &&
-         e.target !== menuBtn){
-        sidebar.classList.remove('open');
+         e.target !== menuBtn &&
+         e.target !== overlay){
+        closeSidebar();
       }
     });
   }
