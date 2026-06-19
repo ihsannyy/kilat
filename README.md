@@ -1,11 +1,11 @@
 <div align="center">
 
 # 🚀 KILAT
-### **Fast & Ultra-Lightweight JavaScript Runtime for Termux**
+### **Fast & Ultra-Lightweight JavaScript Runtime for Termux & Linux**
 
 <img src="website/public/kilat.jpg" alt="Kilat Banner" width="400" style="border-radius: 8px; margin: 15px 0; max-width: 100%;"/>
 
-Kilat adalah runtime JavaScript CommonJS yang ringan dan efisien, dibangun di atas **Go** menggunakan compiler engine **Goja**. Runtime ini dirancang khusus untuk perangkat mobile melalui **Termux (Android)** guna memberikan performa tinggi dengan konsumsi daya dan penyimpanan yang minimal.
+Kilat adalah runtime JavaScript CommonJS yang ringan dan efisien, dibangun di atas **Go** menggunakan compiler engine **Goja**. Runtime ini dirancang khusus untuk perangkat mobile melalui **Termux (Android)** serta sistem operasi **Linux** (seperti Kali Linux, Ubuntu, dll.) guna memberikan performa tinggi dengan konsumsi daya dan penyimpanan yang minimal.
 
 *Bekerja mirip Node.js/Bun, tetapi dirancang tanpa beban folder raksasa `node_modules`.*
 
@@ -13,8 +13,8 @@ Kilat adalah runtime JavaScript CommonJS yang ringan dan efisien, dibangun di at
 
 [![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?logo=go&logoColor=white&style=for-the-badge)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#-lisensi)
-[![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Android-brightgreen?style=for-the-badge)](#)
-[![Version](https://img.shields.io/badge/Version-0.1.0-blue?style=for-the-badge)](#-roadmap)
+[![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Linux-brightgreen?style=for-the-badge)](#)
+[![Version](https://img.shields.io/badge/Version-0.3.0-blue?style=for-the-badge)](#-roadmap)
 
 </div>
 

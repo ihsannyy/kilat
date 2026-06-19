@@ -68,7 +68,7 @@ export default function App() {
               </div>
               <h1 className="hero-heading">Kilat</h1>
               <p className="hero-desc">
-                Runtime JavaScript ringan dan cepat untuk Termux. Eksekusi script, install package, dan jalankan proyek — <strong>tanpa node_modules</strong>.
+                Runtime JavaScript ringan dan cepat untuk Termux & Linux. Eksekusi script, install package, dan jalankan proyek — <strong>tanpa node_modules</strong>.
               </p>
               <div className="hero-buttons">
                 <a href="#installation" className="btn btn-primary">
@@ -198,10 +198,10 @@ export default function App() {
         return (
           <div className="doc">
             <h1 className="doc-title">Instalasi</h1>
-            <p className="lede">Dua cara memasang Kilat di Termux: unduh binary rilis otomatis (direkomendasikan) atau compile sendiri dari source code.</p>
+            <p className="lede">Dua cara memasang Kilat di Termux & Linux: unduh binary rilis otomatis (direkomendasikan) atau compile sendiri dari source code.</p>
 
             <h2 className="section-title">Instalasi Otomatis (Rekomendasi)</h2>
-            <p>Metode tercepat. Skrip instalasi di bawah akan mendeteksi arsitektur CPU Android Anda secara otomatis (ARM64, AMD64, atau ARMv7) dan mengunduh binary executable yang sesuai.</p>
+            <p>Metode tercepat. Skrip instalasi di bawah akan mendeteksi arsitektur CPU perangkat Termux / Linux Anda secara otomatis (ARM64, AMD64, atau ARMv7) dan mengunduh binary executable yang sesuai.</p>
             
             <div className="term-window">
               <div className="term-bar">
