@@ -311,7 +311,7 @@ export default function App() {
             <p className="lede">Dari inisialisasi folder proyek baru hingga memanggil dependensi pustaka luar. Berikut panduan harian runtime Kilat.</p>
 
             <h2 className="section-title">Inisialisasi Proyek</h2>
-            <p>Gunakan perintah <code>kilat init</code> untuk membuat struktur proyek standar. Perintah ini akan meluncurkan setup interaktif untuk menulis konfigurasi <code>package.json</code> serta memproduksi entry point <code>index.js</code>.</p>
+            <p>Gunakan perintah <code>kilat init</code> untuk membuat struktur proyek standar secara interaktif, atau tambahkan parameter <code>-y</code> (seperti: <code>kilat init -y</code>) untuk melewati prompt interaktif dan langsung memproduksi konfigurasi menggunakan nilai default.</p>
             
             <div className="term-window">
               <div className="term-bar">
@@ -323,7 +323,7 @@ export default function App() {
                 <span className="term-title">bash terminal</span>
                 <button 
                   className="term-copy"
-                  onClick={() => handleCopy('usage-init', 'kilat init')}
+                  onClick={() => handleCopy('usage-init', 'kilat init -y')}
                 >
                   {copiedTextMap['usage-init'] ? 'Copied!' : 'copy'}
                 </button>

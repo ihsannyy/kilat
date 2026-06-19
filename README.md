@@ -69,9 +69,9 @@ mv kilat $PREFIX/bin/
 ## 🚀 Panduan Penggunaan
 
 ### Inisialisasi Proyek Baru
-Membuat file konfigurasi `package.json` dan entry point secara interaktif.
+Membuat file konfigurasi `package.json` dan entry point secara interaktif (atau gunakan `-y` untuk langsung menyetujui opsi default).
 ```bash
-kilat init
+kilat init -y
 ```
 
 ### Menjalankan Berkas JavaScript

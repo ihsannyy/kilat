@@ -68,7 +68,11 @@ func main() {
 	case "repl":
 		repl.Start()
 	case "init":
-		if err := initcmd.RunInit(); err != nil {
+		autoYes := false
+		if len(os.Args) >= 3 && (os.Args[2] == "-y" || os.Args[2] == "--yes") {
+			autoYes = true
+		}
+		if err := initcmd.RunInit(autoYes); err != nil {
 			color.Red("❌ Gagal init: %v", err)
 			os.Exit(1)
 		}
@@ -130,13 +134,13 @@ func printHelp() {
 	cyan.Printf("🚀 Kilat v%s - Fast JS Runtime for Termux\n", utils.Version)
 	fmt.Println()
 	color.White("Penggunaan:")
-	color.Yellow("  kilat init                 Inisialisasi proyek Kilat (package.json)")
+	color.Yellow("  kilat init [-y]            Inisialisasi proyek Kilat (opsional: auto-yes)")
 	color.Yellow("  kilat run <file.js> [-w]   Jalankan file JavaScript (opsional: watch mode)")
 	color.Yellow("  kilat add <package>        Install package dari npm")
 	color.Yellow("  kilat --version            Tampilkan versi")
 	fmt.Println()
 	color.White("Contoh:")
-	color.Cyan("  kilat init")
+	color.Cyan("  kilat init -y")
 	color.Cyan("  kilat run index.js --watch")
 	color.Cyan("  kilat add lodash")
 }
