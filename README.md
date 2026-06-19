@@ -191,7 +191,7 @@ jolt run test.js
 ## 🗺️ Peta Jalan (Roadmap)
 
 - [x] **v0.1.0** — Core runtime, module resolver CommonJS, dan package manager dasar.
-- [ ] **v0.2.0** — Watch mode (`--watch`) & dukungan pembacaan file `.env` otomatis.
+- [x] **v0.2.0** — Watch mode (`--watch`) & dukungan pembacaan file `.env` otomatis.
 - [ ] **v0.3.0** — REPL Interaktif di terminal.
 - [ ] **v0.4.0** — Built-in HTTP Server (`Bun.serve`-like API).
 - [ ] **v0.5.0** — Dukungan kompilasi TypeScript instan (via esbuild integrations).
