@@ -289,7 +289,7 @@ export default function App() {
                 <pre>
                   <code>
                     <span className="sh-prompt">$</span>kilat --version{"\n"}
-                    <span className="sh-out">Kilat v0.3.0</span>
+                    <span className="sh-out">Kilat v0.4.0</span>
                   </code>
                 </pre>
               </div>
@@ -740,24 +740,24 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="timeline-item active">
+              <div className="timeline-item done">
                 <div className="timeline-dot"></div>
                 <div className="timeline-card">
                   <div className="timeline-meta">
                     <span className="timeline-ver">v0.4.0</span>
-                    <span className="timeline-status active">Pengerjaan</span>
+                    <span className="timeline-status done">Selesai</span>
                   </div>
                   <h4 className="timeline-title">Built-In HTTP Server</h4>
                   <p className="timeline-desc">Implementasi HTTP server internal terintegrasi berkecepatan tinggi mirip dengan <code>Bun.serve</code>.</p>
                 </div>
               </div>
 
-              <div className="timeline-item">
+              <div className="timeline-item active">
                 <div className="timeline-dot"></div>
                 <div className="timeline-card">
                   <div className="timeline-meta">
                     <span className="timeline-ver">v0.5.0</span>
-                    <span className="timeline-status planned">Rencana</span>
+                    <span className="timeline-status active">Pengerjaan</span>
                   </div>
                   <h4 className="timeline-title">Dukungan TypeScript Instan</h4>
                   <p className="timeline-desc">Kompilasi dan eksekusi TypeScript langsung secara runtime menggunakan integrasi parser loader esbuild.</p>
@@ -812,9 +812,27 @@ export default function App() {
             <div className="changelog-list">
               <div className="changelog-version">
                 <div className="changelog-header">
+                  <h2 className="changelog-ver-title">v0.4.0</h2>
+                  <span className="changelog-date">20 Juni 2026</span>
+                  <span className="changelog-badge latest">Terbaru</span>
+                </div>
+                <div className="changelog-content">
+                  <p>Rilis versi ini memperkenalkan <strong>HTTP Server Bawaan</strong> (mirip dengan Bun.serve). Pengguna kini dapat membuat HTTP server asinkron performa tinggi dan menggunakan Fetch API standar (Headers, Request, Response) langsung dari runtime Kilat.</p>
+                  
+                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
+                  <ul>
+                    <li><strong>Built-In HTTP Server (<code>Bun.serve</code>)</strong>: Implementasi HTTP server asinkron internal performa tinggi.</li>
+                    <li><strong>Dukungan Fetch API Dasar</strong>: Integrasi global class <code>Request</code>, <code>Response</code>, dan <code>Headers</code> untuk memanipulasi HTTP request dan response secara efisien.</li>
+                    <li><strong>REPL &amp; Event-Loop Asinkron</strong>: Integrasi REPL interaktif berbasis event-loop untuk mendukung eksekusi kode asinkron di latar belakang.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="changelog-version">
+                <div className="changelog-header">
                   <h2 className="changelog-ver-title">v0.3.0</h2>
                   <span className="changelog-date">19 Juni 2026</span>
-                  <span className="changelog-badge latest">Terbaru</span>
+                  <span className="changelog-badge">Lama</span>
                 </div>
                 <div className="changelog-content">
                   <p>Rilis versi minor ini memperkenalkan <strong>REPL Interaktif</strong> bawaan. Pengguna kini dapat berinteraksi dan mencoba kode JavaScript langsung dari shell Termux tanpa membuat file terpisah.</p>
@@ -946,7 +964,7 @@ export default function App() {
       <nav className="navbar">
         <div className="nav-container">
           <a href="#index" className="logo">
-            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v0.3.0</span>
+            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v0.4.0</span>
           </a>
 
           {/* Desktop nav links */}

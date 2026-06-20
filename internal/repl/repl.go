@@ -24,42 +24,41 @@ func Start() {
 	gray.Println("Ketik '.exit' atau tekan Ctrl+C / Ctrl+D untuk keluar.")
 	fmt.Println()
 
-	// Initialize runtime and set global require path to current directory
 	rt := engine.New(engine.DefaultOptions())
 	rt.SetGlobalRequire(".")
 
-	scanner := bufio.NewScanner(os.Stdin)
+	rt.SetHasServer(true)
 
-	for {
-		yellow.Print("kilat> ")
-		if !scanner.Scan() {
-			break
+	yellow.Print("kilat> ")
+
+	go func() {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			line := scanner.Text()
+			rt.QueueJob(func() {
+				trimmed := strings.TrimSpace(line)
+				if trimmed == ".exit" || trimmed == "exit" || trimmed == "exit()" {
+					fmt.Println("\nSampai jumpa! ⚡")
+					os.Exit(0)
+				}
+				if trimmed != "" {
+					val, err := rt.VM().RunString(trimmed)
+					if err != nil {
+						red.Printf("❌ Error: %v\n", err)
+					} else if val != nil && !goja.IsUndefined(val) {
+						printValue(val, green)
+					}
+				}
+				yellow.Print("kilat> ")
+			})
 		}
+		rt.QueueJob(func() {
+			fmt.Println("\nSampai jumpa! ⚡")
+			os.Exit(0)
+		})
+	}()
 
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" {
-			continue
-		}
-
-		if line == ".exit" || line == "exit" || line == "exit()" {
-			break
-		}
-
-		// Evaluate Javascript line
-		val, err := rt.VM().RunString(line)
-		if err != nil {
-			// Print error
-			red.Printf("❌ Error: %v\n", err)
-			continue
-		}
-
-		// Format and print return value if it's not undefined
-		if val != nil && !goja.IsUndefined(val) {
-			printValue(val, green)
-		}
-	}
-
-	fmt.Println("\nSampai jumpa! ⚡")
+	rt.RunEventLoop()
 }
 
 func printValue(val goja.Value, green *color.Color) {

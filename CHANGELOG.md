@@ -4,6 +4,12 @@ Semua pembaruan penting untuk proyek **Kilat** akan didokumentasikan di berkas i
 
 ---
 
+## [v0.4.0] - 2026-06-20
+### ⚡ Fitur Baru
+* **Built-in HTTP Server (`Bun.serve`-like API)**: Server HTTP internal performa tinggi yang efisien menggunakan objek global `Bun.serve` untuk menangani routing dan request/response.
+* **Dukungan Fetch API Dasar**: Global class `Request`, `Response`, dan `Headers` yang kompatibel dengan Fetch API untuk mempermudah manipulasi HTTP request dan response.
+* **REPL & Event-loop Integrasi**: REPL interaktif yang sepenuhnya asinkron berbasis event-loop sehingga server HTTP atau promise dapat berjalan di background saat REPL sedang menunggu input pengguna.
+
 ## [v0.3.0] - 2026-06-19
 ### ⚡ Fitur Baru
 * **REPL Interaktif (Interactive Shell)**: Menjalankan runtime `kilat` tanpa argumen atau `kilat repl` akan meluncurkan interpreter interaktif JavaScript di terminal.

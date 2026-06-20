@@ -10,8 +10,10 @@ import (
 )
 
 type Runtime struct {
-	vm    *goja.Runtime
-	cache map[string]*moduleRecord
+	vm        *goja.Runtime
+	cache     map[string]*moduleRecord
+	jobs      chan func()
+	hasServer bool
 }
 
 type moduleRecord struct {
@@ -21,16 +23,113 @@ type moduleRecord struct {
 func New(opts Options) *Runtime {
 	vm := goja.New()
 	
-	// Register built-in standard modules
+	r := &Runtime{
+		vm:    vm,
+		cache: make(map[string]*moduleRecord),
+		jobs:  make(chan func(), 1024),
+	}
+
 	modules.RegisterConsole(vm)
 	modules.RegisterFS(vm)
 	modules.RegisterNet(vm)
 	modules.RegisterOS(vm)
+	modules.RegisterBun(vm, func(job func()) {
+		r.jobs <- job
+	}, func(hasServer bool) {
+		r.hasServer = hasServer
+	})
+	bootstrapJS := `
+		class Headers {
+			constructor(init) {
+				this._headers = {};
+				if (init) {
+					if (init instanceof Headers) {
+						this._headers = { ...init._headers };
+					} else if (typeof init === 'object') {
+						for (const [key, val] of Object.entries(init)) {
+							this._headers[key.toLowerCase()] = String(val);
+						}
+					}
+				}
+			}
+			get(name) {
+				return this._headers[name.toLowerCase()] || null;
+			}
+			set(name, value) {
+				this._headers[name.toLowerCase()] = String(value);
+			}
+			forEach(callback) {
+				for (const [key, val] of Object.entries(this._headers)) {
+					callback(val, key);
+				}
+			}
+		}
 
-	return &Runtime{
-		vm:    vm,
-		cache: make(map[string]*moduleRecord),
+		class Request {
+			constructor(url, options = {}) {
+				this.url = url;
+				this.method = options.method || 'GET';
+				this.headers = new Headers(options.headers);
+				this._body = options.body || '';
+			}
+			async text() {
+				return this._body;
+			}
+			async json() {
+				return JSON.parse(this._body);
+			}
+		}
+
+		class Response {
+			constructor(body, options = {}) {
+				this._body = body === null || body === undefined ? '' : String(body);
+				this.status = options.status || 200;
+				this.headers = new Headers(options.headers);
+			}
+			async text() {
+				return this._body;
+			}
+			async json() {
+				return JSON.parse(this._body);
+			}
+		}
+
+		globalThis.Headers = Headers;
+		globalThis.Request = Request;
+		globalThis.Response = Response;
+
+		globalThis.__handleRequest = function(fetchFn, request, callback) {
+			try {
+				const result = fetchFn(request);
+				if (result && typeof result.then === 'function') {
+					result.then(
+						res => {
+							let finalRes = res;
+							if (!(res instanceof Response)) {
+								finalRes = new Response(res);
+							}
+							callback(null, finalRes);
+						},
+						err => callback(err, null)
+					);
+				} else {
+					let finalRes = result;
+					if (!(result instanceof Response)) {
+						finalRes = new Response(result);
+					}
+					callback(null, finalRes);
+				}
+			} catch (err) {
+				callback(err, null);
+			}
+		};
+	`
+	_, err := vm.RunString(bootstrapJS)
+	if err != nil {
+		panic(fmt.Sprintf("failed to run bootstrap JS: %v", err))
 	}
+
+	return r
 }
 
 func (r *Runtime) RunFile(path string) error {
@@ -39,7 +138,11 @@ func (r *Runtime) RunFile(path string) error {
 		return err
 	}
 	_, err = r.loadModule(absPath)
-	return err
+	if err != nil {
+		return err
+	}
+	r.RunEventLoop()
+	return nil
 }
 
 func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
@@ -83,7 +186,7 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		moduleName := call.Arguments[0].String()
 		
 		// Handle core built-in modules
-		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" {
+		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" {
 			return r.vm.Get(moduleName)
 		}
 		
@@ -189,7 +292,7 @@ func (r *Runtime) SetGlobalRequire(currentDir string) {
 		}
 		moduleName := call.Arguments[0].String()
 		
-		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" {
+		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" {
 			return r.vm.Get(moduleName)
 		}
 		
@@ -204,4 +307,33 @@ func (r *Runtime) SetGlobalRequire(currentDir string) {
 		return val
 	}
 	r.vm.Set("require", requireFunc)
+}
+
+func (r *Runtime) QueueJob(job func()) {
+	r.jobs <- job
+}
+
+func (r *Runtime) SetHasServer(val bool) {
+	r.hasServer = val
+}
+
+func (r *Runtime) RunEventLoop() {
+	for {
+		select {
+		case job, ok := <-r.jobs:
+			if !ok {
+				return
+			}
+			job()
+		default:
+			if !r.hasServer {
+				return
+			}
+			job, ok := <-r.jobs
+			if !ok {
+				return
+			}
+			job()
+		}
+	}
 }
