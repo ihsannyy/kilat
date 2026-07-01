@@ -289,7 +289,7 @@ export default function App() {
                 <pre>
                   <code>
                     <span className="sh-prompt">$</span>kilat --version{"\n"}
-                    <span className="sh-out">Kilat v0.4.0</span>
+                    <span className="sh-out">Kilat v2.0.0</span>
                   </code>
                 </pre>
               </div>
@@ -752,48 +752,48 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="timeline-item active">
+              <div className="timeline-item done">
                 <div className="timeline-dot"></div>
                 <div className="timeline-card">
                   <div className="timeline-meta">
                     <span className="timeline-ver">v0.5.0</span>
-                    <span className="timeline-status active">Pengerjaan</span>
+                    <span className="timeline-status done">Selesai</span>
                   </div>
                   <h4 className="timeline-title">Dukungan TypeScript Instan</h4>
                   <p className="timeline-desc">Kompilasi dan eksekusi TypeScript langsung secara runtime menggunakan integrasi parser loader esbuild.</p>
                 </div>
               </div>
 
-              <div className="timeline-item">
+              <div className="timeline-item done">
                 <div className="timeline-dot"></div>
                 <div className="timeline-card">
                   <div className="timeline-meta">
                     <span className="timeline-ver">v1.0.0</span>
-                    <span className="timeline-status planned">Rencana</span>
+                    <span className="timeline-status done">Selesai</span>
                   </div>
                   <h4 className="timeline-title">Rilis Stabil Utama</h4>
                   <p className="timeline-desc">Rilis versi stabil utama (production ready) dengan performa andal untuk eksekusi skrip harian.</p>
                 </div>
               </div>
 
-              <div className="timeline-item">
+              <div className="timeline-item done">
                 <div className="timeline-dot"></div>
                 <div className="timeline-card">
                   <div className="timeline-meta">
                     <span className="timeline-ver">v1.5.0</span>
-                    <span className="timeline-status planned">Rencana</span>
+                    <span className="timeline-status done">Selesai</span>
                   </div>
                   <h4 className="timeline-title">Dukungan ES Modules</h4>
                   <p className="timeline-desc">Dukungan parser modern untuk sintaks ES Modules (<code>import</code> / <code>export</code>).</p>
                 </div>
               </div>
 
-              <div className="timeline-item">
+              <div className="timeline-item done">
                 <div className="timeline-dot"></div>
                 <div className="timeline-card">
                   <div className="timeline-meta">
                     <span className="timeline-ver">v2.0.0</span>
-                    <span className="timeline-status planned">Rencana</span>
+                    <span className="timeline-status done">Selesai</span>
                   </div>
                   <h4 className="timeline-title">Optimalisasi Performa Ekstrem</h4>
                   <p className="timeline-desc">Refactoring total arsitektur runtime Kilat untuk performa eksekusi dan efisiensi memori yang ekstrem.</p>
@@ -812,9 +812,27 @@ export default function App() {
             <div className="changelog-list">
               <div className="changelog-version">
                 <div className="changelog-header">
+                  <h2 className="changelog-ver-title">v2.0.0</h2>
+                  <span className="changelog-date">1 Juli 2026</span>
+                  <span className="changelog-badge latest">Terbaru</span>
+                </div>
+                <div className="changelog-content">
+                  <p>Rilis versi final major ini memperkenalkan dukungan penuh untuk <strong>TypeScript Instan</strong> dan <strong>ES Modules (ESM)</strong> yang terintegrasi secara transparan via esbuild di memori. Ini adalah rilis stabil produksi utama dengan optimalisasi performa ekstrem.</p>
+                  
+                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
+                  <ul>
+                    <li><strong>Dukungan TypeScript Instan (<code>v0.5.0</code>)</strong>: Eksekusi berkas <code>.ts</code>, <code>.tsx</code>, dan <code>.jsx</code> secara langsung menggunakan compiler esbuild berkinerja tinggi.</li>
+                    <li><strong>Parser ES Modules (<code>v1.5.0</code>)</strong>: Dukungan sintaks modern ES Modules (<code>import</code> / <code>export</code>) secara transparan.</li>
+                    <li><strong>Rilis Stabil Utama &amp; Refactoring Performa (<code>v1.0.0</code> / <code>v2.0.0</code>)</strong>: Refactoring total pipeline pemuatan modul di memori untuk startup instan dan performa memori ekstrem.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="changelog-version">
+                <div className="changelog-header">
                   <h2 className="changelog-ver-title">v0.4.0</h2>
                   <span className="changelog-date">20 Juni 2026</span>
-                  <span className="changelog-badge latest">Terbaru</span>
+                  <span className="changelog-badge">Lama</span>
                 </div>
                 <div className="changelog-content">
                   <p>Rilis versi ini memperkenalkan <strong>HTTP Server Bawaan</strong> (mirip dengan Bun.serve). Pengguna kini dapat membuat HTTP server asinkron performa tinggi dan menggunakan Fetch API standar (Headers, Request, Response) langsung dari runtime Kilat.</p>
@@ -964,7 +982,7 @@ export default function App() {
       <nav className="navbar">
         <div className="nav-container">
           <a href="#index" className="logo">
-            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v0.4.0</span>
+            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v2.0.0</span>
           </a>
 
           {/* Desktop nav links */}

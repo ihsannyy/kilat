@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"github.com/dop251/goja"
+	"github.com/evanw/esbuild/pkg/api"
 	"kilat/internal/modules"
 )
 
@@ -171,13 +173,40 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		return jsonVal, nil
 	}
 
-	// Read JavaScript code
 	codeBytes, err := ioutil.ReadFile(absolutePath)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create module-specific require function
+	ext := filepath.Ext(absolutePath)
+	var loader api.Loader
+	switch ext {
+	case ".ts":
+		loader = api.LoaderTS
+	case ".tsx":
+		loader = api.LoaderTSX
+	case ".jsx":
+		loader = api.LoaderJSX
+	default:
+		loader = api.LoaderJS
+	}
+
+	res := api.Transform(string(codeBytes), api.TransformOptions{
+		Loader: loader,
+		Format: api.FormatCommonJS,
+		Target: api.ES2015,
+	})
+
+	if len(res.Errors) > 0 {
+		var errMsg strings.Builder
+		for _, msg := range res.Errors {
+			errMsg.WriteString(fmt.Sprintf("%s:%d:%d: error: %s\n", msg.Location.File, msg.Location.Line, msg.Location.Column, msg.Text))
+		}
+		return nil, fmt.Errorf("compile error: %s", errMsg.String())
+	}
+
+	codeString := string(res.Code)
+
 	currentDir := filepath.Dir(absolutePath)
 	requireFunc := func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
@@ -185,7 +214,6 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		}
 		moduleName := call.Arguments[0].String()
 		
-		// Handle core built-in modules
 		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" {
 			return r.vm.Get(moduleName)
 		}
@@ -201,8 +229,7 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		return val
 	}
 
-	// Wrap code in CJS function scope wrapper
-	wrappedCode := "(function(exports, require, module, __filename, __dirname) {\n" + string(codeBytes) + "\n})"
+	wrappedCode := "(function(exports, require, module, __filename, __dirname) {\n" + codeString + "\n})"
 	
 	prg, err := goja.Compile(absolutePath, wrappedCode, false)
 	if err != nil {
@@ -264,12 +291,15 @@ func resolvePath(currentDir, moduleName string) (string, error) {
 		return "", fmt.Errorf("module '%s' tidak ditemukan", moduleName)
 	}
 
-	// Check relative file variations (.js, .json, index.js inside folders)
 	possiblePaths := []string{
 		targetPath,
 		targetPath + ".js",
 		targetPath + ".json",
+		targetPath + ".ts",
+		targetPath + ".tsx",
+		targetPath + ".jsx",
 		filepath.Join(targetPath, "index.js"),
+		filepath.Join(targetPath, "index.ts"),
 	}
 
 	for _, p := range possiblePaths {

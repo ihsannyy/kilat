@@ -90,7 +90,7 @@ func executeFile(filePath string) {
 
 func runAndWatch(filePath string) {
 	cyan := color.New(color.FgCyan, color.Bold)
-	cyan.Println("👀 Watch mode aktif. Menunggu perubahan file (.js / .json)...")
+	cyan.Println("👀 Watch mode aktif. Menunggu perubahan file (.js / .ts / .jsx / .tsx / .json)...")
 	executeFile(filePath)
 
 	lastModTime := getMaxModTime()
@@ -119,7 +119,7 @@ func getMaxModTime() time.Time {
 			return nil
 		}
 		ext := filepath.Ext(path)
-		if ext == ".js" || ext == ".json" {
+		if ext == ".js" || ext == ".ts" || ext == ".jsx" || ext == ".tsx" || ext == ".json" {
 			if info.ModTime().After(maxTime) {
 				maxTime = info.ModTime()
 			}

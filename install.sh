@@ -5,7 +5,7 @@ set -e
 
 REPO="IHx-cmyk/kilat"
 BINARY="kilat"
-VERSION="v0.4.0"
+VERSION="v2.0.0"
 
 # Warna
 RED='\033[0;31m'

@@ -4,6 +4,12 @@ Semua pembaruan penting untuk proyek **Kilat** akan didokumentasikan di berkas i
 
 ---
 
+## [v2.0.0] - 2026-07-01
+### ⚡ Fitur Baru
+* **Dukungan TypeScript Instan (v0.5.0)**: Eksekusi berkas TypeScript (`.ts`, `.tsx`, `.jsx`) secara langsung dan transparan menggunakan integrasi compiler esbuild berkinerja tinggi.
+* **Dukungan ES Modules (v1.5.0)**: Parser modul ESM (`import` / `export`) yang ditranspilasi secara otomatis ke CommonJS saat runtime.
+* **Optimalisasi Ekstrem & Stabil (v1.0.0 / v2.0.0)**: Refactoring total pipeline pemuatan modul dengan integrasi transpile esbuild di memori untuk startup super cepat.
+
 ## [v0.4.0] - 2026-06-20
 ### ⚡ Fitur Baru
 * **Built-in HTTP Server (`Bun.serve`-like API)**: Server HTTP internal performa tinggi yang efisien menggunakan objek global `Bun.serve` untuk menangani routing dan request/response.
