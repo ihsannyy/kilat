@@ -151,59 +151,127 @@ export default function App() {
       ctx.rect(w * 0.8, h - 180, w * 0.15, 180)
       ctx.fill()
 
-      const houseW = 180
-      const houseH = 110
-      const houseX = w - houseW - 60
-      const houseY = h - houseH - 220
-
       ctx.fillStyle = '#020108'
       ctx.beginPath()
-      ctx.arc(w - 150, h - 10, 220, 0, 2 * Math.PI)
+      ctx.arc(w - 320, h + 30, 240, 0, 2 * Math.PI)
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.arc(w - 140, h - 10, 220, 0, 2 * Math.PI)
       ctx.fill()
 
       ctx.beginPath()
       ctx.rect(0, h - 60, w, 60)
       ctx.fill()
 
+      const h1W = 150
+      const h1H = 95
+      const h1X = w - h1W - 50
+      const h1Y = h - h1H - 220
+
       ctx.fillStyle = '#060416'
-      ctx.fillRect(houseX, houseY, houseW, houseH)
+      ctx.fillRect(h1X, h1Y, h1W, h1H)
 
       ctx.fillStyle = '#03020a'
       ctx.beginPath()
-      ctx.moveTo(houseX - 15, houseY)
-      ctx.lineTo(houseX + houseW / 2, houseY - 45)
-      ctx.lineTo(houseX + houseW + 15, houseY)
+      ctx.moveTo(h1X - 12, h1Y)
+      ctx.lineTo(h1X + h1W / 2, h1Y - 40)
+      ctx.lineTo(h1X + h1W + 12, h1Y)
       ctx.closePath()
       ctx.fill()
 
-      ctx.fillRect(houseX + 24, houseY - 40, 18, 30)
+      ctx.fillRect(h1X + 20, h1Y - 35, 15, 25)
 
       ctx.fillStyle = '#020108'
-      ctx.fillRect(houseX + houseW / 2 - 16, houseY + houseH - 50, 32, 50)
+      ctx.fillRect(h1X + h1W / 2 - 14, h1Y + h1H - 45, 28, 45)
 
       ctx.fillStyle = 'rgba(251, 191, 36, 0.95)'
       ctx.shadowColor = '#ffea79'
       ctx.shadowBlur = 32
-      ctx.fillRect(houseX + 28, houseY + 28, 26, 26)
-      ctx.fillRect(houseX + houseW - 54, houseY + 28, 26, 26)
+      ctx.fillRect(h1X + 22, h1Y + 22, 22, 22)
+      ctx.fillRect(h1X + h1W - 44, h1Y + 22, 22, 22)
       ctx.shadowBlur = 0
 
       ctx.strokeStyle = '#060416'
-      ctx.lineWidth = 2
-      ctx.strokeRect(houseX + 28, houseY + 28, 26, 26)
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(h1X + 22, h1Y + 22, 22, 22)
       ctx.beginPath()
-      ctx.moveTo(houseX + 41, houseY + 28)
-      ctx.lineTo(houseX + 41, houseY + 54)
-      ctx.moveTo(houseX + 28, houseY + 41)
-      ctx.lineTo(houseX + 54, houseY + 41)
+      ctx.moveTo(h1X + 33, h1Y + 22)
+      ctx.lineTo(h1X + 33, h1Y + 44)
+      ctx.moveTo(h1X + 22, h1Y + 33)
+      ctx.lineTo(h1X + 44, h1Y + 33)
       ctx.stroke()
 
-      ctx.strokeRect(houseX + houseW - 54, houseY + 28, 26, 26)
+      ctx.strokeRect(h1X + h1W - 44, h1Y + 22, 22, 22)
       ctx.beginPath()
-      ctx.moveTo(houseX + houseW - 41, houseY + 28)
-      ctx.lineTo(houseX + houseW - 41, houseY + 54)
-      ctx.moveTo(houseX + houseW - 54, houseY + 41)
-      ctx.lineTo(houseX + houseW - 28, houseY + 41)
+      ctx.moveTo(h1X + h1W - 33, h1Y + 22)
+      ctx.lineTo(h1X + h1W - 33, h1Y + 44)
+      ctx.moveTo(h1X + h1W - 44, h1Y + 33)
+      ctx.lineTo(h1X + h1W - 22, h1Y + 33)
+      ctx.stroke()
+
+      const h2W = 110
+      const h2H = 75
+      const h2X = w - h2W - 190
+      const h2Y = h - h2H - 170
+
+      ctx.fillStyle = '#050313'
+      ctx.fillRect(h2X, h2Y, h2W, h2H)
+
+      ctx.fillStyle = '#020108'
+      ctx.beginPath()
+      ctx.moveTo(h2X - 10, h2Y)
+      ctx.lineTo(h2X + h2W / 2, h2Y - 30)
+      ctx.lineTo(h2X + h2W + 10, h2Y)
+      ctx.closePath()
+      ctx.fill()
+
+      ctx.fillRect(h2X + h2W / 2 - 12, h2Y + h2H - 35, 24, 35)
+
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.95)'
+      ctx.shadowColor = '#ffea79'
+      ctx.shadowBlur = 32
+      ctx.fillRect(h2X + 18, h2Y + 18, 18, 18)
+      ctx.shadowBlur = 0
+
+      ctx.strokeStyle = '#050313'
+      ctx.strokeRect(h2X + 18, h2Y + 18, 18, 18)
+      ctx.beginPath()
+      ctx.moveTo(h2X + 27, h2Y + 18)
+      ctx.lineTo(h2X + 27, h2Y + 36)
+      ctx.moveTo(h2X + 18, h2Y + 27)
+      ctx.lineTo(h2X + 36, h2Y + 27)
+      ctx.stroke()
+
+      const h3W = 85
+      const h3H = 60
+      const h3X = w - h3W - 290
+      const h3Y = h - h3H - 110
+
+      ctx.fillStyle = '#040310'
+      ctx.fillRect(h3X, h3Y, h3W, h3H)
+
+      ctx.fillStyle = '#020108'
+      ctx.beginPath()
+      ctx.moveTo(h3X - 8, h3Y)
+      ctx.lineTo(h3X + h3W / 2, h3Y - 24)
+      ctx.lineTo(h3X + h3W + 8, h3Y)
+      ctx.closePath()
+      ctx.fill()
+
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.95)'
+      ctx.shadowColor = '#ffea79'
+      ctx.shadowBlur = 32
+      ctx.fillRect(h3X + h3W - 32, h3Y + 16, 16, 16)
+      ctx.shadowBlur = 0
+
+      ctx.strokeStyle = '#040310'
+      ctx.strokeRect(h3X + h3W - 32, h3Y + 16, 16, 16)
+      ctx.beginPath()
+      ctx.moveTo(h3X + h3W - 24, h3Y + 16)
+      ctx.lineTo(h3X + h3W - 24, h3Y + 32)
+      ctx.moveTo(h3X + h3W - 32, h3Y + 24)
+      ctx.lineTo(h3X + h3W - 16, h3Y + 24)
       ctx.stroke()
     }
 
