@@ -1,40 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
-interface Benchmark {
-  label: string
-  metric: string
-  kilatSegments: number
-  nodeSegments: number
-  higherIsBetter: boolean
+interface PageItem {
+  key: string
+  title: string
+  icon: string
 }
 
-const benchmarks: Benchmark[] = [
-  {
-    label: 'React SSR (Requests / sec)',
-    metric: 'req/sec',
-    kilatSegments: 9,
-    nodeSegments: 2,
-    higherIsBetter: true
-  },
-  {
-    label: 'File Reading Startup (ms)',
-    metric: 'ms',
-    kilatSegments: 1,
-    nodeSegments: 7,
-    higherIsBetter: false
-  },
-  {
-    label: 'Package Install Speed (s)',
-    metric: 'sec',
-    kilatSegments: 2,
-    nodeSegments: 8,
-    higherIsBetter: false
-  }
+const pages: PageItem[] = [
+  { key: 'home', title: 'Dashboard', icon: '⚡' },
+  { key: 'install', title: 'Instalasi', icon: '📥' },
+  { key: 'api', title: 'API Referensi', icon: '🔌' },
+  { key: 'changelog', title: 'Changelog', icon: '📜' }
 ]
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home')
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
+  const [timeMode, setTimeMode] = useState<string>('MALAM')
+  const [clockText, setClockText] = useState<string>('')
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text.trim())
@@ -44,286 +28,338 @@ export default function App() {
     }, 2000)
   }
 
-  return (
-    <div className="hardware-station">
-      <div className="ambient-glow purple-glow"></div>
-      <div className="ambient-glow cyan-glow"></div>
-      <div className="crt-scanlines"></div>
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      const hrs = now.getHours()
+      const mins = String(now.getMinutes()).padStart(2, '0')
+      setClockText(`${String(hrs).padStart(2, '0')}:${mins}`)
 
-      <header className="station-header">
-        <div className="header-brand">
-          <div className="status-led green pulse"></div>
-          <span className="station-logo">KILAT</span>
-          <span className="station-ver">v3.0.0</span>
+      if (hrs >= 5 && hrs < 11) {
+        setTimeMode('PAGI')
+      } else if (hrs >= 11 && hrs < 15) {
+        setTimeMode('SIANG')
+      } else if (hrs >= 15 && hrs < 18) {
+        setTimeMode('SORE')
+      } else {
+        setTimeMode('MALAM')
+      }
+    }
+    
+    updateTime()
+    const timeTimer = setInterval(updateTime, 10000)
+    return () => clearInterval(timeTimer)
+  }, [])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let animId: number
+    let w = (canvas.width = window.innerWidth)
+    let h = (canvas.height = window.innerHeight)
+
+    const handleResize = () => {
+      w = canvas.width = window.innerWidth
+      h = canvas.height = window.innerHeight
+    }
+    window.addEventListener('resize', handleResize)
+
+    const maxDrops = 100
+    const rain: Array<{ x: number; y: number; speed: number; len: number }> = []
+    for (let i = 0; i < maxDrops; i++) {
+      rain.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        speed: 12 + Math.random() * 8,
+        len: 12 + Math.random() * 12
+      })
+    }
+
+    let flash = 0
+    let bolt: Array<{ x1: number; y1: number; x2: number; y2: number }> = []
+
+    const buildLightning = () => {
+      const segs = []
+      let cx = Math.random() * w
+      let cy = 0
+      for (let i = 0; i < 18; i++) {
+        const ny = cy + (h / 18) + Math.random() * 15
+        const nx = cx + (Math.random() - 0.5) * 35
+        segs.push({ x1: cx, y1: cy, x2: nx, y2: ny })
+        cx = nx
+        cy = ny
+        if (ny >= h) break
+      }
+      bolt = segs
+      flash = 0.55
+    }
+
+    const render = () => {
+      ctx.clearRect(0, 0, w, h)
+
+      const grad = ctx.createLinearGradient(0, 0, 0, h)
+      if (timeMode === 'PAGI') {
+        grad.addColorStop(0, '#0f0e21')
+        grad.addColorStop(1, '#ae5231')
+      } else if (timeMode === 'SIANG') {
+        grad.addColorStop(0, '#191b26')
+        grad.addColorStop(1, '#4e5669')
+      } else if (timeMode === 'SORE') {
+        grad.addColorStop(0, '#1b1429')
+        grad.addColorStop(1, '#612551')
+      } else {
+        grad.addColorStop(0, '#020108')
+        grad.addColorStop(1, '#0a0621')
+      }
+      ctx.fillStyle = grad
+      ctx.fillRect(0, 0, w, h)
+
+      if (flash > 0) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${flash})`
+        ctx.fillRect(0, 0, w, h)
+
+        ctx.strokeStyle = `rgba(255, 255, 255, ${flash + 0.4})`
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        bolt.forEach(s => {
+          ctx.moveTo(s.x1, s.y1)
+          ctx.lineTo(s.x2, s.y2)
+        })
+        ctx.stroke()
+
+        flash -= 0.04
+      }
+
+      if (Math.random() < 0.006 && flash <= 0) {
+        buildLightning()
+      }
+
+      ctx.strokeStyle = 'rgba(174, 194, 224, 0.28)'
+      ctx.lineWidth = 1
+      for (let i = 0; i < maxDrops; i++) {
+        const d = rain[i]
+        ctx.beginPath()
+        ctx.moveTo(d.x, d.y)
+        ctx.lineTo(d.x - 1, d.y + d.len)
+        ctx.stroke()
+
+        d.y += d.speed
+        d.x -= 0.5
+        if (d.y > h) {
+          d.y = -d.len
+          d.x = Math.random() * w
+        }
+      }
+
+      animId = requestAnimationFrame(render)
+    }
+
+    render()
+
+    return () => {
+      cancelAnimationFrame(animId)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [timeMode])
+
+  return (
+    <div className="weather-runtime-portal">
+      <canvas ref={canvasRef} className="storm-backdrop" />
+
+      <header className="glass-navbar">
+        <div className="navbar-inner">
+          <div className="brand">
+            <span className="spark">⚡</span>
+            <span className="name">kilat</span>
+            <span className="badge">v3.0.0</span>
+          </div>
+          <div className="environment-clock">
+            <span className="clock-icon">🌦️</span>
+            <span className="time-lbl">MODE: {timeMode}</span>
+            <span className="time-val">[{clockText}]</span>
+          </div>
         </div>
-        <nav className="station-nav-tabs">
-          <button className={`station-tab-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>Home Console</button>
-          <button className={`station-tab-btn ${activeTab === 'api' ? 'active' : ''}`} onClick={() => setActiveTab('api')}>API Deck</button>
-          <button className={`station-tab-btn ${activeTab === 'changelog' ? 'active' : ''}`} onClick={() => setActiveTab('changelog')}>Changelog Tape</button>
-        </nav>
-        <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="header-github">GitHub</a>
       </header>
 
-      <main className="station-body">
-        {activeTab === 'home' && (
-          <div className="home-view animate-fade">
-            <section className="hero-section">
-              <h1 className="hero-title">Kilat is a fast, all-in-one JS & TS runtime</h1>
-              <p className="hero-subtitle">
-                Dirancang khusus untuk mengoptimalkan Termux Android dan Linux. Kilat meniadakan folder <code>node_modules</code> lokal, mendukung TypeScript bawaan, dan memulai program secara instan dalam 2ms.
-              </p>
-              
-              <div className="skeuo-install-box">
-                <div className="install-header">
-                  <div className="bezel-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                  <span className="install-title">INSTALLATION CHANNEL</span>
-                </div>
-                <div className="install-body">
-                  <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
-                  <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}>
-                    {copiedMap['hero-inst'] ? 'COPIED' : 'COPY'}
-                  </button>
-                </div>
-              </div>
-            </section>
+      <main className="main-portal-content">
+        <nav className="glass-tabs">
+          {pages.map(p => (
+            <button key={p.key} className={`tab-link ${activeTab === p.key ? 'active' : ''}`} onClick={() => setActiveTab(p.key)}>
+              <span className="tab-icon">{p.icon}</span>
+              <span className="tab-text">{p.title}</span>
+            </button>
+          ))}
+          <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="tab-link link-github">
+            <span className="tab-icon">🐙</span>
+            <span className="tab-text">GitHub</span>
+          </a>
+        </nav>
 
-            <section className="benchmark-section">
-              <div className="section-titlebar">
-                <h2>HARDWARE SPEED VU METERS</h2>
-                <p>Pengukuran beban komparatif Kilat terhadap Node.js. Menampilkan performa level LED fisik.</p>
-              </div>
+        <div className="portal-page-pane">
+          {activeTab === 'home' && (
+            <div className="pane-view animate-in">
+              <section className="portal-hero">
+                <h1 className="hero-heading">Supercharge JavaScript & TypeScript on Termux</h1>
+                <p className="hero-lead">
+                  Kilat adalah runtime minimalis bertenaga Go untuk eksekusi script kilat di perangkat seluler. Tanpa beban direktori <code>node_modules</code>, memuat instan, dan siap pakai.
+                </p>
 
-              <div className="vu-meters-container">
-                {benchmarks.map((bench, idx) => (
-                  <div key={idx} className="vu-card">
-                    <h3 className="vu-label">{bench.label}</h3>
-                    
-                    <div className="vu-row">
-                      <div className="vu-device-name">KILAT</div>
-                      <div className="led-bar">
-                        {Array.from({ length: 10 }).map((_, i) => {
-                          const isLit = i < bench.kilatSegments
-                          let colorClass = 'green'
-                          if (i >= 7) colorClass = 'red'
-                          else if (i >= 5) colorClass = 'yellow'
-                          return <span key={i} className={`led-seg ${colorClass} ${isLit ? 'on' : ''}`}></span>
-                        })}
-                      </div>
-                      <div className="vu-value text-cyan">{bench.higherIsBetter && bench.kilatSegments === 9 ? 'FAST' : 'EFFICIENT'}</div>
+                <div className="terminal-install-box">
+                  <div className="box-hdr">
+                    <div className="leds">
+                      <span className="led red"></span>
+                      <span className="led yellow"></span>
+                      <span className="led green"></span>
                     </div>
-
-                    <div className="vu-row">
-                      <div className="vu-device-name">NODE.JS</div>
-                      <div className="led-bar">
-                        {Array.from({ length: 10 }).map((_, i) => {
-                          const isLit = i < bench.nodeSegments
-                          let colorClass = 'green'
-                          if (i >= 7) colorClass = 'red'
-                          else if (i >= 5) colorClass = 'yellow'
-                          return <span key={i} className={`led-seg ${colorClass} ${isLit ? 'on' : ''}`}></span>
-                        })}
-                      </div>
-                      <div className="vu-value text-red">{!bench.higherIsBetter && bench.nodeSegments === 8 ? 'SLOW' : 'LAGGING'}</div>
-                    </div>
+                    <span className="box-title">installer channel</span>
                   </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="features-rack">
-              <div className="section-titlebar">
-                <h2>RACK-MOUNTED RUNTIME MODULES</h2>
-                <p>Bagian-bagian kemampuan bawaan runtime Kilat yang tersusun dalam modul rak perangkat keras.</p>
-              </div>
-
-              <div className="rack-modules-list">
-                <div className="rack-module">
-                  <div className="rack-faceplate">
-                    <div className="rack-handle"></div>
-                    <div className="rack-info">
-                      <h3>01. PACKAGE MANAGER (<code>kilat add</code>)</h3>
-                      <p>Mengunduh module langsung dari npm registry ke dalam cache global terpusat di <code>~/.kilat/packages/</code>. Folder proyek Anda tidak akan memakan memori penyimpanan internal Termux.</p>
-                    </div>
-                    <div className="rack-handle"></div>
-                  </div>
-                  <div className="rack-display">
-                    <pre><code><span className="sh-prompt">$</span>kilat add chalk{"\n"}<span className="sh-out">📦 Fetching chalk from npm...{"\n"}✔ Installed chalk (global cache)</span></code></pre>
+                  <div className="box-body">
+                    <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}>
+                      {copiedMap['hero-inst'] ? 'COPIED' : 'COPY'}
+                    </button>
                   </div>
                 </div>
+              </section>
 
-                <div className="rack-module">
-                  <div className="rack-faceplate">
-                    <div className="rack-handle"></div>
-                    <div className="rack-info">
-                      <h3>02. TYPESCRIPT COMPILER (esbuild)</h3>
-                      <p>Mendukung eksekusi file <code>.ts</code>, <code>.tsx</code>, dan <code>.jsx</code> secara langsung. Compiler esbuild internal melakukan transpiling langsung di memori saat runtime dipanggil.</p>
-                    </div>
-                    <div className="rack-handle"></div>
-                  </div>
-                  <div className="rack-display">
-                    <pre><code><span className="sh-comment">// run directly: kilat run hello.ts</span>{"\n"}<span className="sh-keyword">const</span> x: <span className="sh-keyword">string</span> = <span className="sh-string">'Kilat TS'</span>;{"\n"}<span className="sh-func">console.log</span>(x);</code></pre>
-                  </div>
+              <section className="features-glass-grid">
+                <div className="glass-card">
+                  <div className="card-badge">ENGINE</div>
+                  <h3>Ringan & Kencang</h3>
+                  <p>Inisialisasi engine Goja yang sangat cepat (~2ms), membebaskan RAM Termux dari overhead V8 Node.js.</p>
                 </div>
 
-                <div className="rack-module">
-                  <div className="rack-faceplate">
-                    <div className="rack-handle"></div>
-                    <div className="rack-info">
-                      <h3>03. SHELL RUNNER (<code>globalThis.$</code>)</h3>
-                      <p>Memanggil utilitas terminal Linux/Termux asli secara asinkron dari JavaScript. Menggunakan interface Go goroutine di latar belakang untuk mendapatkan hasil command stdout/stderr.</p>
-                    </div>
-                    <div className="rack-handle"></div>
-                  </div>
-                  <div className="rack-display">
-                    <pre><code><span className="sh-keyword">const</span> sys = <span className="sh-keyword">await</span> $`uname -a`;{"\n"}<span className="sh-func">console.log</span>(sys.stdout);</code></pre>
-                  </div>
+                <div className="glass-card">
+                  <div className="card-badge">COMPILER</div>
+                  <h3>TypeScript Bawaan</h3>
+                  <p>Dukungan instan untuk berkas <code>.ts</code>, <code>.tsx</code>, dan <code>.jsx</code> via esbuild memori tanpa transpiler eksternal.</p>
                 </div>
 
-                <div className="rack-module">
-                  <div className="rack-faceplate">
-                    <div className="rack-handle"></div>
-                    <div className="rack-info">
-                      <h3>04. HTTP SERVER (<code>Bun.serve</code>)</h3>
-                      <p>Inisialisasi HTTP server berkinerja tinggi. Didukung adapter asinkron Go net/http untuk throughput maksimal di perangkat mobile Android.</p>
-                    </div>
-                    <div className="rack-handle"></div>
-                  </div>
-                  <div className="rack-display">
-                    <pre><code>Bun.serve(&#123;{"\n"}  port: 3000,{"\n"}  fetch(req) &#123; return new Response('OK'); &#125;{"\n"}&#125;);</code></pre>
-                  </div>
+                <div className="glass-card">
+                  <div className="card-badge">CACHE</div>
+                  <h3>Bebas node_modules</h3>
+                  <p>Dependency dipetakan langsung ke cache global tunggal untuk menghemat penyimpanan disk internal HP.</p>
                 </div>
-              </div>
-            </section>
-          </div>
-        )}
-
-        {activeTab === 'api' && (
-          <div className="api-view animate-fade">
-            <div className="section-titlebar">
-              <h2>API OPERATIONS MANUAL</h2>
-              <p>Metode library bawaan runtime Kilat yang siap dieksekusi.</p>
+              </section>
             </div>
+          )}
 
-            <div className="hardware-panel-grid">
-              <div className="panel-slot">
-                <div className="slot-hdr">
-                  <span className="slot-id">API_01</span>
+          {activeTab === 'install' && (
+            <div className="pane-view animate-in">
+              <h2 className="pane-title">Instalasi Runtime</h2>
+              <p className="pane-subtitle">Panduan pemasangan biner statis Kilat di perangkat Anda.</p>
+
+              <div className="glass-panel">
+                <h3>1. Instalasi Skrip Otomatis</h3>
+                <p>Mendeteksi arsitektur CPU dan memasang biner secara otomatis:</p>
+                <div className="terminal-install-box">
+                  <div className="box-hdr">
+                    <div className="leds">
+                      <span className="led"></span>
+                    </div>
+                  </div>
+                  <div className="box-body">
+                    <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}>
+                      {copiedMap['inst-auto'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-panel">
+                <h3>2. Verifikasi Pemasangan</h3>
+                <p>Jalankan perintah ini untuk memastikan biner Kilat aktif:</p>
+                <div className="terminal-install-box">
+                  <div className="box-hdr">
+                    <div className="leds">
+                      <span className="led"></span>
+                    </div>
+                  </div>
+                  <div className="box-body">
+                    <code>kilat --version</code>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-verify', 'kilat --version')}>
+                      {copiedMap['inst-verify'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'api' && (
+            <div className="pane-view animate-in">
+              <h2 className="pane-title">API Referensi</h2>
+              <p className="pane-subtitle">Daftar global API dan core module built-in bawaan Kilat.</p>
+
+              <div className="api-panel-grid">
+                <div className="api-panel">
                   <h3>globalThis.$</h3>
+                  <p>Mengeksekusi perintah shell linux/termux secara asinkron.</p>
+                  <pre><code>const out = await $`uname -a`;</code></pre>
                 </div>
-                <p>Menjalankan biner Linux secara langsung dan asinkron.</p>
-                <pre><code>const out = await $`ls -la`;</code></pre>
-              </div>
 
-              <div className="panel-slot">
-                <div className="slot-id">API_02</div>
-                <div className="slot-hdr">
+                <div className="api-panel">
                   <h3>globalThis.fetch</h3>
+                  <p>Melakukan network request asinkron berbasis standard Promise.</p>
+                  <pre><code>const res = await fetch(url);</code></pre>
                 </div>
-                <p>HTTP request asinkron berbasis Promise untuk transfer data.</p>
-                <pre><code>const res = await fetch(url);</code></pre>
-              </div>
 
-              <div className="panel-slot">
-                <div className="slot-hdr">
-                  <span className="slot-id">API_03</span>
+                <div className="api-panel">
                   <h3>require('fs')</h3>
+                  <p>Menyediakan operasi filesystem sinkron (readFileSync, writeFileSync).</p>
+                  <pre><code>fs.writeFileSync('log.txt', 'OK');</code></pre>
                 </div>
-                <p>Operasi filesystem lokal (readFileSync, writeFileSync, readdirSync, existsSync).</p>
-                <pre><code>const content = fs.readFileSync('x.txt');</code></pre>
-              </div>
 
-              <div className="panel-slot">
-                <div className="slot-hdr">
-                  <span className="slot-id">API_04</span>
+                <div className="api-panel">
                   <h3>require('os')</h3>
+                  <p>Mengambil data parameter CLI dan variabel lingkungan (getenv).</p>
+                  <pre><code>const user = os.getenv('USER');</code></pre>
                 </div>
-                <p>Akses environment variable (getenv) dan argument CLI (args).</p>
-                <pre><code>const args = os.args();</code></pre>
-              </div>
-
-              <div className="panel-slot">
-                <div className="slot-hdr">
-                  <span className="slot-id">API_05</span>
-                  <h3>Bun.serve</h3>
-                </div>
-                <p>Menjalankan HTTP API server asinkron performa tinggi.</p>
-                <pre><code>Bun.serve(&#123; port: 3000, fetch: ... &#125;);</code></pre>
-              </div>
-
-              <div className="panel-slot">
-                <div className="slot-hdr">
-                  <span className="slot-id">API_06</span>
-                  <h3>console.log</h3>
-                </div>
-                <p>Mencetak output berwarna (green, red, yellow, blue).</p>
-                <pre><code>console.log('Done', 'green');</code></pre>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'changelog' && (
-          <div className="changelog-view animate-fade">
-            <div className="section-titlebar">
-              <h2>RELEASE CHANGELOG TAPE</h2>
-              <p>Gulungan catatan pembaruan versi biner statis Kilat.</p>
-            </div>
+          {activeTab === 'changelog' && (
+            <div className="pane-view animate-in">
+              <h2 className="pane-title">Release Changelog</h2>
+              <p className="pane-subtitle">Riwayat pembaruan biner statis Kilat.</p>
 
-            <div className="changelog-hardware-tape">
-              <div className="tape-block">
-                <div className="tape-block-hdr">
-                  <span className="ver-badge">v3.0.0</span>
-                  <span className="ver-date">11 Juli 2026</span>
-                  <span className="ver-status-led green"></span>
+              <div className="changelog-timeline">
+                <div className="timeline-segment">
+                  <div className="segment-hdr">
+                    <span className="ver">v3.0.0</span>
+                    <span className="date">11 Juli 2026</span>
+                    <span className="led green active"></span>
+                  </div>
+                  <p>Rilis major ini memperkenalkan **Global Shell Command Execution (<code>$</code>)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.</p>
                 </div>
-                <p>Memperkenalkan **Global Shell Command Execution (<code>$</code>)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.</p>
-              </div>
 
-              <div className="tape-block">
-                <div className="tape-block-hdr">
-                  <span className="ver-badge">v2.1.0</span>
-                  <span className="ver-date">11 Juli 2026</span>
-                  <span className="ver-status-led"></span>
+                <div className="timeline-segment">
+                  <div className="segment-hdr">
+                    <span className="ver">v2.1.0</span>
+                    <span className="date">11 Juli 2026</span>
+                  </div>
+                  <p>Rilis minor ini memperkenalkan **Global Fetch API (<code>fetch</code>)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.</p>
                 </div>
-                <p>Memperkenalkan **Global Fetch API (<code>fetch</code>)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.</p>
-              </div>
 
-              <div className="tape-block">
-                <div className="tape-block-hdr">
-                  <span className="ver-badge">v2.0.0</span>
-                  <span className="ver-date">1 Juli 2026</span>
-                  <span className="ver-status-led"></span>
+                <div className="timeline-segment">
+                  <div className="segment-hdr">
+                    <span className="ver">v2.0.0</span>
+                    <span className="date">1 Juli 2026</span>
+                  </div>
+                  <p>Integrasi compiler **esbuild** internal untuk mendukung pemuatan file **TypeScript (TS, TSX, JSX)** dan transpiler **ES Modules (ESM)** di memori secara otomatis.</p>
                 </div>
-                <p>Integrasi compiler **esbuild** internal untuk mendukung pemuatan file **TypeScript (TS, TSX, JSX)** dan transpiler **ES Modules (ESM)** di memori secara otomatis.</p>
-              </div>
-
-              <div className="tape-block">
-                <div className="tape-block-hdr">
-                  <span className="ver-badge">v0.4.0</span>
-                  <span className="ver-date">20 Juni 2026</span>
-                  <span className="ver-status-led"></span>
-                </div>
-                <p>Mendukung pembuatan HTTP Server asinkron internal dengan **Bun.serve()**, serta integrasi REPL yang mendukung eksekusi microtasks.</p>
-              </div>
-
-              <div className="tape-block">
-                <div className="tape-block-hdr">
-                  <span className="ver-badge">v0.1.0</span>
-                  <span className="ver-date">19 Juni 2026</span>
-                  <span className="ver-status-led"></span>
-                </div>
-                <p>Rilis biner perdana interpreter JavaScript Kilat berbasis Goja Engine dengan modul fundamental (fs, os, console) serta manajemen dependensi global terpusat.</p>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
 
-      <footer className="station-footer">
+      <footer className="portal-footer">
         <p>MIT License © 2026 Kilat. Dibuat seadanya untuk optimasi Termux Android.</p>
       </footer>
     </div>
