@@ -904,45 +904,27 @@ export default function App() {
   }
 
   return (
-    <div>
-      {/* Background Blobs */}
+    <div className="app-layout">
       <div className="glow-blob glow-left"></div>
       <div className="glow-blob glow-right"></div>
 
-      {/* Navigation Header */}
       <nav className="navbar">
         <div className="nav-container">
           <a href="#index" className="logo">
             <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v3.0.0</span>
           </a>
 
-          {/* Desktop nav links */}
-          <ul className="nav-links">
-            {pageOrder.map((page) => (
-              <li key={page.key}>
-                <a
-                  href={`#${page.key}`}
-                  className={`nav-link ${activePage === page.key ? 'active' : ''}`}
-                >
-                  {page.title}
-                </a>
-              </li>
-            ))}
-            <li>
-              <a
-                href="https://github.com/IHx-cmyk/kilat"
-                target="_blank"
-                rel="noreferrer"
-                className="btn-github"
-              >
-                GitHub
-              </a>
-            </li>
-          </ul>
+          <a
+            href="https://github.com/IHx-cmyk/kilat"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-github desktop-only"
+          >
+            GitHub
+          </a>
 
-          {/* Mobile hamburger menu */}
           <button
-            className="menu-btn"
+            className="menu-btn mobile-only"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -973,7 +955,6 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Mobile Drawer menu */}
       <div className={`mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
         {pageOrder.map((page) => (
           <a
@@ -995,44 +976,60 @@ export default function App() {
         </a>
       </div>
 
-      {/* Content wrapper */}
-      <div className="shell">
-        <main>
-          <div className="content-container">
-            {activePage !== 'index' && (
-              <div className="eyebrow">
-                <span className="eyebrow-prompt">$</span> cat docs/{activePage}.md
-              </div>
-            )}
-            
-            {/* Renders active React TSX Component */}
-            {renderPageContent()}
-
-            {/* Pagers */}
-            {activePage !== 'index' && (
-              <div className="doc-pager">
-                {prevPage && (
-                  <a href={`#${prevPage.key}`} className="pager-btn">
-                    <span className="pager-dir">← sebelumnya</span>
-                    <span className="pager-lbl">{prevPage.title}</span>
+      <div className="main-wrapper">
+        <aside className="sidebar desktop-only">
+          <div className="sidebar-sticky">
+            <h3 className="sidebar-heading">Dokumentasi</h3>
+            <ul className="sidebar-links">
+              {pageOrder.map((page) => (
+                <li key={page.key}>
+                  <a
+                    href={`#${page.key}`}
+                    className={`sidebar-link ${activePage === page.key ? 'active' : ''}`}
+                  >
+                    {page.title}
                   </a>
-                )}
-                {nextPage && (
-                  <a href={`#${nextPage.key}`} className="pager-btn next">
-                    <span className="pager-dir">selanjutnya →</span>
-                    <span className="pager-lbl">{nextPage.title}</span>
-                  </a>
-                )}
-              </div>
-            )}
-
-            {/* Footer */}
-            <footer className="footer">
-              <span>Dibuat seadanya. Modal sebatang rokok dan seglintir harapan user Termux</span>
-              <span>MIT License © 2026 Kilat.</span>
-            </footer>
+                </li>
+              ))}
+            </ul>
           </div>
-        </main>
+        </aside>
+
+        <div className="shell">
+          <main>
+            <div className="content-container">
+              {activePage !== 'index' && (
+                <div className="eyebrow">
+                  <span className="eyebrow-prompt">$</span> cat docs/{activePage}.md
+                </div>
+              )}
+              
+              {renderPageContent()}
+
+              {activePage !== 'index' && (
+                <div className="doc-pager">
+                  {prevPage && (
+                    <a href={`#${prevPage.key}`} className="pager-btn">
+                      <span className="pager-dir">← sebelumnya</span>
+                      <span className="pager-lbl">{prevPage.title}</span>
+                    </a>
+                  )}
+                  {nextPage && (
+                    <a href={`#${nextPage.key}`} className="pager-btn next">
+                      <span className="pager-dir">selanjutnya →</span>
+                      <span className="pager-lbl">{nextPage.title}</span>
+                    </a>
+                  )}
+                </div>
+              )}
+
+              <footer className="footer">
+                <span>Dibuat seadanya. Modal sebatang rokok dan seglintir harapan user Termux</span>
+                <span>MIT License © 2026 Kilat.</span>
+              </footer>
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   )
