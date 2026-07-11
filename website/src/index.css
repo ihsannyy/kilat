@@ -1000,3 +1000,36 @@ table.doc-table tr:hover td {
   margin-bottom: 8px;
 }
 
+.hero-image-container {
+  display: flex;
+  justify-content: center;
+  margin: 32px auto 48px;
+  position: relative;
+  max-width: 640px;
+}
+
+.hero-image {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 40px var(--primary-glow);
+  transition: var(--transition);
+  animation: float-hero 6s ease-in-out infinite;
+}
+
+.hero-image:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--border-hover);
+  box-shadow: 
+    0 30px 60px -10px rgba(0, 0, 0, 0.6),
+    0 0 50px rgba(245, 158, 11, 0.25);
+}
+
+@keyframes float-hero {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+

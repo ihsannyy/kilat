@@ -78,6 +78,10 @@ export default function App() {
                 </a>
               </div>
 
+              <div className="hero-image-container">
+                <img src="/kilat.png" alt="Kilat Banner" className="hero-image" />
+              </div>
+
               {/* Terminal Preview */}
               <div className="term-window" style={{ maxWidth: '600px', margin: '0 auto 40px' }}>
                 <div className="term-bar">
