@@ -143,22 +143,26 @@ export default function App() {
     const drawSilhouettes = () => {
       ctx.fillStyle = 'rgba(8, 7, 24, 0.4)'
       ctx.beginPath()
-      ctx.rect(0, h - 140, w * 0.15, 140)
-      ctx.rect(w * 0.15, h - 190, w * 0.12, 190)
-      ctx.rect(w * 0.32, h - 160, w * 0.14, 160)
-      ctx.rect(w * 0.5, h - 220, w * 0.1, 220)
-      ctx.rect(w * 0.65, h - 120, w * 0.12, 120)
-      ctx.rect(w * 0.8, h - 170, w * 0.15, 170)
+      ctx.rect(0, h - 150, w * 0.15, 150)
+      ctx.rect(w * 0.15, h - 200, w * 0.12, 200)
+      ctx.rect(w * 0.32, h - 170, w * 0.14, 170)
+      ctx.rect(w * 0.5, h - 230, w * 0.1, 230)
+      ctx.rect(w * 0.65, h - 130, w * 0.12, 130)
+      ctx.rect(w * 0.8, h - 180, w * 0.15, 180)
       ctx.fill()
 
       const houseW = 180
       const houseH = 110
-      const houseX = w - houseW - 40
-      const houseY = h - houseH - 24
+      const houseX = w - houseW - 60
+      const houseY = h - houseH - 65
 
       ctx.fillStyle = '#020108'
       ctx.beginPath()
-      ctx.rect(0, h - 24, w, 24)
+      ctx.arc(w - 120, h + 45, 220, 0, 2 * Math.PI)
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.rect(0, h - 35, w, 35)
       ctx.fill()
 
       ctx.fillStyle = '#060416'
@@ -177,12 +181,30 @@ export default function App() {
       ctx.fillStyle = '#020108'
       ctx.fillRect(houseX + houseW / 2 - 16, houseY + houseH - 50, 32, 50)
 
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.8)'
-      ctx.shadowColor = '#fbbf24'
-      ctx.shadowBlur = 12
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.95)'
+      ctx.shadowColor = '#ffea79'
+      ctx.shadowBlur = 32
       ctx.fillRect(houseX + 28, houseY + 28, 26, 26)
       ctx.fillRect(houseX + houseW - 54, houseY + 28, 26, 26)
       ctx.shadowBlur = 0
+
+      ctx.strokeStyle = '#060416'
+      ctx.lineWidth = 2
+      ctx.strokeRect(houseX + 28, houseY + 28, 26, 26)
+      ctx.beginPath()
+      ctx.moveTo(houseX + 41, houseY + 28)
+      ctx.lineTo(houseX + 41, houseY + 54)
+      ctx.moveTo(houseX + 28, houseY + 41)
+      ctx.lineTo(houseX + 54, houseY + 41)
+      ctx.stroke()
+
+      ctx.strokeRect(houseX + houseW - 54, houseY + 28, 26, 26)
+      ctx.beginPath()
+      ctx.moveTo(houseX + houseW - 41, houseY + 28)
+      ctx.lineTo(houseX + houseW - 41, houseY + 54)
+      ctx.moveTo(houseX + houseW - 54, houseY + 41)
+      ctx.lineTo(houseX + houseW - 28, houseY + 41)
+      ctx.stroke()
     }
 
     const render = () => {
