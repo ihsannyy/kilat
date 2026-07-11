@@ -303,7 +303,7 @@ body {
 
 .portal-hero {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 44px;
 }
 
 .hero-heading {
@@ -413,12 +413,76 @@ body {
   border-color: var(--secondary);
 }
 
+.benchmarks-table-wrapper {
+  margin: 48px 0;
+  border-top: 1px solid var(--border-color);
+  padding-top: 48px;
+}
+
+.section-subtitle-technical {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.glass-table-container {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.glass-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.glass-table th, .glass-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.glass-table th {
+  background: rgba(15, 23, 42, 0.2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.glass-table tr:last-child td {
+  border-bottom: none;
+}
+
+.glass-table td strong {
+  color: #fff;
+}
+
+.text-cyan {
+  color: var(--secondary);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.text-green {
+  color: #10b981;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
 .features-glass-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   border-top: 1px solid var(--border-color);
-  padding-top: 40px;
+  padding-top: 48px;
 }
 
 .glass-card {
@@ -593,14 +657,6 @@ body {
 @media (max-width: 768px) {
   .desktop-only {
     display: none !important;
-  }
-  .time-lbl {
-    display: none !important;
-  }
-  .environment-clock {
-    font-size: 10px;
-    padding: 3px 8px;
-    gap: 4px;
   }
   .navbar-inner {
     justify-content: space-between;
