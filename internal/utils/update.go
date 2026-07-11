@@ -39,7 +39,7 @@ func CheckUpdate() {
 	current := Version
 	if cache.LatestVersion != "" && isNewerVersion(current, cache.LatestVersion) {
 		color.Yellow("\n✨ Versi baru Kilat tersedia: %s (Versi saat ini: %s)", "v"+cache.LatestVersion, "v"+current)
-		color.Cyan("👉 Perbarui dengan: curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash\n")
+		color.Cyan("👉 Perbarui dengan: curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash\n")
 	}
 
 	if time.Since(cache.LastChecked) > 24*time.Hour {
@@ -49,7 +49,7 @@ func CheckUpdate() {
 
 func fetchLatestVersion(cacheFile string, cache UpdateCache) {
 	client := &http.Client{Timeout: 5 * time.Second}
-	req, err := http.NewRequest("GET", "https://api.github.com/repos/IHx-cmyk/kilat/releases/latest", nil)
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/ihsannyy/kilat/releases/latest", nil)
 	if err != nil {
 		return
 	}

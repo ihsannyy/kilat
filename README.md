@@ -46,7 +46,7 @@ Kilat memecahkan masalah ini dengan:
 Cara termudah dan tercepat untuk memasang Kilat. Skrip ini akan otomatis mendeteksi arsitektur perangkat Anda (ARM64, AMD64, atau ARMv7) dan memasang binary rilis yang sesuai:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash
 ```
 
 ### 2. Build Mandiri dari Source
@@ -54,7 +54,7 @@ Jika ingin mengompilasi sendiri, pastikan sudah memasang Go v1.21 ke atas:
 
 ```bash
 # Clone repositori
-git clone https://github.com/IHx-cmyk/kilat
+git clone https://github.com/ihsannyy/kilat
 cd kilat
 
 # Kompilasi source code
@@ -193,7 +193,7 @@ Setiap kontribusi berupa perbaikan bug, penambahan modul bawaan baru, maupun sar
 
 ```bash
 # Langkah pengembangan lokal:
-git clone https://github.com/IHx-cmyk/kilat
+git clone https://github.com/ihsannyy/kilat
 cd kilat
 go mod tidy
 go build -o kilat ./cmd/kilat
@@ -206,7 +206,7 @@ Silakan buat Fork, lakukan perubahan, dan kirimkan Pull Request (PR) ke reposito
 ## 📜 Lisensi
 Proyek ini dilisensikan di bawah **MIT License**. Lihat berkas lisensi untuk detail selengkapnya.
 
-MIT © 2026 [IHx-cmyk](https://github.com/IHx-cmyk)
+MIT © 2026 [ihsannyy](https://github.com/ihsannyy)
 
 ---
 

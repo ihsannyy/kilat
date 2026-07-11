@@ -3,7 +3,7 @@
 
 set -e
 
-REPO="IHx-cmyk/kilat"
+REPO="ihsannyy/kilat"
 BINARY="kilat"
 VERSION="v3.0.0"
 
