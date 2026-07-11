@@ -1,17 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 interface PageItem {
   key: string
   title: string
-  icon: string
+  icon: React.ReactNode
 }
-
-const pages: PageItem[] = [
-  { key: 'home', title: 'Dashboard', icon: '⚡' },
-  { key: 'install', title: 'Instalasi', icon: '📥' },
-  { key: 'api', title: 'API Referensi', icon: '🔌' },
-  { key: 'changelog', title: 'Changelog', icon: '📜' }
-]
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home')
@@ -19,6 +12,55 @@ export default function App() {
   const [timeMode, setTimeMode] = useState<string>('MALAM')
   const [clockText, setClockText] = useState<string>('')
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  const pages: PageItem[] = [
+    {
+      key: 'home',
+      title: 'Dashboard',
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      )
+    },
+    {
+      key: 'install',
+      title: 'Instalasi',
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+      )
+    },
+    {
+      key: 'api',
+      title: 'API Referensi',
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="6" y1="3" x2="6" y2="15" />
+          <circle cx="18" cy="6" r="3" />
+          <circle cx="6" cy="18" r="3" />
+          <path d="M18 9a9 9 0 0 1-9 9" />
+        </svg>
+      )
+    },
+    {
+      key: 'changelog',
+      title: 'Changelog',
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+        </svg>
+      )
+    }
+  ]
 
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text.trim())
@@ -67,14 +109,14 @@ export default function App() {
     }
     window.addEventListener('resize', handleResize)
 
-    const maxDrops = 100
+    const maxDrops = 120
     const rain: Array<{ x: number; y: number; speed: number; len: number }> = []
     for (let i = 0; i < maxDrops; i++) {
       rain.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        speed: 12 + Math.random() * 8,
-        len: 12 + Math.random() * 12
+        speed: 14 + Math.random() * 8,
+        len: 15 + Math.random() * 12
       })
     }
 
@@ -94,7 +136,52 @@ export default function App() {
         if (ny >= h) break
       }
       bolt = segs
-      flash = 0.55
+      flash = 0.6
+    }
+
+    const drawSilhouettes = () => {
+      ctx.fillStyle = 'rgba(8, 7, 24, 0.4)'
+      ctx.beginPath()
+      ctx.rect(0, h - 140, w * 0.15, 140)
+      ctx.rect(w * 0.15, h - 190, w * 0.12, 190)
+      ctx.rect(w * 0.32, h - 160, w * 0.14, 160)
+      ctx.rect(w * 0.5, h - 220, w * 0.1, 220)
+      ctx.rect(w * 0.65, h - 120, w * 0.12, 120)
+      ctx.rect(w * 0.8, h - 170, w * 0.15, 170)
+      ctx.fill()
+
+      const houseW = 180
+      const houseH = 110
+      const houseX = w - houseW - 40
+      const houseY = h - houseH - 24
+
+      ctx.fillStyle = '#020108'
+      ctx.beginPath()
+      ctx.rect(0, h - 24, w, 24)
+      ctx.fill()
+
+      ctx.fillStyle = '#060416'
+      ctx.fillRect(houseX, houseY, houseW, houseH)
+
+      ctx.fillStyle = '#03020a'
+      ctx.beginPath()
+      ctx.moveTo(houseX - 15, houseY)
+      ctx.lineTo(houseX + houseW / 2, houseY - 45)
+      ctx.lineTo(houseX + houseW + 15, houseY)
+      ctx.closePath()
+      ctx.fill()
+
+      ctx.fillRect(houseX + 24, houseY - 40, 18, 30)
+
+      ctx.fillStyle = '#020108'
+      ctx.fillRect(houseX + houseW / 2 - 16, houseY + houseH - 50, 32, 50)
+
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.8)'
+      ctx.shadowColor = '#fbbf24'
+      ctx.shadowBlur = 12
+      ctx.fillRect(houseX + 28, houseY + 28, 26, 26)
+      ctx.fillRect(houseX + houseW - 54, houseY + 28, 26, 26)
+      ctx.shadowBlur = 0
     }
 
     const render = () => {
@@ -102,17 +189,17 @@ export default function App() {
 
       const grad = ctx.createLinearGradient(0, 0, 0, h)
       if (timeMode === 'PAGI') {
-        grad.addColorStop(0, '#0f0e21')
-        grad.addColorStop(1, '#ae5231')
+        grad.addColorStop(0, '#0c0b1d')
+        grad.addColorStop(1, '#a64f2e')
       } else if (timeMode === 'SIANG') {
-        grad.addColorStop(0, '#191b26')
-        grad.addColorStop(1, '#4e5669')
+        grad.addColorStop(0, '#171822')
+        grad.addColorStop(1, '#484f61')
       } else if (timeMode === 'SORE') {
-        grad.addColorStop(0, '#1b1429')
-        grad.addColorStop(1, '#612551')
+        grad.addColorStop(0, '#191225')
+        grad.addColorStop(1, '#5b224c')
       } else {
-        grad.addColorStop(0, '#020108')
-        grad.addColorStop(1, '#0a0621')
+        grad.addColorStop(0, '#010106')
+        grad.addColorStop(1, '#08051c')
       }
       ctx.fillStyle = grad
       ctx.fillRect(0, 0, w, h)
@@ -121,7 +208,7 @@ export default function App() {
         ctx.fillStyle = `rgba(255, 255, 255, ${flash})`
         ctx.fillRect(0, 0, w, h)
 
-        ctx.strokeStyle = `rgba(255, 255, 255, ${flash + 0.4})`
+        ctx.strokeStyle = `rgba(255, 255, 255, ${flash + 0.45})`
         ctx.lineWidth = 3
         ctx.beginPath()
         bolt.forEach(s => {
@@ -130,14 +217,16 @@ export default function App() {
         })
         ctx.stroke()
 
-        flash -= 0.04
+        flash -= 0.05
       }
 
-      if (Math.random() < 0.006 && flash <= 0) {
+      if (Math.random() < 0.007 && flash <= 0) {
         buildLightning()
       }
 
-      ctx.strokeStyle = 'rgba(174, 194, 224, 0.28)'
+      drawSilhouettes()
+
+      ctx.strokeStyle = 'rgba(174, 194, 224, 0.32)'
       ctx.lineWidth = 1
       for (let i = 0; i < maxDrops; i++) {
         const d = rain[i]
@@ -172,12 +261,17 @@ export default function App() {
       <header className="glass-navbar">
         <div className="navbar-inner">
           <div className="brand">
-            <span className="spark">⚡</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="spark-svg">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
             <span className="name">kilat</span>
             <span className="badge">v3.0.0</span>
           </div>
           <div className="environment-clock">
-            <span className="clock-icon">🌦️</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="clock-svg">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
             <span className="time-lbl">MODE: {timeMode}</span>
             <span className="time-val">[{clockText}]</span>
           </div>
@@ -188,12 +282,16 @@ export default function App() {
         <nav className="glass-tabs">
           {pages.map(p => (
             <button key={p.key} className={`tab-link ${activeTab === p.key ? 'active' : ''}`} onClick={() => setActiveTab(p.key)}>
-              <span className="tab-icon">{p.icon}</span>
+              <span className="tab-icon-svg">{p.icon}</span>
               <span className="tab-text">{p.title}</span>
             </button>
           ))}
           <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="tab-link link-github">
-            <span className="tab-icon">🐙</span>
+            <span className="tab-icon-svg">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+              </svg>
+            </span>
             <span className="tab-text">GitHub</span>
           </a>
         </nav>

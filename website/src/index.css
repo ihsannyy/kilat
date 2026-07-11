@@ -99,11 +99,16 @@ body {
   align-items: center;
   gap: 8px;
 }
-.spark {
-  font-size: 18px;
+.spark-svg {
   color: var(--secondary);
-  text-shadow: 0 0 10px var(--secondary);
+  filter: drop-shadow(0 0 6px var(--secondary));
+  animation: pulse-spark 2s infinite alternate;
 }
+@keyframes pulse-spark {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.12); opacity: 1; }
+}
+
 .name {
   font-weight: 800;
   font-size: 20px;
@@ -133,6 +138,9 @@ body {
   padding: 4px 12px;
   border-radius: 9999px;
   color: var(--text-secondary);
+}
+.clock-svg {
+  color: var(--text-muted);
 }
 .time-val {
   color: var(--secondary);
@@ -187,6 +195,19 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border-color: var(--border-color);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.tab-icon-svg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+.tab-link:hover .tab-icon-svg, .tab-link.active .tab-icon-svg {
+  color: #fff;
 }
 
 .link-github {
