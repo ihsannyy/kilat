@@ -3,24 +3,26 @@ import { useState, useEffect } from 'react'
 interface PageItem {
   key: string
   title: string
+  icon: string
 }
 
 const pageOrder: PageItem[] = [
-  { key: 'index', title: 'Home' },
-  { key: 'installation', title: 'Instalasi' },
-  { key: 'usage', title: 'Penggunaan' },
-  { key: 'project', title: 'Struktur' },
-  { key: 'modules', title: 'Modules' },
-  { key: 'changelog', title: 'Changelog' },
-  { key: 'contributing', title: 'Kontribusi' }
+  { key: 'index', title: 'Home', icon: '🏠' },
+  { key: 'installation', title: 'Instalasi', icon: '📥' },
+  { key: 'usage', title: 'Penggunaan', icon: '🛠️' },
+  { key: 'modules', title: 'API & Modules', icon: '🔌' },
+  { key: 'changelog', title: 'Changelog', icon: '📜' },
+  { key: 'contributing', title: 'Kontribusi', icon: '🤝' }
 ]
 
 export default function App() {
   const [activePage, setActivePage] = useState<string>('index')
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
   const [copiedTextMap, setCopiedTextMap] = useState<Record<string, boolean>>({})
+  const [terminalTab, setTerminalTab] = useState<string>('hello')
+  const [terminalOutput, setTerminalOutput] = useState<string>('')
+  const [isTyping, setIsTyping] = useState<boolean>(false)
 
-  // Hash-based client-side routing
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '')
@@ -33,14 +35,11 @@ export default function App() {
       setMobileMenuOpen(false)
       window.scrollTo(0, 0)
     }
-
     window.addEventListener('hashchange', handleHashChange)
-    handleHashChange() // Run initially
-
+    handleHashChange()
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  // Copy helper
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text.trim())
     setCopiedTextMap(prev => ({ ...prev, [id]: true }))
@@ -49,149 +48,147 @@ export default function App() {
     }, 2000)
   }
 
-  // Get index position for pager buttons
-  const currentPageIndex = pageOrder.findIndex(p => p.key === activePage)
-  const prevPage = currentPageIndex > 0 ? pageOrder[currentPageIndex - 1] : null
-  const nextPage = currentPageIndex < pageOrder.length - 1 ? pageOrder[currentPageIndex + 1] : null
+  const simulateTerminal = (tab: string) => {
+    setTerminalTab(tab)
+    setIsTyping(true)
+    setTerminalOutput('')
+    
+    let text = ''
+    let outputs: string[] = []
 
-  // Render components for each page
+    if (tab === 'hello') {
+      text = 'kilat run hello.js'
+      outputs = [
+        '🚀 Hello from Kilat!',
+        'OS: android',
+        'Files: [ "hello.js", "package.json" ]'
+      ]
+    } else if (tab === 'typescript') {
+      text = 'kilat run hello.ts'
+      outputs = [
+        '✨ esbuild transpiled TypeScript...',
+        'User: ihsannyy',
+        'TypeScript v5.x executing in memory successfully!'
+      ]
+    } else if (tab === 'fetch') {
+      text = 'kilat run api.js'
+      outputs = [
+        '📡 Fetching https://api.github.com/repos/ihsannyy/kilat...',
+        'Status: 200 OK',
+        'Repository: kilat (Stars: 12)'
+      ]
+    } else if (tab === 'shell') {
+      text = 'kilat run run-command.js'
+      outputs = [
+        '⚡ Executing: $`uname -a`',
+        'Linux termux-android 4.19.191-android12-9 #1 SMP PREEMPT'
+      ]
+    }
+
+    let i = 0
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setTerminalOutput(prev => prev + text[i])
+        i++
+      } else {
+        clearInterval(interval)
+        setIsTyping(false)
+        setTimeout(() => {
+          setTerminalOutput(prev => prev + '\n' + outputs.join('\n'))
+        }, 150)
+      }
+    }, 40)
+  }
+
+  useEffect(() => {
+    simulateTerminal('hello')
+  }, [])
+
   const renderPageContent = () => {
     switch (activePage) {
       case 'index':
         return (
-          <div className="doc">
-            <div className="home-hero">
+          <div className="home-layout animate-fade-in">
+            <div className="hero-section">
               <div className="hero-badge">
                 <span className="hero-badge-dot"></span>
-                dibuat dengan Go + Goja
+                Ditenagai Go + Goja
               </div>
-              <h1 className="hero-heading">Kilat</h1>
-              <p className="hero-desc">
-                Runtime JavaScript ringan dan cepat untuk Termux & Linux. Eksekusi script, install package, dan jalankan proyek — <strong>tanpa node_modules</strong>.
+              <h1 className="hero-title">Kilat</h1>
+              <p className="hero-subtitle">
+                Runtime JavaScript & TypeScript super ringan untuk Termux dan Linux. Jalankan script, instal dependensi NPM — <strong>tanpa node_modules</strong>.
               </p>
-              <div className="hero-buttons">
-                <a href="#installation" className="btn btn-primary">
-                  Mulai Instalasi →
-                </a>
-                <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="btn btn-ghost">
-                  Lihat di GitHub
-                </a>
+              <div className="hero-actions">
+                <a href="#installation" className="btn btn-primary">Mulai Instalasi</a>
+                <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="btn btn-ghost">GitHub</a>
               </div>
+            </div>
 
-              <div className="hero-image-container">
-                <img src="/kilat.png" alt="Kilat Banner" className="hero-image" />
-              </div>
-
-              {/* Terminal Preview */}
-              <div className="term-window" style={{ maxWidth: '600px', margin: '0 auto 40px' }}>
-                <div className="term-bar">
-                  <div className="term-dots">
-                    <span className="term-dot r"></span>
-                    <span className="term-dot y"></span>
-                    <span className="term-dot g"></span>
+            <div className="interactive-demo-section">
+              <h2 className="demo-section-heading">Coba Interaktif Simulator</h2>
+              <p className="demo-section-sub">Klik tab di bawah untuk mensimulasikan berbagai perintah Kilat langsung di browser Anda.</p>
+              
+              <div className="demo-terminal-wrapper">
+                <div className="terminal-tabs">
+                  <button className={`terminal-tab ${terminalTab === 'hello' ? 'active' : ''}`} onClick={() => simulateTerminal('hello')}>Hello JS</button>
+                  <button className={`terminal-tab ${terminalTab === 'typescript' ? 'active' : ''}`} onClick={() => simulateTerminal('typescript')}>TypeScript</button>
+                  <button className={`terminal-tab ${terminalTab === 'fetch' ? 'active' : ''}`} onClick={() => simulateTerminal('fetch')}>Fetch API</button>
+                  <button className={`terminal-tab ${terminalTab === 'shell' ? 'active' : ''}`} onClick={() => simulateTerminal('shell')}>Shell Runner ($)</button>
+                </div>
+                <div className="demo-terminal">
+                  <div className="terminal-header">
+                    <div className="terminal-dots">
+                      <span className="terminal-dot red"></span>
+                      <span className="terminal-dot yellow"></span>
+                      <span className="terminal-dot green"></span>
+                    </div>
+                    <span className="terminal-title">~/kilat-simulator</span>
                   </div>
-                  <span className="term-title">~/projects/hello — kilat</span>
-                  <button 
-                    className="term-copy"
-                    onClick={() => handleCopy('home-term', 'kilat run hello.js')}
-                  >
-                    {copiedTextMap['home-term'] ? 'Copied!' : 'copy'}
-                  </button>
-                </div>
-                <div className="term-body">
-                  <pre>
-                    <code>
-                      <span className="sh-prompt">$</span>kilat run hello.js{"\n"}
-                      <span className="sh-out">🚀 Hello from Kilat!{"\n"}</span>
-                      <span className="sh-out">OS: android{"\n"}</span>
-                      <span className="sh-out">Files: [ 'hello.js', 'package.json' ]</span>
-                    </code>
-                  </pre>
+                  <div className="terminal-body">
+                    <pre>
+                      <code>
+                        <span className="sh-prompt">$</span>{terminalOutput}
+                        {isTyping && <span className="terminal-cursor"></span>}
+                      </code>
+                    </pre>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <h2 className="section-title" id="kenapa">Kenapa Kilat?</h2>
-            <div className="grid-container cols-3">
-              <div className="grid-card">
-                <div className="card-icon">⚡</div>
-                <h3 className="card-title">Eksekusi Cepat</h3>
-                <p className="card-desc">CommonJS dijalankan langsung lewat Goja, tanpa overhead V8 yang berat untuk perangkat mobile.</p>
+            <div className="features-grid">
+              <div className="feature-card">
+                <div className="feature-icon">⚡</div>
+                <h3 className="feature-title">Eksekusi Instan</h3>
+                <p className="feature-desc">Startup cepat berbasis engine interpreter Goja murni, menghindari beban startup Node V8 pada Android.</p>
               </div>
-              <div className="grid-card">
-                <div className="card-icon">📦</div>
-                <h3 className="card-title">Package Manager Bawaan</h3>
-                <p className="card-desc">Cukup gunakan perintah <code>kilat add &lt;package&gt;</code> — tidak memerlukan npm atau yarn terpisah.</p>
+              <div className="feature-card">
+                <div className="feature-icon">📦</div>
+                <h3 className="feature-title">Package Manager</h3>
+                <p className="feature-desc">Perintah <code>kilat add</code> mengunduh modul NPM langsung ke cache global terpusat.</p>
               </div>
-              <div className="grid-card">
-                <div className="card-icon">🔌</div>
-                <h3 className="card-title">Module Bawaan</h3>
-                <p className="card-desc">Modul core penting seperti <code>console</code>, <code>fs</code>, <code>net</code>, dan <code>os</code> sudah terintegrasi siap pakai.</p>
+              <div className="feature-card">
+                <div className="feature-icon">📁</div>
+                <h3 className="feature-title">Tanpa node_modules</h3>
+                <p className="feature-desc">Hemat ruang penyimpanan perangkat seluler dengan menghilangkan direktori duplikasi dependensi lokal.</p>
               </div>
-              <div className="grid-card">
-                <div className="card-icon">📁</div>
-                <h3 className="card-title">Tanpa node_modules</h3>
-                <p className="card-desc">Dependency disimpan rapi terpusat di <code>.kilat/packages</code>, membebaskan space proyek Anda.</p>
-              </div>
-              <div className="grid-card">
-                <div className="card-icon">🔄</div>
-                <h3 className="card-title">require() dengan Cache</h3>
-                <p className="card-desc">Import package berulang tetap terasa ringan berkat mekanisme caching modul otomatis.</p>
-              </div>
-              <div className="grid-card">
-                <div className="card-icon">🛠️</div>
-                <h3 className="card-title">kilat init</h3>
-                <p className="card-desc">Mulai proyek baru lengkap dengan package.json lewat satu instruksi CLI interaktif.</p>
+              <div className="feature-card">
+                <div className="feature-icon">🔌</div>
+                <h3 className="feature-title">Bawaan API Lengkap</h3>
+                <p className="feature-desc">Dilengkapi modul bawaan penting untuk console warna, filesystem, network fetch, dan environment.</p>
               </div>
             </div>
 
-            <h2 className="section-title" id="tanpa-beban">Tanpa Beban node_modules</h2>
-            <p>Konsep pemetaan dependency Kilat dibanding package manager Node.js standar:</p>
-            <div className="comparison-section">
-              <div className="comp-box bad">
-                <div className="comp-header">
-                  <span>node_modules/ (NPM)</span>
-                  <span>khas project npm</span>
-                </div>
-                <div className="comp-body">
-                  <div className="comp-row">lodash <span className="comp-bar"><i style={{ width: '80%' }}></i></span></div>
-                  <div className="comp-row">chalk <span className="comp-bar"><i style={{ width: '50%' }}></i></span></div>
-                  <div className="comp-row">+ 240 dependencies <span className="comp-bar"><i style={{ width: '100%' }}></i></span></div>
-                  <div className="comp-row">+ nested duplicate folders <span className="comp-bar"><i style={{ width: '90%' }}></i></span></div>
-                </div>
+            <div className="install-banner">
+              <div className="banner-text">
+                <h3>Pasang Sekarang di Termux Anda</h3>
+                <p>Cukup jalankan satu perintah instalasi otomatis untuk mulai menggunakan Kilat.</p>
               </div>
-              <div className="comp-box good">
-                <div className="comp-header">
-                  <span>.kilat/packages/ (Kilat)</span>
-                  <span>punya Kilat (global)</span>
-                </div>
-                <div className="comp-body">
-                  <div className="comp-row">lodash <span className="comp-bar"><i style={{ width: '20%' }}></i></span></div>
-                  <div className="comp-row">chalk <span className="comp-bar"><i style={{ width: '15%' }}></i></span></div>
-                  <div className="comp-row" style={{ color: 'var(--secondary)' }}>Zero nested node_modules <span className="comp-bar"><i style={{ width: '0%', background: 'transparent' }}></i></span></div>
-                </div>
-              </div>
-            </div>
-            <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginTop: '-10px' }}>
-              *Ilustrasi konsep penyimpanan terpusat — menghemat waktu tulis I/O disk Android yang lambat.
-            </p>
-
-            <h2 className="section-title" id="mulai">Mulai dalam 3 Langkah</h2>
-            <div className="grid-container cols-3">
-              <div className="grid-card" style={{ textAlign: 'center' }}>
-                <h3 className="card-title">1. Pasang Kilat</h3>
-                <p className="card-desc" style={{ marginBottom: '14px' }}>Unduh binary rilis otomatis.</p>
-                <a href="#installation" className="btn btn-ghost" style={{ fontSize: '12px', padding: '6px 12px' }}>Instalasi →</a>
-              </div>
-              <div className="grid-card" style={{ textAlign: 'center' }}>
-                <h3 className="card-title">2. Init Proyek</h3>
-                <p className="card-desc" style={{ marginBottom: '14px' }}><code>kilat init</code> untuk configurasi.</p>
-                <a href="#usage" className="btn btn-ghost" style={{ fontSize: '12px', padding: '6px 12px' }}>Penggunaan →</a>
-              </div>
-              <div className="grid-card" style={{ textAlign: 'center' }}>
-                <h3 className="card-title">3. Jalankan</h3>
-                <p className="card-desc" style={{ marginBottom: '14px' }}><code>kilat run index.js</code>.</p>
-                <a href="#usage" className="btn btn-ghost" style={{ fontSize: '12px', padding: '6px 12px' }}>Contoh →</a>
+              <div className="banner-code-box">
+                <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
+                <button className="btn-copy-banner" onClick={() => handleCopy('inst-banner', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}>
+                  {copiedTextMap['inst-banner'] ? 'Copied' : 'Salin'}
+                </button>
               </div>
             </div>
           </div>
@@ -199,109 +196,47 @@ export default function App() {
 
       case 'installation':
         return (
-          <div className="doc">
-            <h1 className="doc-title">Instalasi</h1>
-            <p className="lede">Dua cara memasang Kilat di Termux & Linux: unduh binary rilis otomatis (direkomendasikan) atau compile sendiri dari source code.</p>
+          <div className="doc-layout animate-fade-in">
+            <h1 className="doc-page-title">Instalasi Kilat</h1>
+            <p className="doc-page-subtitle">Ikuti langkah-langkah di bawah untuk memasang runtime Kilat di Termux Android atau perangkat Linux.</p>
 
-            <h2 className="section-title">Instalasi Otomatis (Rekomendasi)</h2>
-            <p>Metode tercepat. Skrip instalasi di bawah akan mendeteksi arsitektur CPU perangkat Termux / Linux Anda secara otomatis (ARM64, AMD64, atau ARMv7) dan mengunduh binary executable yang sesuai.</p>
-            
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Instalasi Otomatis (Sangat Direkomendasikan)</h2>
+              <p>Script instalasi resmi akan memindai arsitektur CPU Anda (ARM64, AMD64, atau ARMv7), mengunduh biner rilis statis terbaru, dan meletakkannya langsung ke path bin Anda.</p>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Shell Command</span>
+                  <button onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}>{copiedTextMap['inst-auto'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}
-                >
-                  {copiedTextMap['inst-auto'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-comment"># Jalankan perintah ini di aplikasi Termux Anda</span>{"\n"}
-                    <span className="sh-prompt">$</span>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash
-                  </code>
-                </pre>
+                <pre><code><span className="sh-prompt">$</span>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code></pre>
               </div>
             </div>
 
-            <h2 className="section-title">Build dari Source Code</h2>
-            <p>Gunakan opsi ini jika Anda ingin mengompilasi versi pengembangan terbaru langsung dari branch repositori utama.</p>
-            <p><strong>Persyaratan sistem:</strong></p>
-            <ul>
-              <li>Go Compiler versi 1.21 atau yang lebih baru (<code>pkg install golang</code>).</li>
-              <li>Git terinstall di Termux (<code>pkg install git</code>).</li>
-              <li>Akses internet aktif untuk resolve Go packages.</li>
-            </ul>
-
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Build dari Source Code</h2>
+              <p>Apabila Anda ingin menggunakan versi pengembangan terkini atau mengompilasi sendiri secara lokal, Anda dapat melacak kode sumber proyek:</p>
+              <ul>
+                <li>Pastikan compiler Go terpasang (<code>pkg install golang</code>).</li>
+                <li>Pastikan Git terpasang (<code>pkg install git</code>).</li>
+              </ul>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Source Compile</span>
+                  <button onClick={() => handleCopy('inst-source', 'git clone https://github.com/IHx-cmyk/kilat\ncd kilat\ngo build -o kilat ./cmd/kilat\nmv kilat $PREFIX/bin/')}>{copiedTextMap['inst-source'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('inst-source', 'git clone https://github.com/IHx-cmyk/kilat\ncd kilat\ngo build -o kilat ./cmd/kilat\nmv kilat $PREFIX/bin/')}
-                >
-                  {copiedTextMap['inst-source'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-comment"># Clone repositori resmi</span>{"\n"}
-                    <span className="sh-prompt">$</span>git clone https://github.com/IHx-cmyk/kilat{"\n"}
-                    <span className="sh-prompt">$</span>cd kilat{"\n\n"}
-                    <span className="sh-comment"># Build source code ke binary</span>{"\n"}
-                    <span className="sh-prompt">$</span>go build -o kilat ./cmd/kilat{"\n\n"}
-                    <span className="sh-comment"># Pindahkan binary ke directory path Termux</span>{"\n"}
-                    <span className="sh-prompt">$</span>mv kilat $PREFIX/bin/
-                  </code>
-                </pre>
+                <pre><code><span className="sh-comment"># Clone repositori</span>{"\n"}<span className="sh-prompt">$</span>git clone https://github.com/IHx-cmyk/kilat{"\n"}<span className="sh-prompt">$</span>cd kilat{"\n"}<span className="sh-comment"># Compile biner runtime</span>{"\n"}<span className="sh-prompt">$</span>go build -o kilat ./cmd/kilat{"\n"}<span className="sh-comment"># Pindahkan ke environment path</span>{"\n"}<span className="sh-prompt">$</span>mv kilat $PREFIX/bin/</code></pre>
               </div>
             </div>
 
-            <h2 className="section-title">Verifikasi Instalasi</h2>
-            <p>Ketik perintah versi berikut untuk menguji apakah command path Kilat sudah dikenali:</p>
-
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Verifikasi Hasil</h2>
+              <p>Gunakan bendera versi untuk memastikan Kilat telah terpasang dengan benar di terminal Anda:</p>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Terminal</span>
+                  <button onClick={() => handleCopy('inst-verify', 'kilat --version')}>{copiedTextMap['inst-verify'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('inst-ver', 'kilat --version')}
-                >
-                  {copiedTextMap['inst-ver'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-prompt">$</span>kilat --version{"\n"}
-                    <span className="sh-out">Kilat v3.0.0</span>
-                  </code>
-                </pre>
-              </div>
-            </div>
-
-            <div className="callout-box warn">
-              <div className="callout-tag">[!]</div>
-              <div className="callout-text">
-                Apabila muncul kendala <code>command not found</code>, mohon periksa apakah environment binary Termux Anda (<code>$PREFIX/bin</code>) sudah terdaftar di daftar <code>$PATH</code> shell Anda (seperti `.bashrc` atau `.zshrc`).
+                <pre><code><span className="sh-prompt">$</span>kilat --version{"\n"}<span className="sh-out">Kilat v3.0.0</span></code></pre>
               </div>
             </div>
           </div>
@@ -309,243 +244,55 @@ export default function App() {
 
       case 'usage':
         return (
-          <div className="doc">
-            <h1 className="doc-title">Penggunaan & Contoh</h1>
-            <p className="lede">Dari inisialisasi folder proyek baru hingga memanggil dependensi pustaka luar. Berikut panduan harian runtime Kilat.</p>
+          <div className="doc-layout animate-fade-in">
+            <h1 className="doc-page-title">Panduan Penggunaan</h1>
+            <p className="doc-page-subtitle">Cara mengelola proyek, memasang dependensi, dan menjalankan berkas JavaScript dengan Kilat CLI.</p>
 
-            <h2 className="section-title">Inisialisasi Proyek</h2>
-            <p>Gunakan perintah <code>kilat init</code> untuk membuat struktur proyek standar secara interaktif, atau tambahkan parameter <code>-y</code> (seperti: <code>kilat init -y</code>) untuk melewati prompt interaktif dan langsung memproduksi konfigurasi menggunakan nilai default.</p>
-            
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Memulai Proyek Baru</h2>
+              <p>Perintah <code>kilat init</code> digunakan untuk membuat berkas konfigurasi <code>package.json</code> secara interaktif.</p>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Terminal</span>
+                  <button onClick={() => handleCopy('usage-init', 'kilat init')}>{copiedTextMap['usage-init'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('usage-init', 'kilat init -y')}
-                >
-                  {copiedTextMap['usage-init'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-prompt">$</span>kilat init{"\n"}
-                    <span className="sh-out">? Nama proyek: hello-kilat{"\n"}</span>
-                    <span className="sh-out">? Versi: 1.0.0{"\n"}</span>
-                    <span className="sh-out">? Entry point: index.js{"\n"}</span>
-                    <span className="sh-out">✔ package.json dibuat{"\n"}</span>
-                    <span className="sh-out">✔ index.js dibuat</span>
-                  </code>
-                </pre>
+                <pre><code><span className="sh-prompt">$</span>kilat init{"\n"}<span className="sh-out">? Nama proyek: proyek-saya{"\n"}? Versi: 1.0.0{"\n"}? Entry point: index.js{"\n"}✔ package.json berhasil dibuat!</span></code></pre>
               </div>
             </div>
 
-            <h2 className="section-title">Menjalankan File JavaScript</h2>
-            <p>Perintah <code>kilat run &lt;namafile.js&gt;</code> memuat file JavaScript Anda ke dalam mesin interpretasi Goja:</p>
-
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Menjalankan Berkas</h2>
+              <p>Gunakan perintah <code>kilat run</code> untuk mengeksekusi berkas JavaScript (CJS/ESM) atau TypeScript:</p>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Terminal</span>
+                  <button onClick={() => handleCopy('usage-run', 'kilat run index.js')}>{copiedTextMap['usage-run'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('usage-run', 'kilat run index.js')}
-                >
-                  {copiedTextMap['usage-run'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-prompt">$</span>kilat run index.js
-                  </code>
-                </pre>
+                <pre><code><span className="sh-prompt">$</span>kilat run index.js</code></pre>
               </div>
             </div>
 
-            <h2 className="section-title">Mengunduh Package dari NPM</h2>
-            <p>Dependency diunduh langsung dari registri npm resmi, tersimpan secara global, dan ditambahkan secara otomatis pada <code>dependencies</code> berkas <code>package.json</code> Anda.</p>
-
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Menambahkan Package NPM</h2>
+              <p>Gunakan <code>kilat add</code> untuk mengunduh package dari NPM registry global tanpa meletakkannya di folder lokal proyek Anda:</p>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Terminal</span>
+                  <button onClick={() => handleCopy('usage-add', 'kilat add lodash')}>{copiedTextMap['usage-add'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('usage-add', 'kilat add lodash')}
-                >
-                  {copiedTextMap['usage-add'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-prompt">$</span>kilat add lodash
-                  </code>
-                </pre>
+                <pre><code><span className="sh-prompt">$</span>kilat add lodash</code></pre>
               </div>
             </div>
 
-            <div className="callout-box">
-              <div className="callout-tag">[info]</div>
-              <div className="callout-text">
-                Ingin mengunci versi tertentu? Tambahkan tanda <code>@</code> pada nama package, seperti: <code>kilat add lodash@4</code>
-              </div>
-            </div>
-
-            <h2 className="section-title">Contoh Kode Lengkap</h2>
-            <p>1. Tulis kode berikut di file <code>hello.js</code>:</p>
-
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Watch Mode (Auto Reload)</h2>
+              <p>Gunakan opsi <code>-w</code> atau <code>--watch</code> untuk memantau perubahan berkas dan memuat ulang program secara otomatis:</p>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Terminal</span>
+                  <button onClick={() => handleCopy('usage-watch', 'kilat run index.js --watch')}>{copiedTextMap['usage-watch'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">hello.js</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('code-hello', 'console.log("🚀 Hello from Kilat!");\nconst fs = require(\'fs\');\nconst os = require(\'os\');\nconsole.log("OS:", os.getenv("OSTYPE") || "unknown");\nconsole.log("Files:", fs.readdirSync("."));')}
-                >
-                  {copiedTextMap['code-hello'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-keyword">const</span> fs = <span className="sh-func">require</span>(<span className="sh-string">'fs'</span>);{"\n"}
-                    <span className="sh-keyword">const</span> os = <span className="sh-func">require</span>(<span className="sh-string">'os'</span>);{"\n\n"}
-                    <span className="sh-func">console.log</span>(<span className="sh-string">"🚀 Hello from Kilat!"</span>);{"\n"}
-                    <span className="sh-func">console.log</span>(<span className="sh-string">"OS:"</span>, os.getenv(<span className="sh-string">"OSTYPE"</span>) || <span className="sh-string">"unknown"</span>);{"\n"}
-                    <span className="sh-func">console.log</span>(<span className="sh-string">"Files:"</span>, fs.readdirSync(<span className="sh-string">"."</span>));
-                  </code>
-                </pre>
-              </div>
-            </div>
-
-            <p>2. Jalankan berkas menggunakan CLI runtime Kilat:</p>
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
-                </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('code-run-hello', 'kilat run hello.js')}
-                >
-                  {copiedTextMap['code-run-hello'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-prompt">$</span>kilat run hello.js
-                  </code>
-                </pre>
-              </div>
-            </div>
-
-            <p>3. Contoh menggunakan dependensi npm <code>lodash</code> setelah diunduh (<code>kilat add lodash</code>):</p>
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
-                </div>
-                <span className="term-title">lodash_test.js</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('code-lodash', 'const _ = require(\'lodash\');\nconsole.log(_.chunk([1,2,3,4,5], 2));')}
-                >
-                  {copiedTextMap['code-lodash'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-keyword">const</span> _ = <span className="sh-func">require</span>(<span className="sh-string">'lodash'</span>);{"\n"}
-                    <span className="sh-func">console.log</span>(_.chunk([1, 2, 3, 4, 5], 2));{"\n"}
-                    <span className="sh-comment">// Output: [[1, 2], [3, 4], [5]]</span>
-                  </code>
-                </pre>
-              </div>
-            </div>
-          </div>
-        )
-
-      case 'project':
-        return (
-          <div className="doc">
-            <h1 className="doc-title">Struktur Proyek & Package Manager</h1>
-            <p className="lede">Bagaimana repositori Kilat disusun, dan bagaimana dependency-nya dikelola di balik layar secara terpusat.</p>
-
-            <h2 className="section-title">Struktur Folder Kilat</h2>
-            <p>Berikut tata letak modul internal source code Kilat di GitHub. Ini berguna jika Anda berniat memodifikasi runtime Kilat:</p>
-
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
-                </div>
-                <span className="term-title">kilat project tree</span>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    kilat/{"\n"}
-                    ├── cmd/kilat/main.go          <span className="sh-comment"># Entry point CLI Go</span>{"\n"}
-                    ├── internal/{"\n"}
-                    │   ├── engine/                <span className="sh-comment"># Goja runtime & wrapper system require()</span>{"\n"}
-                    │   ├── modules/                <span className="sh-comment"># Core module built-in (console, fs, net, os)</span>{"\n"}
-                    │   ├── pkgmanager/              <span className="sh-comment"># CLI npm fetcher, zip parser & caching</span>{"\n"}
-                    │   ├── init/                    <span className="sh-comment"># Setup perintah kilat init</span>{"\n"}
-                    │   └── utils/                   <span className="sh-comment"># Spinner, progress bar & logging warna</span>{"\n"}
-                    ├── examples/                    <span className="sh-comment"># Sampel javascript test</span>{"\n"}
-                    ├── go.mod{"\n"}
-                    └── README.md
-                  </code>
-                </pre>
-              </div>
-            </div>
-
-            <h2 className="section-title">Bagaimana Package Manager Bekerja</h2>
-            <p>Jika Node.js meletakkan ribuan file pustaka terduplikasi di setiap folder proyek, Kilat mengusung pendekatan modern:</p>
-            <div className="grid-container cols-2">
-              <div className="grid-card">
-                <h3 className="card-title">package.json Kompatibel</h3>
-                <p className="card-desc">Format berkas metadata package.json tetap standar. Memungkinkan pemindahan konfigurasi di kemudian hari.</p>
-              </div>
-              <div className="grid-card">
-                <h3 className="card-title">Penyimpanan Terpusat</h3>
-                <p className="card-desc">Semua dependency diinstal satu kali pada direktori global <code>~/.kilat/packages/</code>.</p>
-              </div>
-              <div className="grid-card">
-                <h3 className="card-title">Intersepsi require()</h3>
-                <p className="card-desc">Saat interpreter memuat require('module'), Kilat mendeteksi folder cache pusat dan memuatnya secara instan.</p>
-              </div>
-              <div className="grid-card">
-                <h3 className="card-title">Efisiensi I/O Android</h3>
-                <p className="card-desc">Meminimalkan jutaan operasi read/write pada filesystem Android/Termux, memperpanjang umur baterai dan hardware.</p>
+                <pre><code><span className="sh-prompt">$</span>kilat run index.js --watch</code></pre>
               </div>
             </div>
           </div>
@@ -553,293 +300,125 @@ export default function App() {
 
       case 'modules':
         return (
-          <div className="doc">
-            <h1 className="doc-title">Module Bawaan & Testing</h1>
-            <p className="lede">Daftar API inti built-in bawaan Kilat yang dapat langsung Anda panggil tanpa instalasi, serta panduan pengujian package.</p>
+          <div className="doc-layout animate-fade-in">
+            <h1 className="doc-page-title">API & Modul Bawaan</h1>
+            <p className="doc-page-subtitle">Modul inti yang terintegrasi secara bawaan di runtime Kilat untuk mempercepat proses pengembangan Anda.</p>
 
-            <h2 className="section-title">Referensi API Core</h2>
-            <p>Kilat menyediakan standard library internal untuk mengelola console, memproses file, melakukan koneksi internet, dan membaca shell.</p>
-
-            <div className="table-wrapper">
-              <table className="doc-table">
-                <thead>
-                  <tr>
-                    <th>Module / Method</th>
-                    <th>Fungsi Utama</th>
-                    <th>Contoh Singkat</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><code>console.log(msg, [color])</code></td>
-                    <td>Menulis log output. Opsi warna: <code>green, yellow, blue, red</code>.</td>
-                    <td><code>console.log('OK', 'green')</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>console.error(msg)</code></td>
-                    <td>Menulis log kesalahan ke stderr berwarna merah.</td>
-                    <td><code>console.error('Crash!')</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>fs.readFileSync(path)</code></td>
-                    <td>Membaca isi file string secara sinkron.</td>
-                    <td><code>const data = fs.readFileSync('r.txt')</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>fs.writeFileSync(path, str)</code></td>
-                    <td>Menulis file teks string secara sinkron.</td>
-                    <td><code>fs.writeFileSync('w.txt', 'Kilat')</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>fs.readdirSync(dir)</code></td>
-                    <td>Membaca daftar nama file dalam direktori.</td>
-                    <td><code>const list = fs.readdirSync('.')</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>fs.existsSync(path)</code></td>
-                    <td>Menguji keberadaan file/path.</td>
-                    <td><code>if (fs.existsSync('c.json')) ...</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>net.fetch(url)</code></td>
-                    <td>HTTP GET request sinkron, mengembalikan string.</td>
-                    <td><code>const res = net.fetch('https://...')</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>os.getenv(key)</code></td>
-                    <td>Mengambil string environment variable.</td>
-                    <td><code>const user = os.getenv('USER')</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>os.args()</code></td>
-                    <td>Mengembalikan array CLI parameters.</td>
-                    <td><code>const params = os.args()</code></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <h2 className="section-title">Pengujian Testing Dependensi</h2>
-            <p>Untuk memastikan penanganan warna terminal berjalan lancar, Anda dapat mencoba memasang module warna terpopuler seperti <code>chalk</code>:</p>
-            
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>API Global Baru (Asinkron)</h2>
+              <p>Sejak versi 2.1.0 dan 3.0.0, Kilat mendukung API global asinkron yang terintegrasi dengan loop tugas latar belakang:</p>
+              <ul>
+                <li><strong><code>globalThis.fetch(url, options)</code></strong>: API Fetch standar asinkron untuk melakukan HTTP request.</li>
+                <li><strong><code>globalThis.$(command)</code></strong>: Shell executor asinkron. Dapat dipanggil sebagai fungsi atau tag template literal.</li>
+              </ul>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>example.js</span>
+                  <button onClick={() => handleCopy('api-global', 'async function main() {\n  const res = await fetch("https://api.github.com");\n  const data = await res.json();\n  console.log(data);\n  const out = await $`echo "Platform: $(uname)"`;\n  console.log(out.stdout);\n}\nmain();')}>{copiedTextMap['api-global'] ? 'Disalin!' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('mod-test-install', 'kilat add chalk')}
-                >
-                  {copiedTextMap['mod-test-install'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-prompt">$</span>kilat add chalk
-                  </code>
-                </pre>
+                <pre><code><span className="sh-keyword">async</span> <span className="sh-keyword">function</span> <span className="sh-func">main</span>() &#123;{"\n"}  <span className="sh-keyword">const</span> res = <span className="sh-keyword">await</span> <span className="sh-func">fetch</span>(<span className="sh-string">"https://api.github.com"</span>);{"\n"}  <span className="sh-keyword">const</span> data = <span className="sh-keyword">await</span> res.<span className="sh-func">json</span>();{"\n"}  <span className="sh-func">console.log</span>(data);{"\n\n"}  <span className="sh-keyword">const</span> out = <span className="sh-keyword">await</span> $`echo "Platform: $(uname)"`;{"\n"}  <span className="sh-func">console.log</span>(out.stdout);{"\n"}&#125;{"\n"}<span className="sh-func">main</span>();</code></pre>
               </div>
             </div>
 
-            <p>Tulis berkas JavaScript <code>test.js</code>:</p>
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
-                </div>
-                <span className="term-title">test.js</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('mod-test-code', 'const chalk = require(\'chalk\');\nconsole.log(chalk.green(\'✔ Kilat & Chalk berhasil bekerja dengan sempurna!\'));')}
-                >
-                  {copiedTextMap['mod-test-code'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-keyword">const</span> chalk = <span className="sh-func">require</span>(<span className="sh-string">'chalk'</span>);{"\n"}
-                    <span className="sh-func">console.log</span>(chalk.green(<span className="sh-string">'✔ Kilat & Chalk berhasil bekerja dengan sempurna!'</span>));
-                  </code>
-                </pre>
-              </div>
-            </div>
-
-            <p>Jalankan berkas menggunakan Kilat:</p>
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
-                </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('mod-test-run', 'kilat run test.js')}
-                >
-                  {copiedTextMap['mod-test-run'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-prompt">$</span>kilat run test.js{"\n"}
-                    <span className="sh-out" style={{ color: 'var(--secondary)' }}>✔ Kilat & Chalk berhasil bekerja dengan sempurna!</span>
-                  </code>
-                </pre>
+            <div className="doc-card">
+              <h2>Modul Core Standard</h2>
+              <div className="table-container">
+                <table className="glass-table">
+                  <thead>
+                    <tr>
+                      <th>Modul / Method</th>
+                      <th>Deskripsi</th>
+                      <th>Contoh Pemanggilan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>require('fs')</code></td>
+                      <td>Operasi filesystem secara sinkron (readFileSync, writeFileSync, readdirSync, existsSync).</td>
+                      <td><code>const fs = require('fs');</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>require('os')</code></td>
+                      <td>Membaca data sistem operasi, lingkungan (getenv), dan parameter CLI (args).</td>
+                      <td><code>const os = require('os');</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>console.log()</code></td>
+                      <td>Log output berwarna (opsional parameter warna: green, red, yellow, blue).</td>
+                      <td><code>console.log('OK', 'green');</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>Bun.serve()</code></td>
+                      <td>HTTP Server asinkron built-in berkinerja tinggi.</td>
+                      <td><code>Bun.serve(&#123; port: 3000, fetch: ... &#125;);</code></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         )
 
-
-
       case 'changelog':
         return (
-          <div className="doc">
-            <h1 className="doc-title">Changelog</h1>
-            <p className="lede">Catatan rilis dan riwayat pembaruan runtime Kilat.</p>
+          <div className="doc-layout animate-fade-in">
+            <h1 className="doc-page-title">Riwayat Rilis</h1>
+            <p className="doc-page-subtitle">Daftar perubahan bertahap dan rilis berkala biner runtime Kilat.</p>
 
-            <div className="changelog-list">
-              <div className="changelog-version">
-                <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v3.0.0</h2>
-                  <span className="changelog-date">11 Juli 2026</span>
-                  <span className="changelog-badge latest">Terbaru</span>
-                </div>
-                <div className="changelog-content">
-                  <p>Rilis versi major ini memperkenalkan dukungan penuh untuk <strong>Shell Command Execution ($)</strong>. Pengguna kini dapat memanggil fungsi <code>$</code> secara global dan asinkron (baik sebagai fungsi biasa maupun tag template literal) untuk mengeksekusi perintah shell Linux/Termux.</p>
-                  
-                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
-                  <ul>
-                    <li><strong>Shell Command Execution (<code>$</code>)</strong>: Eksekusi perintah Linux/Termux secara langsung dan asinkron dengan output teks, parsing JSON, properti stderr, dan exitCode.</li>
-                  </ul>
+            <div className="timeline-container">
+              <div className="timeline-node">
+                <div className="node-marker active"></div>
+                <div className="node-content">
+                  <div className="node-header">
+                    <h3>v3.0.0</h3>
+                    <span className="node-date">11 Juli 2026</span>
+                    <span className="node-tag latest">Terbaru</span>
+                  </div>
+                  <p>Memperkenalkan **Global Shell Command Execution (<code>$</code>)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.</p>
                 </div>
               </div>
 
-              <div className="changelog-version">
-                <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v2.1.0</h2>
-                  <span className="changelog-date">11 Juli 2026</span>
-                  <span className="changelog-badge">Lama</span>
-                </div>
-                <div className="changelog-content">
-                  <p>Rilis versi minor ini memperkenalkan dukungan penuh untuk <strong>Global Fetch API</strong>. Pengguna kini dapat memanggil fungsi <code>fetch()</code> secara global dan asinkron untuk melakukan HTTP request standar dan menerima objek <code>Response</code> asli.</p>
-                  
-                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
-                  <ul>
-                    <li><strong>Global fetch() API</strong>: Fungsi global Fetch API yang sepenuhnya asinkron berbasis event-loop dan goroutine di latar belakang.</li>
-                  </ul>
+              <div className="timeline-node">
+                <div className="node-marker"></div>
+                <div className="node-content">
+                  <div className="node-header">
+                    <h3>v2.1.0</h3>
+                    <span className="node-date">11 Juli 2026</span>
+                  </div>
+                  <p>Memperkenalkan **Global Fetch API (<code>fetch</code>)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.</p>
                 </div>
               </div>
 
-              <div className="changelog-version">
-                <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v2.0.0</h2>
-                  <span className="changelog-date">1 Juli 2026</span>
-                  <span className="changelog-badge">Lama</span>
-                </div>
-                <div className="changelog-content">
-                  <p>Rilis versi final major ini memperkenalkan dukungan penuh untuk <strong>TypeScript Instan</strong> dan <strong>ES Modules (ESM)</strong> yang terintegrasi secara transparan via esbuild di memori. Ini adalah rilis stabil produksi utama dengan optimalisasi performa ekstrem.</p>
-                  
-                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
-                  <ul>
-                    <li><strong>Dukungan TypeScript Instan (<code>v0.5.0</code>)</strong>: Eksekusi berkas <code>.ts</code>, <code>.tsx</code>, dan <code>.jsx</code> secara langsung menggunakan compiler esbuild berkinerja tinggi.</li>
-                    <li><strong>Parser ES Modules (<code>v1.5.0</code>)</strong>: Dukungan sintaks modern ES Modules (<code>import</code> / <code>export</code>) secara transparan.</li>
-                    <li><strong>Rilis Stabil Utama &amp; Refactoring Performa (<code>v1.0.0</code> / <code>v2.0.0</code>)</strong>: Refactoring total pipeline pemuatan modul di memori untuk startup instan dan performa memori ekstrem.</li>
-                  </ul>
+              <div className="timeline-node">
+                <div className="node-marker"></div>
+                <div className="node-content">
+                  <div className="node-header">
+                    <h3>v2.0.0</h3>
+                    <span className="node-date">1 Juli 2026</span>
+                  </div>
+                  <p>Integrasi compiler **esbuild** internal untuk mendukung pemuatan file **TypeScript (TS, TSX, JSX)** dan transpiler **ES Modules (ESM)** di memori secara otomatis.</p>
                 </div>
               </div>
 
-              <div className="changelog-version">
-                <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v0.4.0</h2>
-                  <span className="changelog-date">20 Juni 2026</span>
-                  <span className="changelog-badge">Lama</span>
-                </div>
-                <div className="changelog-content">
-                  <p>Rilis versi ini memperkenalkan <strong>HTTP Server Bawaan</strong> (mirip dengan Bun.serve). Pengguna kini dapat membuat HTTP server asinkron performa tinggi dan menggunakan Fetch API standar (Headers, Request, Response) langsung dari runtime Kilat.</p>
-                  
-                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
-                  <ul>
-                    <li><strong>Built-In HTTP Server (<code>Bun.serve</code>)</strong>: Implementasi HTTP server asinkron internal performa tinggi.</li>
-                    <li><strong>Dukungan Fetch API Dasar</strong>: Integrasi global class <code>Request</code>, <code>Response</code>, dan <code>Headers</code> untuk memanipulasi HTTP request dan response secara efisien.</li>
-                    <li><strong>REPL &amp; Event-Loop Asinkron</strong>: Integrasi REPL interaktif berbasis event-loop untuk mendukung eksekusi kode asinkron di latar belakang.</li>
-                  </ul>
+              <div className="timeline-node">
+                <div className="node-marker"></div>
+                <div className="node-content">
+                  <div className="node-header">
+                    <h3>v0.4.0</h3>
+                    <span className="node-date">20 Juni 2026</span>
+                  </div>
+                  <p>Mendukung pembuatan HTTP Server asinkron internal dengan **Bun.serve()**, serta integrasi REPL yang mendukung eksekusi microtasks.</p>
                 </div>
               </div>
 
-              <div className="changelog-version">
-                <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v0.3.0</h2>
-                  <span className="changelog-date">19 Juni 2026</span>
-                  <span className="changelog-badge">Lama</span>
-                </div>
-                <div className="changelog-content">
-                  <p>Rilis versi minor ini memperkenalkan <strong>REPL Interaktif</strong> bawaan. Pengguna kini dapat berinteraksi dan mencoba kode JavaScript langsung dari shell Termux tanpa membuat file terpisah.</p>
-                  
-                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
-                  <ul>
-                    <li><strong>REPL Interaktif (<code>repl</code>)</strong>: Menjalankan perintah <code>kilat</code> tanpa argumen atau <code>kilat repl</code> akan meluncurkan interactive shell JavaScript.</li>
-                    <li><strong>Global Module Require</strong>: Dukungan pemanggilan <code>require()</code> module di dalam REPL.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="changelog-version">
-                <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v0.2.0</h2>
-                  <span className="changelog-date">19 Juni 2026</span>
-                  <span className="changelog-badge">Lama</span>
-                </div>
-                <div className="changelog-content">
-                  <p>Rilis versi minor ini memperkenalkan Watch Mode untuk auto-reload saat pengembangan, dukungan pemuatan berkas <code>.env</code> secara bawaan, serta penyempurnaan pembungkusan module CommonJS untuk standardisasi scope yang lebih baik.</p>
-                  
-                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
-                  <ul>
-                    <li><strong>Watch Mode (<code>--watch</code> / <code>-w</code>)</strong>: Jalankan skrip dengan <code>kilat run index.js --watch</code> untuk otomatis merestart runtime setiap kali ada berkas <code>.js</code> atau <code>.json</code> yang berubah.</li>
-                    <li><strong>Dukungan File <code>.env</code></strong>: Kilat secara otomatis membaca berkas <code>.env</code> pada direktori aktif saat startup dan memasukkannya ke variabel lingkungan sistem.</li>
-                  </ul>
-
-                  <h4 className="changelog-section-name">📦 CommonJS & Loader</h4>
-                  <ul>
-                    <li><strong>Standard Scope Wrapping</strong>: Kode JavaScript sekarang dibungkus dalam CJS standard module wrapper <code>(function(exports, require, module, __filename, __dirname) &#123; ... &#125;)</code>, memisahkan variabel module scope secara bersih.</li>
-                    <li><strong>Relative Require & JSON</strong>: Mendukung require relative path (<code>./</code> dan <code>../</code>) serta pembacaan file JSON langsung (<code>require('./data.json')</code>).</li>
-                    <li><strong>Built-in Interceptor</strong>: Penggunaan <code>require('os')</code>, <code>require('fs')</code>, dll., sekarang otomatis diarahkan ke global module bawaan.</li>
-                  </ul>
-
-                  <h4 className="changelog-section-name">🔧 Perbaikan & Lain-lain</h4>
-                  <ul>
-                    <li><strong>Fix Git Ignore</strong>: Memperbaiki aturan ignore pada repositori agar tidak mengabaikan folder source code utama <code>cmd/</code>.</li>
-                    <li><strong>Custom Domain</strong>: Pemutakhiran metadata dokumentasi dan deployment dengan custom domain.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="changelog-version">
-                <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v0.1.0</h2>
-                  <span className="changelog-date">19 Juni 2026</span>
-                  <span className="changelog-badge">Initial Release</span>
-                </div>
-                <div className="changelog-content">
-                  <p>Rilis fondasi utama dari runtime interpreter JavaScript Kilat untuk perangkat Termux Android.</p>
-                  
-                  <h4 className="changelog-section-name">⚡ Fitur Utama</h4>
-                  <ul>
-                    <li><strong>Engine Goja</strong>: Pemuatan interpreter JavaScript murni berbasis Go yang sangat cepat saat startup dibandingkan V8 Node.js pada perangkat mobile.</li>
-                    <li><strong>Centralized Package Manager (<code>kilat add</code>)</strong>: Pemasangan dependensi npm secara terpusat di direktori global pengguna (<code>~/.kilat/packages/</code>) sehingga tidak memerlukan folder <code>node_modules</code> raksasa di setiap folder proyek.</li>
-                    <li><strong>Built-in Modules</strong>: Menyertakan modul dasar <code>console</code> (log berwarna), <code>fs</code> (akses filesystem), <code>net</code> (fetch HTTP request), dan <code>os</code> (akses environment/arguments).</li>
-                    <li><strong>Interactive CLI</strong>: Interface inisialisasi interaktif via <code>kilat init</code>.</li>
-                  </ul>
+              <div className="timeline-node">
+                <div className="node-marker"></div>
+                <div className="node-content">
+                  <div className="node-header">
+                    <h3>v0.1.0</h3>
+                    <span className="node-date">19 Juni 2026</span>
+                  </div>
+                  <p>Rilis biner perdana interpreter JavaScript Kilat berbasis Goja Engine dengan modul fundamental (fs, os, console) serta manajemen dependensi global terpusat.</p>
                 </div>
               </div>
             </div>
@@ -848,53 +427,26 @@ export default function App() {
 
       case 'contributing':
         return (
-          <div className="doc">
-            <h1 className="doc-title">Kontribusi & Lisensi</h1>
-            <p className="lede">Mari berkolaborasi mematangkan Kilat sebagai runtime JavaScript teringan untuk Termux.</p>
+          <div className="doc-layout animate-fade-in">
+            <h1 className="doc-page-title">Berkontribusi ke Kilat</h1>
+            <p className="doc-page-subtitle">Cara berpartisipasi membesarkan proyek Kilat agar menjadi semakin andal dan cepat.</p>
 
-            <h2 className="section-title">Cara Berkontribusi</h2>
-            <p>Kami sangat menyukai kontribusi komunitas! Anda dapat berkontribusi melalui pelaporan bug, usulan fitur, perbaikan performa, maupun penyempurnaan modul. Ikuti langkah pengerjaan lokal berikut:</p>
-
-            <div className="term-window">
-              <div className="term-bar">
-                <div className="term-dots">
-                  <span className="term-dot r"></span>
-                  <span className="term-dot y"></span>
-                  <span className="term-dot g"></span>
+            <div className="doc-card">
+              <h2>Panduan Memulai Cepat</h2>
+              <p>Kami sangat menyambut kontribusi kode, pelaporan bug, dan perbaikan dokumentasi. Anda dapat mengompilasi biner secara lokal dari fork repositori Anda:</p>
+              <div className="code-window">
+                <div className="window-header">
+                  <span>Terminal</span>
+                  <button onClick={() => handleCopy('contrib-code', 'git clone https://github.com/IHx-cmyk/kilat\ncd kilat\ngo mod tidy\ngo build -o kilat ./cmd/kilat')}>{copiedTextMap['contrib-code'] ? 'Salin' : 'Salin'}</button>
                 </div>
-                <span className="term-title">bash terminal</span>
-                <button 
-                  className="term-copy"
-                  onClick={() => handleCopy('contribute-cl', 'git clone https://github.com/IHx-cmyk/kilat\ncd kilat\ngo mod tidy\ngo build -o kilat ./cmd/kilat')}
-                >
-                  {copiedTextMap['contribute-cl'] ? 'Copied!' : 'copy'}
-                </button>
-              </div>
-              <div className="term-body">
-                <pre>
-                  <code>
-                    <span className="sh-comment"># Clone hasil fork repositori Anda</span>{"\n"}
-                    <span className="sh-prompt">$</span>git clone https://github.com/IHx-cmyk/kilat{"\n"}
-                    <span className="sh-prompt">$</span>cd kilat{"\n\n"}
-                    <span className="sh-comment"># Tidy dependencies dan compile secara lokal</span>{"\n"}
-                    <span className="sh-prompt">$</span>go mod tidy{"\n"}
-                    <span className="sh-prompt">$</span>go build -o kilat ./cmd/kilat
-                  </code>
-                </pre>
+                <pre><code><span className="sh-prompt">$</span>git clone https://github.com/IHx-cmyk/kilat{"\n"}<span className="sh-prompt">$</span>cd kilat{"\n"}<span className="sh-prompt">$</span>go mod tidy{"\n"}<span className="sh-prompt">$</span>go build -o kilat ./cmd/kilat</code></pre>
               </div>
             </div>
 
-            <div className="callout-box">
-              <div className="callout-tag">[info]</div>
-              <div className="callout-text">
-                Kirimkan Pull Request (PR) ke branch <code>main</code>. Pastikan kode Anda sudah terformat rapi sesuai gaya bahasa Go (<code>go fmt</code>).
-              </div>
+            <div className="doc-card">
+              <h2>Lisensi Proyek</h2>
+              <p>Kilat dirilis sebagai perangkat lunak open-source berlisensi <strong>MIT License</strong>. Anda bebas menggunakan, memodifikasi, dan membagikannya secara gratis sesuai syarat atribusi.</p>
             </div>
-
-            <h2 className="section-title">Lisensi Perangkat Lunak</h2>
-            <p>
-              Proyek runtime Kilat dirilis di bawah lisensi terbuka <strong>MIT License</strong>. Anda bebas menggunakan, memodifikasi, mendistribusikan, dan melakukan komersialisasi perangkat lunak ini secara gratis, selama mencantumkan atribusi pembuat asli.
-            </p>
           </div>
         )
 
@@ -904,40 +456,18 @@ export default function App() {
   }
 
   return (
-    <div className="app-layout">
-      <div className="glow-blob glow-left"></div>
-      <div className="glow-blob glow-right"></div>
+    <div className="app-container">
+      <div className="glow-mesh glow-1"></div>
+      <div className="glow-mesh glow-2"></div>
+      <div className="cyber-grid"></div>
 
-      <nav className="navbar">
-        <div className="nav-container">
-          <a href="#index" className="logo">
-            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v3.0.0</span>
+      <nav className="glass-navbar">
+        <div className="navbar-inner">
+          <a href="#index" className="brand-logo">
+            <span className="logo-spark">⚡</span> kilat <span className="logo-version">v3.0.0</span>
           </a>
-
-          <a
-            href="https://github.com/IHx-cmyk/kilat"
-            target="_blank"
-            rel="noreferrer"
-            className="btn-github desktop-only"
-          >
-            GitHub
-          </a>
-
-          <button
-            className="menu-btn mobile-only"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
+          <button className="menu-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               {mobileMenuOpen ? (
                 <>
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -955,81 +485,51 @@ export default function App() {
         </div>
       </nav>
 
-      <div className={`mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
-        {pageOrder.map((page) => (
-          <a
-            key={page.key}
-            href={`#${page.key}`}
-            className={`mobile-link ${activePage === page.key ? 'active' : ''}`}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {page.title}
+      <div className={`drawer-nav ${mobileMenuOpen ? 'open' : ''}`}>
+        {pageOrder.map(page => (
+          <a key={page.key} href={`#${page.key}`} className={`drawer-link ${activePage === page.key ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+            <span className="drawer-icon">{page.icon}</span> {page.title}
           </a>
         ))}
-        <a
-          href="https://github.com/IHx-cmyk/kilat"
-          target="_blank"
-          rel="noreferrer"
-          className="mobile-link"
-        >
-          GitHub
+        <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="drawer-link">
+          <span className="drawer-icon">🐙</span> GitHub
         </a>
       </div>
 
-      <div className="main-wrapper">
-        <aside className="sidebar desktop-only">
-          <div className="sidebar-sticky">
-            <h3 className="sidebar-heading">Dokumentasi</h3>
-            <ul className="sidebar-links">
-              {pageOrder.map((page) => (
-                <li key={page.key}>
-                  <a
-                    href={`#${page.key}`}
-                    className={`sidebar-link ${activePage === page.key ? 'active' : ''}`}
-                  >
-                    {page.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
+      <div className="layout-body">
+        <aside className="glass-sidebar">
+          <div className="sidebar-brand">
+            <span className="logo-spark">⚡</span> kilat <span className="logo-version">v3.0.0</span>
           </div>
+          <nav className="sidebar-menu">
+            {pageOrder.map(page => (
+              <a key={page.key} href={`#${page.key}`} className={`menu-item ${activePage === page.key ? 'active' : ''}`}>
+                <span className="menu-icon">{page.icon}</span>
+                <span className="menu-text">{page.title}</span>
+              </a>
+            ))}
+            <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="menu-item-github">
+              🐙 GitHub
+            </a>
+          </nav>
         </aside>
 
-        <div className="shell">
-          <main>
-            <div className="content-container">
-              {activePage !== 'index' && (
-                <div className="eyebrow">
-                  <span className="eyebrow-prompt">$</span> cat docs/{activePage}.md
-                </div>
-              )}
-              
-              {renderPageContent()}
+        <main className="main-content">
+          <div className="page-wrapper">
+            {activePage !== 'index' && (
+              <div className="terminal-breadcrumbs">
+                <span className="breadcrumb-path">docs/{activePage}.js</span>
+              </div>
+            )}
+            
+            {renderPageContent()}
 
-              {activePage !== 'index' && (
-                <div className="doc-pager">
-                  {prevPage && (
-                    <a href={`#${prevPage.key}`} className="pager-btn">
-                      <span className="pager-dir">← sebelumnya</span>
-                      <span className="pager-lbl">{prevPage.title}</span>
-                    </a>
-                  )}
-                  {nextPage && (
-                    <a href={`#${nextPage.key}`} className="pager-btn next">
-                      <span className="pager-dir">selanjutnya →</span>
-                      <span className="pager-lbl">{nextPage.title}</span>
-                    </a>
-                  )}
-                </div>
-              )}
-
-              <footer className="footer">
-                <span>Dibuat seadanya. Modal sebatang rokok dan seglintir harapan user Termux</span>
-                <span>MIT License © 2026 Kilat.</span>
-              </footer>
-            </div>
-          </main>
-        </div>
+            <footer className="glass-footer">
+              <p>Dibuat seadanya. Modal sebatang rokok & segelintir harapan user Termux.</p>
+              <p>MIT License © 2026 Kilat.</p>
+            </footer>
+          </div>
+        </main>
       </div>
     </div>
   )
