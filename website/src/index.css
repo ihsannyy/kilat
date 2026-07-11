@@ -485,7 +485,7 @@ h2.section-title:first-of-type {
   color: #fff;
   letter-spacing: -0.03em;
   margin-bottom: 18px;
-  background: linear-gradient(135deg, #ffffff 40%, #9ca3af 100%);
+  background: linear-gradient(135deg, #ffffff 30%, #a78bfa 70%, #22d3ee 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -524,23 +524,26 @@ h2.section-title:first-of-type {
   transition: var(--transition);
 }
 .btn-primary {
-  background: var(--primary);
-  color: #000;
-  border: 1px solid var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 .btn-primary:hover {
-  background: #fcd34d;
-  box-shadow: 0 8px 20px var(--primary-glow);
+  background: linear-gradient(135deg, #a78bfa, #22d3ee);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
   transform: translateY(-2px);
 }
 .btn-ghost {
   background: transparent;
   color: var(--text-primary);
   border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 .btn-ghost:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: var(--text-muted);
+  border-color: var(--primary);
   transform: translateY(-2px);
 }
 
