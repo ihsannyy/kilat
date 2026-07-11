@@ -373,7 +373,9 @@ export default function App() {
                     <span className="box-title">installer channel</span>
                   </div>
                   <div className="box-body">
-                    <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
+                    <div className="code-scroll-wrapper">
+                      <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
+                    </div>
                     <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}>
                       {copiedMap['hero-inst'] ? 'COPIED' : 'COPY'}
                     </button>
@@ -418,7 +420,9 @@ export default function App() {
                     </div>
                   </div>
                   <div className="box-body">
-                    <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
+                    <div className="code-scroll-wrapper">
+                      <code>curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash</code>
+                    </div>
                     <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/IHx-cmyk/kilat/main/install.sh | bash')}>
                       {copiedMap['inst-auto'] ? 'COPIED' : 'COPY'}
                     </button>
@@ -436,7 +440,9 @@ export default function App() {
                     </div>
                   </div>
                   <div className="box-body">
-                    <code>kilat --version</code>
+                    <div className="code-scroll-wrapper">
+                      <code>kilat --version</code>
+                    </div>
                     <button className="copy-bezel-btn" onClick={() => handleCopy('inst-verify', 'kilat --version')}>
                       {copiedMap['inst-verify'] ? 'COPIED' : 'COPY'}
                     </button>
@@ -449,7 +455,7 @@ export default function App() {
           {activeTab === 'api' && (
             <div className="pane-view animate-in">
               <h2 className="pane-title">API Referensi</h2>
-              <p className="pane-subtitle">Daftar global API dan core module built-in bawaat Kilat.</p>
+              <p className="pane-subtitle">Daftar global API dan core module built-in bawaan Kilat.</p>
 
               <div className="api-panel-grid">
                 <div className="api-panel">
