@@ -577,6 +577,14 @@ body {
   .desktop-only {
     display: none !important;
   }
+  .time-lbl {
+    display: none !important;
+  }
+  .environment-clock {
+    font-size: 10px;
+    padding: 3px 8px;
+    gap: 4px;
+  }
   .navbar-inner {
     justify-content: space-between;
   }

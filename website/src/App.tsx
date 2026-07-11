@@ -300,13 +300,14 @@ export default function App() {
           </nav>
 
           <div className="navbar-actions">
-            <div className="environment-clock desktop-only">
+            <div className="environment-clock">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="clock-svg">
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
-              <span className="time-lbl">MODE: {timeMode}</span>
-              <span className="time-val">[{clockText}]</span>
+              <span className="time-lbl">MODE:&nbsp;</span>
+              <span className="time-mode-name">{timeMode}</span>
+              <span className="time-val">&nbsp;[{clockText}]</span>
             </div>
             
             <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
