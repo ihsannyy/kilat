@@ -4,6 +4,10 @@ Semua pembaruan penting untuk proyek **Kilat** akan didokumentasikan di berkas i
 
 ---
 
+## [v3.0.0] - 2026-07-11
+### ⚡ Fitur Baru
+* **Shell Command Execution (`$`)**: Dukungan eksekusi perintah shell Linux/Termux menggunakan helper global `$` (baik sebagai fungsi biasa maupun sebagai tag template literal). Menghasilkan respons asinkron dengan metode `.text()`, `.json()`, serta properti `stderr` dan `exitCode`.
+
 ## [v2.1.0] - 2026-07-11
 ### ⚡ Fitur Baru
 * **Global Fetch API**: Dukungan fungsi `fetch()` global yang kompatibel dengan Fetch API standar. Fungsi ini berjalan secara asinkron di latar belakang menggunakan goroutine, tidak menghalangi event-loop JavaScript utama, dan mengembalikan objek `Response` asli.

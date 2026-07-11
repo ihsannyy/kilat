@@ -288,7 +288,7 @@ export default function App() {
                 <pre>
                   <code>
                     <span className="sh-prompt">$</span>kilat --version{"\n"}
-                    <span className="sh-out">Kilat v2.1.0</span>
+                    <span className="sh-out">Kilat v3.0.0</span>
                   </code>
                 </pre>
               </div>
@@ -707,9 +707,25 @@ export default function App() {
             <div className="changelog-list">
               <div className="changelog-version">
                 <div className="changelog-header">
-                  <h2 className="changelog-ver-title">v2.1.0</h2>
+                  <h2 className="changelog-ver-title">v3.0.0</h2>
                   <span className="changelog-date">11 Juli 2026</span>
                   <span className="changelog-badge latest">Terbaru</span>
+                </div>
+                <div className="changelog-content">
+                  <p>Rilis versi major ini memperkenalkan dukungan penuh untuk <strong>Shell Command Execution ($)</strong>. Pengguna kini dapat memanggil fungsi <code>$</code> secara global dan asinkron (baik sebagai fungsi biasa maupun tag template literal) untuk mengeksekusi perintah shell Linux/Termux.</p>
+                  
+                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
+                  <ul>
+                    <li><strong>Shell Command Execution (<code>$</code>)</strong>: Eksekusi perintah Linux/Termux secara langsung dan asinkron dengan output teks, parsing JSON, properti stderr, dan exitCode.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="changelog-version">
+                <div className="changelog-header">
+                  <h2 className="changelog-ver-title">v2.1.0</h2>
+                  <span className="changelog-date">11 Juli 2026</span>
+                  <span className="changelog-badge">Lama</span>
                 </div>
                 <div className="changelog-content">
                   <p>Rilis versi minor ini memperkenalkan dukungan penuh untuk <strong>Global Fetch API</strong>. Pengguna kini dapat memanggil fungsi <code>fetch()</code> secara global dan asinkron untuk melakukan HTTP request standar dan menerima objek <code>Response</code> asli.</p>
@@ -893,7 +909,7 @@ export default function App() {
       <nav className="navbar">
         <div className="nav-container">
           <a href="#index" className="logo">
-            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v2.1.0</span>
+            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v3.0.0</span>
           </a>
 
           {/* Desktop nav links */}

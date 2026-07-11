@@ -42,7 +42,13 @@ func New(opts Options) *Runtime {
 	}, func() {
 		atomic.AddInt32(&r.activeTasks, -1)
 	})
-	modules.RegisterOS(vm)
+	modules.RegisterOS(vm, func(job func()) {
+		r.jobs <- job
+	}, func() {
+		atomic.AddInt32(&r.activeTasks, 1)
+	}, func() {
+		atomic.AddInt32(&r.activeTasks, -1)
+	})
 	modules.RegisterBun(vm, func(job func()) {
 		r.jobs <- job
 	}, func(hasServer bool) {
@@ -154,6 +160,35 @@ func New(opts Options) *Runtime {
 							status: resp.status,
 							headers: resp.headers
 						}));
+					}
+				});
+			});
+		};
+
+		globalThis.$ = function(strings, ...values) {
+			let cmd = '';
+			if (Array.isArray(strings)) {
+				for (let i = 0; i < strings.length; i++) {
+					cmd += strings[i];
+					if (i < values.length) {
+						cmd += values[i];
+					}
+				}
+			} else {
+				cmd = strings;
+			}
+
+			return new Promise((resolve, reject) => {
+				globalThis.__nativeExec(cmd, (err, stdout, stderr, exitCode) => {
+					if (err) {
+						reject(new Error(err));
+					} else {
+						resolve({
+							text() { return stdout; },
+							json() { return JSON.parse(stdout); },
+							stderr: stderr,
+							exitCode: exitCode
+						});
 					}
 				});
 			});

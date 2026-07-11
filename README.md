@@ -14,7 +14,7 @@ Kilat adalah runtime JavaScript CommonJS yang ringan dan efisien, dibangun di at
 [![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?logo=go&logoColor=white&style=for-the-badge)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#-lisensi)
 [![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Linux-brightgreen?style=for-the-badge)](#)
-[![Version](https://img.shields.io/badge/Version-2.1.0-blue?style=for-the-badge)](#)
+[![Version](https://img.shields.io/badge/Version-3.0.0-blue?style=for-the-badge)](#)
 
 </div>
 
