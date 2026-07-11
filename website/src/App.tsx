@@ -154,15 +154,15 @@ export default function App() {
       const houseW = 180
       const houseH = 110
       const houseX = w - houseW - 60
-      const houseY = h - houseH - 65
+      const houseY = h - houseH - 120
 
       ctx.fillStyle = '#020108'
       ctx.beginPath()
-      ctx.arc(w - 120, h + 45, 220, 0, 2 * Math.PI)
+      ctx.arc(w - 120, h - 10, 220, 0, 2 * Math.PI)
       ctx.fill()
 
       ctx.beginPath()
-      ctx.rect(0, h - 35, w, 35)
+      ctx.rect(0, h - 60, w, 60)
       ctx.fill()
 
       ctx.fillStyle = '#060416'
