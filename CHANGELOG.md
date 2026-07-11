@@ -4,6 +4,10 @@ Semua pembaruan penting untuk proyek **Kilat** akan didokumentasikan di berkas i
 
 ---
 
+## [v2.1.0] - 2026-07-11
+### ⚡ Fitur Baru
+* **Global Fetch API**: Dukungan fungsi `fetch()` global yang kompatibel dengan Fetch API standar. Fungsi ini berjalan secara asinkron di latar belakang menggunakan goroutine, tidak menghalangi event-loop JavaScript utama, dan mengembalikan objek `Response` asli.
+
 ## [v2.0.0] - 2026-07-01
 ### ⚡ Fitur Baru
 * **Dukungan TypeScript Instan (v0.5.0)**: Eksekusi berkas TypeScript (`.ts`, `.tsx`, `.jsx`) secara langsung dan transparan menggunakan integrasi compiler esbuild berkinerja tinggi.

@@ -11,7 +11,6 @@ const pageOrder: PageItem[] = [
   { key: 'usage', title: 'Penggunaan' },
   { key: 'project', title: 'Struktur' },
   { key: 'modules', title: 'Modules' },
-  { key: 'roadmap', title: 'Roadmap' },
   { key: 'changelog', title: 'Changelog' },
   { key: 'contributing', title: 'Kontribusi' }
 ]
@@ -289,7 +288,7 @@ export default function App() {
                 <pre>
                   <code>
                     <span className="sh-prompt">$</span>kilat --version{"\n"}
-                    <span className="sh-out">Kilat v2.0.0</span>
+                    <span className="sh-out">Kilat v2.1.0</span>
                   </code>
                 </pre>
               </div>
@@ -697,111 +696,7 @@ export default function App() {
           </div>
         )
 
-      case 'roadmap':
-        return (
-          <div className="doc">
-            <h1 className="doc-title">Roadmap</h1>
-            <p className="lede">Ke mana arah pengembangan Kilat selanjutnya. Penjelasan fitur pada setiap rencana rilis.</p>
 
-            <div className="timeline-list">
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v0.1.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">Fase Fondasi</h4>
-                  <p className="timeline-desc">Runtime interpreter CommonJS dasar, import resolver, download metadata zip npm, global packages cache path, dan modul inti bawaan (console, fs, net, os).</p>
-                </div>
-              </div>
-
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v0.2.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">Watch Mode & Environment</h4>
-                  <p className="timeline-desc">Menyediakan file watcher auto reload (<code>--watch</code>) dan pemuatan parsing file environment variable <code>.env</code> secara otomatis pada startup.</p>
-                </div>
-              </div>
-
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v0.3.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">REPL Interaktif</h4>
-                  <p className="timeline-desc">Menambahkan antarmuka interaktif Kilat console langsung di dalam shell Termux untuk pengujian ekspresi JavaScript secara langsung.</p>
-                </div>
-              </div>
-
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v0.4.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">Built-In HTTP Server</h4>
-                  <p className="timeline-desc">Implementasi HTTP server internal terintegrasi berkecepatan tinggi mirip dengan <code>Bun.serve</code>.</p>
-                </div>
-              </div>
-
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v0.5.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">Dukungan TypeScript Instan</h4>
-                  <p className="timeline-desc">Kompilasi dan eksekusi TypeScript langsung secara runtime menggunakan integrasi parser loader esbuild.</p>
-                </div>
-              </div>
-
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v1.0.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">Rilis Stabil Utama</h4>
-                  <p className="timeline-desc">Rilis versi stabil utama (production ready) dengan performa andal untuk eksekusi skrip harian.</p>
-                </div>
-              </div>
-
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v1.5.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">Dukungan ES Modules</h4>
-                  <p className="timeline-desc">Dukungan parser modern untuk sintaks ES Modules (<code>import</code> / <code>export</code>).</p>
-                </div>
-              </div>
-
-              <div className="timeline-item done">
-                <div className="timeline-dot"></div>
-                <div className="timeline-card">
-                  <div className="timeline-meta">
-                    <span className="timeline-ver">v2.0.0</span>
-                    <span className="timeline-status done">Selesai</span>
-                  </div>
-                  <h4 className="timeline-title">Optimalisasi Performa Ekstrem</h4>
-                  <p className="timeline-desc">Refactoring total arsitektur runtime Kilat untuk performa eksekusi dan efisiensi memori yang ekstrem.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
 
       case 'changelog':
         return (
@@ -812,9 +707,25 @@ export default function App() {
             <div className="changelog-list">
               <div className="changelog-version">
                 <div className="changelog-header">
+                  <h2 className="changelog-ver-title">v2.1.0</h2>
+                  <span className="changelog-date">11 Juli 2026</span>
+                  <span className="changelog-badge latest">Terbaru</span>
+                </div>
+                <div className="changelog-content">
+                  <p>Rilis versi minor ini memperkenalkan dukungan penuh untuk <strong>Global Fetch API</strong>. Pengguna kini dapat memanggil fungsi <code>fetch()</code> secara global dan asinkron untuk melakukan HTTP request standar dan menerima objek <code>Response</code> asli.</p>
+                  
+                  <h4 className="changelog-section-name">⚡ Fitur Baru</h4>
+                  <ul>
+                    <li><strong>Global fetch() API</strong>: Fungsi global Fetch API yang sepenuhnya asinkron berbasis event-loop dan goroutine di latar belakang.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="changelog-version">
+                <div className="changelog-header">
                   <h2 className="changelog-ver-title">v2.0.0</h2>
                   <span className="changelog-date">1 Juli 2026</span>
-                  <span className="changelog-badge latest">Terbaru</span>
+                  <span className="changelog-badge">Lama</span>
                 </div>
                 <div className="changelog-content">
                   <p>Rilis versi final major ini memperkenalkan dukungan penuh untuk <strong>TypeScript Instan</strong> dan <strong>ES Modules (ESM)</strong> yang terintegrasi secara transparan via esbuild di memori. Ini adalah rilis stabil produksi utama dengan optimalisasi performa ekstrem.</p>
@@ -982,7 +893,7 @@ export default function App() {
       <nav className="navbar">
         <div className="nav-container">
           <a href="#index" className="logo">
-            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v2.0.0</span>
+            <span className="logo-spark">⚡</span> kilat <span className="logo-badge">v2.1.0</span>
           </a>
 
           {/* Desktop nav links */}

@@ -6,16 +6,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"github.com/dop251/goja"
 	"github.com/evanw/esbuild/pkg/api"
 	"kilat/internal/modules"
 )
 
 type Runtime struct {
-	vm        *goja.Runtime
-	cache     map[string]*moduleRecord
-	jobs      chan func()
-	hasServer bool
+	vm          *goja.Runtime
+	cache       map[string]*moduleRecord
+	jobs        chan func()
+	hasServer   bool
+	activeTasks int32
 }
 
 type moduleRecord struct {
@@ -33,13 +35,20 @@ func New(opts Options) *Runtime {
 
 	modules.RegisterConsole(vm)
 	modules.RegisterFS(vm)
-	modules.RegisterNet(vm)
+	modules.RegisterNet(vm, func(job func()) {
+		r.jobs <- job
+	}, func() {
+		atomic.AddInt32(&r.activeTasks, 1)
+	}, func() {
+		atomic.AddInt32(&r.activeTasks, -1)
+	})
 	modules.RegisterOS(vm)
 	modules.RegisterBun(vm, func(job func()) {
 		r.jobs <- job
 	}, func(hasServer bool) {
 		r.hasServer = hasServer
 	})
+
 	bootstrapJS := `
 		class Headers {
 			constructor(init) {
@@ -124,6 +133,30 @@ func New(opts Options) *Runtime {
 			} catch (err) {
 				callback(err, null);
 			}
+		};
+
+		globalThis.fetch = function(url, options = {}) {
+			return new Promise((resolve, reject) => {
+				const method = options.method || 'GET';
+				const headers = {};
+				if (options.headers) {
+					new Headers(options.headers).forEach((value, key) => {
+						headers[key] = value;
+					});
+				}
+				const body = options.body || '';
+
+				globalThis.__nativeFetch(url, method, headers, body, (err, resp) => {
+					if (err) {
+						reject(new Error(err));
+					} else {
+						resolve(new Response(resp.body, {
+							status: resp.status,
+							headers: resp.headers
+						}));
+					}
+				});
+			});
 		};
 	`
 	_, err := vm.RunString(bootstrapJS)
@@ -356,14 +389,15 @@ func (r *Runtime) RunEventLoop() {
 			}
 			job()
 		default:
-			if !r.hasServer {
+			if r.hasServer || atomic.LoadInt32(&r.activeTasks) > 0 {
+				job, ok := <-r.jobs
+				if !ok {
+					return
+				}
+				job()
+			} else {
 				return
 			}
-			job, ok := <-r.jobs
-			if !ok {
-				return
-			}
-			job()
 		}
 	}
 }

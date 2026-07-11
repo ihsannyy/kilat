@@ -14,7 +14,7 @@ Kilat adalah runtime JavaScript CommonJS yang ringan dan efisien, dibangun di at
 [![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?logo=go&logoColor=white&style=for-the-badge)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#-lisensi)
 [![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Linux-brightgreen?style=for-the-badge)](#)
-[![Version](https://img.shields.io/badge/Version-2.0.0-blue?style=for-the-badge)](#-roadmap)
+[![Version](https://img.shields.io/badge/Version-2.1.0-blue?style=for-the-badge)](#)
 
 </div>
 
@@ -185,19 +185,6 @@ Jalankan pengujian:
 ```bash
 kilat run test.js
 ```
-
----
-
-## 🗺️ Peta Jalan (Roadmap)
-
-- [x] **v0.1.0** — Core runtime, module resolver CommonJS, dan package manager dasar.
-- [x] **v0.2.0** — Watch mode (`--watch`) & dukungan pembacaan file `.env` otomatis.
-- [x] **v0.3.0** — REPL Interaktif di terminal.
-- [x] **v0.4.0** — Built-in HTTP Server (`Bun.serve`-like API).
-- [x] **v0.5.0** — Dukungan kompilasi TypeScript instan (via esbuild integrations).
-- [x] **v1.0.0** — Rilis stabil utama (production ready).
-- [x] **v1.5.0** — Dukungan parser ES Modules (`import` / `export`).
-- [x] **v2.0.0** — Refactoring total untuk optimalisasi performa ekstrem.
 
 ---
 
