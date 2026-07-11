@@ -8,6 +8,7 @@ interface PageItem {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
   const [timeMode, setTimeMode] = useState<string>('MALAM')
   const [clockText, setClockText] = useState<string>('')
@@ -18,7 +19,7 @@ export default function App() {
       key: 'home',
       title: 'Dashboard',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
           <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
@@ -28,7 +29,7 @@ export default function App() {
       key: 'install',
       title: 'Instalasi',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
@@ -39,7 +40,7 @@ export default function App() {
       key: 'api',
       title: 'API Referensi',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="6" y1="3" x2="6" y2="15" />
           <circle cx="18" cy="6" r="3" />
           <circle cx="6" cy="18" r="3" />
@@ -51,7 +52,7 @@ export default function App() {
       key: 'changelog',
       title: 'Changelog',
       icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
           <polyline points="14 2 14 8 20 8" />
           <line x1="16" y1="13" x2="8" y2="13" />
@@ -267,35 +268,69 @@ export default function App() {
             <span className="name">kilat</span>
             <span className="badge">v3.0.0</span>
           </div>
-          <div className="environment-clock">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="clock-svg">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-            <span className="time-lbl">MODE: {timeMode}</span>
-            <span className="time-val">[{clockText}]</span>
+
+          <nav className="navbar-links desktop-only">
+            {pages.map(p => (
+              <button key={p.key} className={`nav-tab-btn ${activeTab === p.key ? 'active' : ''}`} onClick={() => setActiveTab(p.key)}>
+                {p.title}
+              </button>
+            ))}
+          </nav>
+
+          <div className="navbar-actions">
+            <div className="environment-clock desktop-only">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="clock-svg">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span className="time-lbl">MODE: {timeMode}</span>
+              <span className="time-val">[{clockText}]</span>
+            </div>
+            
+            <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+              </svg>
+            </a>
+
+            <button className="menu-toggle mobile-only" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle Menu">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                {mobileMenuOpen ? (
+                  <>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </>
+                ) : (
+                  <>
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                  </>
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="main-portal-content">
-        <nav className="glass-tabs">
-          {pages.map(p => (
-            <button key={p.key} className={`tab-link ${activeTab === p.key ? 'active' : ''}`} onClick={() => setActiveTab(p.key)}>
-              <span className="tab-icon-svg">{p.icon}</span>
-              <span className="tab-text">{p.title}</span>
-            </button>
-          ))}
-          <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="tab-link link-github">
-            <span className="tab-icon-svg">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-              </svg>
-            </span>
-            <span className="tab-text">GitHub</span>
-          </a>
-        </nav>
+      <div className={`drawer-nav ${mobileMenuOpen ? 'open' : ''}`}>
+        {pages.map(p => (
+          <button key={p.key} className={`drawer-link ${activeTab === p.key ? 'active' : ''}`} onClick={() => { setActiveTab(p.key); setMobileMenuOpen(false); }}>
+            <span className="tab-icon-svg">{p.icon}</span>
+            <span className="drawer-lbl">{p.title}</span>
+          </button>
+        ))}
+        <a href="https://github.com/IHx-cmyk/kilat" target="_blank" rel="noreferrer" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>
+          <span className="tab-icon-svg">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+            </svg>
+          </span>
+          <span className="drawer-lbl">GitHub</span>
+        </a>
+      </div>
 
+      <main className="main-portal-content">
         <div className="portal-page-pane">
           {activeTab === 'home' && (
             <div className="pane-view animate-in">
@@ -391,7 +426,7 @@ export default function App() {
           {activeTab === 'api' && (
             <div className="pane-view animate-in">
               <h2 className="pane-title">API Referensi</h2>
-              <p className="pane-subtitle">Daftar global API dan core module built-in bawaan Kilat.</p>
+              <p className="pane-subtitle">Daftar global API dan core module built-in bawaat Kilat.</p>
 
               <div className="api-panel-grid">
                 <div className="api-panel">
