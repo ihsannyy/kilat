@@ -626,7 +626,15 @@ export default function App() {
                       <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
                     </div>
                     <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
-                      {copiedMap['hero-inst'] ? 'COPIED' : 'COPY'}
+                      {copiedMap['hero-inst'] ? 'COPIED' : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                          COPY
+                        </span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -711,7 +719,15 @@ export default function App() {
                     </div>
                     <span className="editor-file">index.js</span>
                     <button className="copy-bezel-btn" onClick={() => handleCopy('c1', 'console.log("Kilat runtime is active!");')}>
-                      {copiedMap['c1'] ? 'COPIED' : 'COPY'}
+                      {copiedMap['c1'] ? 'COPIED' : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                          COPY
+                        </span>
+                      )}
                     </button>
                   </div>
                   <div className="vscode-body">
@@ -731,8 +747,21 @@ export default function App() {
                       <span className="dot green"></span>
                     </div>
                     <span className="editor-file">server.ts</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c2', `Bun.serve({ port: 8080, fetch(req) { return new Response("Hello from Kilat!"); } });`)}>
-                      {copiedMap['c2'] ? 'COPIED' : 'COPY'}
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c2', `Bun.serve({
+  port: 8080,
+  fetch(req) {
+    return new Response("Hello from Kilat!");
+  }
+});`)}>
+                      {copiedMap['c2'] ? 'COPIED' : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                          COPY
+                        </span>
+                      )}
                     </button>
                   </div>
                   <div className="vscode-body">
@@ -757,8 +786,16 @@ export default function App() {
                       <span className="dot green"></span>
                     </div>
                     <span className="editor-file">exec.js</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c3', `const out = await $\`free -h\`; console.log(out);`)}>
-                      {copiedMap['c3'] ? 'COPIED' : 'COPY'}
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c3', `const out = await $\`free -h\`;\nconsole.log(out);`)}>
+                      {copiedMap['c3'] ? 'COPIED' : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                          COPY
+                        </span>
+                      )}
                     </button>
                   </div>
                   <div className="vscode-body">
@@ -832,7 +869,15 @@ console.log(out);`}</code></pre>
                       <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
                     </div>
                     <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
-                      {copiedMap['inst-auto'] ? 'COPIED' : 'COPY'}
+                      {copiedMap['inst-auto'] ? 'COPIED' : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                          COPY
+                        </span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -852,7 +897,15 @@ console.log(out);`}</code></pre>
                       <code>kilat --version</code>
                     </div>
                     <button className="copy-bezel-btn" onClick={() => handleCopy('inst-verify', 'kilat --version')}>
-                      {copiedMap['inst-verify'] ? 'COPIED' : 'COPY'}
+                      {copiedMap['inst-verify'] ? 'COPIED' : (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                          COPY
+                        </span>
+                      )}
                     </button>
                   </div>
                 </div>
