@@ -49,7 +49,15 @@ curl -fsSL -o "$BINARY" "$URL" || {
 chmod +x "$BINARY"
 
 echo -e "${CYAN}↳ Installing to $BINDIR/$BINARY${NC}"
-sudo mv "$BINARY" "$BINDIR/" 2>/dev/null || mv "$BINARY" "$BINDIR/"
+if [ -w "$BINDIR" ]; then
+    mv "$BINARY" "$BINDIR/"
+else
+    if command -v sudo >/dev/null 2>&1; then
+        sudo mv "$BINARY" "$BINDIR/"
+    else
+        mv "$BINARY" "$BINDIR/"
+    fi
+fi
 
 cd - > /dev/null
 rm -rf "$TMPDIR"
