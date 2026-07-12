@@ -22,6 +22,11 @@ func main() {
 		return
 	}
 
+	if len(os.Args) == 2 && os.Args[1] == "--update" {
+		utils.SelfUpdate()
+		return
+	}
+
 	if len(os.Args) < 2 {
 		repl.Start()
 		return
@@ -138,6 +143,7 @@ func printHelp() {
 	color.Yellow("  kilat run <file.js> [-w]   Jalankan file JavaScript (opsional: watch mode)")
 	color.Yellow("  kilat add <package>        Install package dari npm")
 	color.Yellow("  kilat --version            Tampilkan versi")
+	color.Yellow("  kilat --update             Perbarui Kilat ke versi terbaru")
 	fmt.Println()
 	color.White("Contoh:")
 	color.Cyan("  kilat init -y")

@@ -3,12 +3,15 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
+
 	"github.com/fatih/color"
 )
 
@@ -98,4 +101,102 @@ func isNewerVersion(current, latest string) bool {
 		}
 	}
 	return len(lParts) > len(cParts)
+}
+
+func SelfUpdate() {
+	color.Cyan("🔄 Memulai pencarian rilis terbaru di GitHub...")
+
+	client := &http.Client{Timeout: 15 * time.Second}
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/ihsannyy/kilat/releases/latest", nil)
+	if err != nil {
+		color.Red("❌ Gagal membuat request: %v", err)
+		return
+	}
+	req.Header.Set("User-Agent", "kilat-cli")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		color.Red("❌ Gagal menghubungi GitHub API: %v", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		color.Red("❌ GitHub API memberikan status: %d", resp.StatusCode)
+		return
+	}
+
+	var result struct {
+		TagName string `json:"tag_name"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		color.Red("❌ Gagal membaca respon data JSON: %v", err)
+		return
+	}
+
+	latestVersion := strings.TrimPrefix(result.TagName, "v")
+	if !isNewerVersion(Version, latestVersion) {
+		color.Green("✅ Kilat Anda sudah menggunakan versi terbaru (v%s)!", Version)
+		return
+	}
+
+	color.Yellow("✨ Menemukan versi baru: v%s. Memulai proses pengunduhan...", latestVersion)
+
+	osName := runtime.GOOS
+	archName := runtime.GOARCH
+
+	if archName == "arm" {
+		archName = "armv7"
+	}
+
+	assetName := fmt.Sprintf("kilat-%s-%s", osName, archName)
+	downloadURL := fmt.Sprintf("https://github.com/ihsannyy/kilat/releases/download/%s/%s", result.TagName, assetName)
+
+	color.Cyan("📡 Mengunduh biner: %s", downloadURL)
+
+	binResp, err := client.Get(downloadURL)
+	if err != nil {
+		color.Red("❌ Gagal mengunduh biner: %v", err)
+		return
+	}
+	defer binResp.Body.Close()
+
+	if binResp.StatusCode != http.StatusOK {
+		color.Red("❌ Gagal mengunduh biner (Status: %d).", binResp.StatusCode)
+		return
+	}
+
+	exePath, err := os.Executable()
+	if err != nil {
+		color.Red("❌ Gagal melacak lokasi biner kilat aktif: %v", err)
+		return
+	}
+
+	oldPath := exePath + ".old"
+	_ = os.Remove(oldPath)
+
+	err = os.Rename(exePath, oldPath)
+	if err != nil {
+		color.Red("❌ Gagal merename biner aktif untuk pertukaran: %v", err)
+		return
+	}
+
+	out, err := os.OpenFile(exePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	if err != nil {
+		color.Red("❌ Gagal membuat biner baru: %v. Mencoba mengembalikan biner lama...", err)
+		_ = os.Rename(oldPath, exePath)
+		return
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, binResp.Body)
+	if err != nil {
+		color.Red("❌ Gagal menulis data biner baru: %v. Mencoba mengembalikan biner lama...", err)
+		_ = os.Rename(oldPath, exePath)
+		return
+	}
+
+	_ = os.Remove(oldPath)
+
+	color.Green("✅ Kilat berhasil diperbarui ke v%s!", latestVersion)
 }
