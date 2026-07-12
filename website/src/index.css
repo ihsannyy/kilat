@@ -180,6 +180,24 @@ body {
   color: var(--secondary);
 }
 
+.lang-toggle-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.lang-toggle-btn:hover {
+  color: #fff;
+  border-color: var(--secondary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .btn-github-link {
   display: inline-flex;
   align-items: center;

@@ -6,7 +6,117 @@ interface PageItem {
   icon: React.ReactNode
 }
 
+const dict = {
+  id: {
+    console: 'Console',
+    architecture: 'Arsitektur',
+    install: 'Instalasi',
+    api: 'API Referensi',
+    changelog: 'Changelog',
+    heroHeading: 'Supercharge JavaScript & TypeScript on Termux',
+    heroLead: 'Kilat adalah runtime minimalis bertenaga Go untuk eksekusi script kilat di perangkat seluler. Tanpa beban direktori node_modules, memuat instan, dan siap pakai.',
+    installerChannel: 'installer channel',
+    benchmarkTitle: 'BENCHMARK KINERJA OBJEKTIF',
+    metricHeader: 'Metrik Uji',
+    nodeHeader: 'Node.js (v20.11)',
+    kilatHeader: 'Kilat Runtime',
+    gainHeader: 'Selisih Keuntungan',
+    startupMetric: 'Waktu Startup Terdingin',
+    ramMetric: 'Alokasi Memori Awal (RAM)',
+    depMetric: 'Beban Folder Dependency',
+    compMetric: 'Compiler TypeScript',
+    startupGain: '~18x Lebih Cepat',
+    ramGain: '~4x Lebih Hemat',
+    depGain: '100% Hemat Disk',
+    compGain: 'Tanpa Overhead Setup',
+    externalCompiler: 'Eksternal (ts-node)',
+    inMemoryCompiler: 'Bawaan (esbuild)',
+    engineTitle: 'Ringan & Kencang',
+    engineDesc: 'Inisialisasi engine Goja yang sangat cepat (~2ms), membebaskan RAM Termux dari overhead V8 Node.js.',
+    compilerTitle: 'TypeScript Bawaan',
+    compilerDesc: 'Dukungan instan untuk berkas .ts, .tsx, dan .jsx via esbuild memori tanpa transpiler eksternal.',
+    cacheTitle: 'Bebas node_modules',
+    cacheDesc: 'Dependency dipetakan langsung ke cache global tunggal untuk menghemat penyimpanan disk internal HP.',
+    archTitle: 'Arsitektur & Logika Sistem',
+    archSub: 'Analisis mendalam bagaimana biner tunggal Kilat mengeksekusi kode JavaScript secara asinkron.',
+    arch1Title: '1. Runtime Mesin Virtual (Goja Engine)',
+    arch1Desc: 'Kilat tidak menggunakan V8 Engine milik Google yang berukuran besar dan membutuhkan alokasi RAM minimal ~30MB hanya untuk memuat lingkungan dasar. Sebagai gantinya, Kilat mengintegrasikan Goja VM, interpreter ECMAScript 5.1/6 yang ditulis murni dalam bahasa Go. Hal ini memungkinkan bytecode dievaluasi langsung di tingkat kernel memori dengan alokasi awal RAM yang sangat kecil (~7.8MB).',
+    arch2Title: '2. Transpilasi Memori TypeScript (esbuild integration)',
+    arch2Desc: 'Ketika pengguna mengeksekusi berkas TypeScript, Kilat tidak menulis ulang file JavaScript sementara ke dalam penyimpanan disk HP (yang lambat dan mengurangi masa pakai memori flash). Biner esbuild internal diintegrasikan secara statis untuk melakukan kompilasi baris TypeScript menjadi string kode JavaScript langsung di dalam memori RAM sesaat sebelum diumpankan ke Goja VM.',
+    arch3Title: '3. Asynchronous Event-Loop via Go Channels',
+    arch3Desc: 'Untuk mendukung operasi I/O non-blocking (seperti fetch asinkron dan modul $ shell executor), Kilat mengimplementasikan event-loop asinkron menggunakan mekanisme internal Go channel dan goroutine. Setiap kali operasi asinkron dipicu dari JavaScript, Goja VM akan mendelegasikan tugas tersebut ke goroutine latar belakang dan mengembalikan Promise ke thread utama. Setelah goroutine menyelesaikan tugasnya, hasilnya akan dikirim kembali melalui Go channel ke event-loop untuk menyelesaikan status Promise.',
+    instTitle: 'Instalasi Runtime',
+    instSub: 'Panduan pemasangan biner statis Kilat di perangkat Anda.',
+    instAuto: '1. Instalasi Skrip Otomatis',
+    instAutoDesc: 'Mendeteksi arsitektur CPU dan memasang biner secara otomatis:',
+    instVerify: '2. Verifikasi Pemasangan',
+    instVerifyDesc: 'Jalankan perintah ini untuk memastikan biner Kilat aktif:',
+    apiTitle: 'API Referensi',
+    apiSub: 'Daftar global API dan core module built-in bawaan Kilat.',
+    changeTitle: 'Release Changelog',
+    changeSub: 'Riwayat pembaruan biner statis Kilat.',
+    change3: 'Rilis major ini memperkenalkan **Global Shell Command Execution ($)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.',
+    change2: 'Rilis minor ini memperkenalkan **Global Fetch API (fetch)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.',
+    change1: 'Integrasi compiler esbuild internal untuk mendukung pemuatan file TypeScript (TS, TSX, JSX) dan transpiler ES Modules (ESM) di memori secara otomatis.',
+    footer: 'MIT License © 2026 Kilat. Dibuat seadanya untuk optimasi Termux Android.'
+  },
+  en: {
+    console: 'Console',
+    architecture: 'Architecture',
+    install: 'Installation',
+    api: 'API Reference',
+    changelog: 'Changelog',
+    heroHeading: 'Supercharge JavaScript & TypeScript on Termux',
+    heroLead: 'Kilat is a minimalist Go-powered runtime built for lightning-fast script execution on mobile devices. Bypasses node_modules, boots instantly, and runs natively.',
+    installerChannel: 'installer channel',
+    benchmarkTitle: 'OBJECTIVE PERFORMANCE BENCHMARKS',
+    metricHeader: 'Benchmark Metric',
+    nodeHeader: 'Node.js (v20.11)',
+    kilatHeader: 'Kilat Runtime',
+    gainHeader: 'Net Advantage',
+    startupMetric: 'Cold Startup Latency',
+    ramMetric: 'Initial Memory Allocation (RAM)',
+    depMetric: 'Dependency Storage Burden',
+    compMetric: 'TypeScript Compiler Overhead',
+    startupGain: '~18x Faster',
+    ramGain: '~4x More Efficient',
+    depGain: '100% Storage Savings',
+    compGain: 'Zero Configuration Setup',
+    externalCompiler: 'External (ts-node)',
+    inMemoryCompiler: 'In-Memory (esbuild)',
+    engineTitle: 'Lightweight & Swift',
+    engineDesc: 'Blazing-fast Goja engine initialization (~2ms), freeing Termux RAM from heavy V8 Node.js overhead.',
+    compilerTitle: 'Native TypeScript',
+    compilerDesc: 'Instant support for .ts, .tsx, and .jsx files via in-memory esbuild without external transpilers.',
+    cacheTitle: 'Zero node_modules',
+    cacheDesc: 'Dependencies mapped directly to a global cache, saving internal storage on mobile devices.',
+    archTitle: 'Architecture & System Logic',
+    archSub: 'Deep dive into how Kilat\'s single static binary executes JavaScript code asynchronously.',
+    arch1Title: '1. Virtual Machine Runtime (Goja Engine)',
+    arch1Desc: 'Kilat avoids Google\'s massive V8 Engine, which demands a minimum of ~30MB RAM just to initialize. Instead, it embeds the Goja VM, a pure Go ECMAScript 5.1/6 interpreter, enabling bytecode evaluation at the memory level with a tiny initial RAM footprint (~7.8MB).',
+    arch2Title: '2. In-Memory TypeScript Transpilation (esbuild)',
+    arch2Desc: 'When executing TypeScript files, Kilat does not write temporary JavaScript files to slow internal flash storage. An embedded esbuild compiler transpiles TypeScript source code to JS strings directly in RAM just before evaluation.',
+    arch3Title: '3. Asynchronous Event-Loop via Go Channels',
+    arch3Desc: 'To support non-blocking I/O operations (like async fetch and shell executing), Kilat implements an async event-loop using internal Go channels and goroutines. When an async task starts in JS, the Goja VM delegates it to a background goroutine and returns a Promise. Upon completion, the result is piped back through a Go channel to resolve the Promise.',
+    instTitle: 'Runtime Installation',
+    instSub: 'Guide to install the static Kilat binary to your local environment.',
+    instAuto: '1. Automated Script Installation',
+    instAutoDesc: 'Detects CPU architecture and installs the appropriate binary automatically:',
+    instVerify: '2. Verify Installation',
+    instVerifyDesc: 'Execute this command to verify the Kilat binary is active:',
+    apiTitle: 'API Reference',
+    apiSub: 'List of built-in global APIs and core modules available in Kilat.',
+    changeTitle: 'Release Changelog',
+    changeSub: 'Version release logs of the static Kilat binary.',
+    change3: 'This major release introduces **Global Shell Command Execution ($)**. Full async support using Go goroutines to run external binaries and CLI utilities on Termux / Linux.',
+    change2: 'This minor release introduces the **Global Fetch API (fetch)**, asynchronously integrated with the event-loop for HTTP API requests.',
+    change1: 'Integrated esbuild compiler for instant in-memory TypeScript (TS, TSX, JSX) and ES Modules (ESM) loading.',
+    footer: 'MIT License © 2026 Kilat. Built lightweight to optimize Termux Android.'
+  }
+}
+
 export default function App() {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
   const [activeTab, setActiveTab] = useState<string>('home')
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
@@ -17,7 +127,7 @@ export default function App() {
   const pages: PageItem[] = [
     {
       key: 'home',
-      title: 'Console',
+      title: dict[lang].console,
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
@@ -29,7 +139,7 @@ export default function App() {
     },
     {
       key: 'architecture',
-      title: 'Arsitektur',
+      title: dict[lang].architecture,
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="12 2 2 7 12 12 22 7 12 2" />
@@ -40,7 +150,7 @@ export default function App() {
     },
     {
       key: 'install',
-      title: 'Instalasi',
+      title: dict[lang].install,
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -51,7 +161,7 @@ export default function App() {
     },
     {
       key: 'api',
-      title: 'API Referensi',
+      title: dict[lang].api,
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="6" y1="3" x2="6" y2="15" />
@@ -63,7 +173,7 @@ export default function App() {
     },
     {
       key: 'changelog',
-      title: 'Changelog',
+      title: dict[lang].changelog,
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -358,6 +468,8 @@ export default function App() {
     }
   }, [timeMode])
 
+  const t = dict[lang]
+
   return (
     <div className="weather-runtime-portal">
       <canvas ref={canvasRef} className="storm-backdrop" />
@@ -381,6 +493,10 @@ export default function App() {
           </nav>
 
           <div className="navbar-actions">
+            <button className="lang-toggle-btn" onClick={() => setLang(lang === 'id' ? 'en' : 'id')}>
+              {lang === 'id' ? 'EN' : 'ID'}
+            </button>
+
             <div className="environment-clock">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="clock-svg">
                 <circle cx="12" cy="12" r="10" />
@@ -393,7 +509,7 @@ export default function App() {
             
             <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42( 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
               </svg>
             </a>
 
@@ -439,10 +555,8 @@ export default function App() {
           {activeTab === 'home' && (
             <div className="pane-view animate-in">
               <section className="portal-hero">
-                <h1 className="hero-heading">Supercharge JavaScript & TypeScript on Termux</h1>
-                <p className="hero-lead">
-                  Kilat adalah runtime minimalis bertenaga Go untuk eksekusi script kilat di perangkat seluler. Tanpa beban direktori <code>node_modules</code>, memuat instan, dan siap pakai.
-                </p>
+                <h1 className="hero-heading">{t.heroHeading}</h1>
+                <p className="hero-lead">{t.heroLead}</p>
 
                 <div className="terminal-install-box">
                   <div className="box-hdr">
@@ -451,7 +565,7 @@ export default function App() {
                       <span className="led yellow"></span>
                       <span className="led green"></span>
                     </div>
-                    <span className="box-title">installer channel</span>
+                    <span className="box-title">{t.installerChannel}</span>
                   </div>
                   <div className="box-body">
                     <div className="code-scroll-wrapper">
@@ -465,41 +579,41 @@ export default function App() {
               </section>
 
               <section className="benchmarks-table-wrapper">
-                <h2 className="section-subtitle-technical">BENCHMARK KINERJA OBJEKTIF</h2>
+                <h2 className="section-subtitle-technical">{t.benchmarkTitle}</h2>
                 <div className="glass-table-container">
                   <table className="glass-table">
                     <thead>
                       <tr>
-                        <th>Metrik Uji</th>
-                        <th>Node.js (v20.11)</th>
-                        <th>Kilat Runtime</th>
-                        <th>Selisih Keuntungan</th>
+                        <th>{t.metricHeader}</th>
+                        <th>{t.nodeHeader}</th>
+                        <th>{t.kilatHeader}</th>
+                        <th>{t.gainHeader}</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td><strong>Waktu Startup Terdingin</strong></td>
+                        <td><strong>{t.startupMetric}</strong></td>
                         <td>38.2 ms</td>
                         <td className="text-cyan">2.1 ms</td>
-                        <td className="text-green">~18x Lebih Cepat</td>
+                        <td className="text-green">{t.startupGain}</td>
                       </tr>
                       <tr>
-                        <td><strong>Alokasi Memori Awal (RAM)</strong></td>
+                        <td><strong>{t.ramMetric}</strong></td>
                         <td>31.4 MB</td>
                         <td className="text-cyan">7.8 MB</td>
-                        <td className="text-green">~4x Lebih Hemat</td>
+                        <td className="text-green">{t.ramGain}</td>
                       </tr>
                       <tr>
-                        <td><strong>Beban Folder Dependency</strong></td>
-                        <td>~120 MB / proyek</td>
+                        <td><strong>{t.depMetric}</strong></td>
+                        <td>~120 MB / proj</td>
                         <td className="text-cyan">0 B (Global Cache)</td>
-                        <td className="text-green">100% Hemat Disk</td>
+                        <td className="text-green">{t.depGain}</td>
                       </tr>
                       <tr>
-                        <td><strong>Compiler TypeScript</strong></td>
-                        <td>Eksternal (ts-node)</td>
-                        <td className="text-cyan">Bawaan (esbuild)</td>
-                        <td className="text-green">Tanpa Overhead Setup</td>
+                        <td><strong>{t.compMetric}</strong></td>
+                        <td>{t.externalCompiler}</td>
+                        <td className="text-cyan">{t.inMemoryCompiler}</td>
+                        <td className="text-green">{t.compGain}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -509,20 +623,20 @@ export default function App() {
               <section className="features-glass-grid">
                 <div className="glass-card">
                   <div className="card-badge">ENGINE</div>
-                  <h3>Ringan & Kencang</h3>
-                  <p>Inisialisasi engine Goja yang sangat cepat (~2ms), membebaskan RAM Termux dari overhead V8 Node.js.</p>
+                  <h3>{t.engineTitle}</h3>
+                  <p>{t.engineDesc}</p>
                 </div>
 
                 <div className="glass-card">
                   <div className="card-badge">COMPILER</div>
-                  <h3>TypeScript Bawaan</h3>
-                  <p>Dukungan instan untuk berkas <code>.ts</code>, <code>.tsx</code>, dan <code>.jsx</code> via esbuild memori tanpa transpiler eksternal.</p>
+                  <h3>{t.compilerTitle}</h3>
+                  <p>{t.compilerDesc}</p>
                 </div>
 
                 <div className="glass-card">
                   <div className="card-badge">CACHE</div>
-                  <h3>Bebas node_modules</h3>
-                  <p>Dependency dipetakan langsung ke cache global tunggal untuk menghemat penyimpanan disk internal HP.</p>
+                  <h3>{t.cacheTitle}</h3>
+                  <p>{t.cacheDesc}</p>
                 </div>
               </section>
             </div>
@@ -530,44 +644,34 @@ export default function App() {
 
           {activeTab === 'architecture' && (
             <div className="pane-view animate-in">
-              <h2 className="pane-title">Arsitektur & Logika Sistem</h2>
-              <p className="pane-subtitle">Analisis mendalam bagaimana biner tunggal Kilat mengeksekusi kode JavaScript secara asinkron.</p>
+              <h2 className="pane-title">{t.archTitle}</h2>
+              <p className="pane-subtitle">{t.archSub}</p>
 
               <div className="glass-panel">
-                <h3>1. Runtime Mesin Virtual (Goja Engine)</h3>
-                <p>
-                  Kilat tidak menggunakan V8 Engine milik Google yang berukuran besar dan membutuhkan alokasi RAM minimal ~30MB hanya untuk memuat lingkungan dasar. 
-                  Sebagai gantinya, Kilat mengintegrasikan **Goja VM**, interpreter ECMAScript 5.1/6 yang ditulis murni dalam bahasa pemrograman Go. 
-                  Hal ini memungkinkan bytecode dievaluasi langsung di tingkat kernel memori dengan alokasi awal RAM yang sangat kecil (~7.8MB).
-                </p>
+                <h3>{t.arch1Title}</h3>
+                <p>{t.arch1Desc}</p>
               </div>
 
               <div className="glass-panel">
-                <h3>2. Transpilasi Memori TypeScript (esbuild integration)</h3>
-                <p>
-                  Ketika pengguna mengeksekusi berkas TypeScript, Kilat tidak menulis ulang file JavaScript sementara ke dalam penyimpanan disk HP (yang lambat dan mengurangi masa pakai memori flash).
-                  Biner esbuild internal diintegrasikan secara statis untuk melakukan kompilasi baris TypeScript menjadi string kode JavaScript langsung di dalam memori RAM sesaat sebelum diumpankan ke Goja VM.
-                </p>
+                <h3>{t.arch2Title}</h3>
+                <p>{t.arch2Desc}</p>
               </div>
 
               <div className="glass-panel">
-                <h3>3. Asynchronous Event-Loop via Go Channels</h3>
-                <p>
-                  Untuk mendukung operasi I/O non-blocking (seperti <code>fetch</code> asinkron dan modul <code>$</code> shell executor), Kilat mengimplementasikan event-loop asinkron menggunakan mekanisme internal Go channel dan goroutine.
-                  Setiap kali operasi asinkron dipicu dari JavaScript, Goja VM akan mendelegasikan tugas tersebut ke goroutine latar belakang dan mengembalikan Promise ke thread utama. Setelah goroutine menyelesaikan tugasnya, hasilnya akan dikirim kembali melalui Go channel ke event-loop untuk menyelesaikan status Promise.
-                </p>
+                <h3>{t.arch3Title}</h3>
+                <p>{t.arch3Desc}</p>
               </div>
             </div>
           )}
 
           {activeTab === 'install' && (
             <div className="pane-view animate-in">
-              <h2 className="pane-title">Instalasi Runtime</h2>
-              <p className="pane-subtitle">Panduan pemasangan biner statis Kilat di perangkat Anda.</p>
+              <h2 className="pane-title">{t.instTitle}</h2>
+              <p className="pane-subtitle">{t.instSub}</p>
 
               <div className="glass-panel">
-                <h3>1. Instalasi Skrip Otomatis</h3>
-                <p>Mendeteksi arsitektur CPU dan memasang biner secara otomatis:</p>
+                <h3>{t.instAuto}</h3>
+                <p>{t.instAutoDesc}</p>
                 <div className="terminal-install-box">
                   <div className="box-hdr">
                     <div className="leds">
@@ -586,8 +690,8 @@ export default function App() {
               </div>
 
               <div className="glass-panel">
-                <h3>2. Verifikasi Pemasangan</h3>
-                <p>Jalankan perintah ini untuk memastikan biner Kilat aktif:</p>
+                <h3>{t.instVerify}</h3>
+                <p>{t.instVerifyDesc}</p>
                 <div className="terminal-install-box">
                   <div className="box-hdr">
                     <div className="leds">
@@ -609,8 +713,8 @@ export default function App() {
 
           {activeTab === 'api' && (
             <div className="pane-view animate-in">
-              <h2 className="pane-title">API Referensi</h2>
-              <p className="pane-subtitle">Daftar global API dan core module built-in bawaan Kilat.</p>
+              <h2 className="pane-title">{t.apiTitle}</h2>
+              <p className="pane-subtitle">{t.apiSub}</p>
 
               <div className="api-panel-grid">
                 <div className="api-panel">
@@ -642,8 +746,8 @@ export default function App() {
 
           {activeTab === 'changelog' && (
             <div className="pane-view animate-in">
-              <h2 className="pane-title">Release Changelog</h2>
-              <p className="pane-subtitle">Riwayat pembaruan biner statis Kilat.</p>
+              <h2 className="pane-title">{t.changeTitle}</h2>
+              <p className="pane-subtitle">{t.changeSub}</p>
 
               <div className="changelog-timeline">
                 <div className="timeline-segment">
@@ -652,7 +756,7 @@ export default function App() {
                     <span className="date">11 Juli 2026</span>
                     <span className="led green active"></span>
                   </div>
-                  <p>Rilis major ini memperkenalkan **Global Shell Command Execution (<code>$</code>)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.</p>
+                  <p>{t.change3}</p>
                 </div>
 
                 <div className="timeline-segment">
@@ -660,7 +764,7 @@ export default function App() {
                     <span className="ver">v2.1.0</span>
                     <span className="date">11 Juli 2026</span>
                   </div>
-                  <p>Rilis minor ini memperkenalkan **Global Fetch API (<code>fetch</code>)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.</p>
+                  <p>{t.change2}</p>
                 </div>
 
                 <div className="timeline-segment">
@@ -668,7 +772,7 @@ export default function App() {
                     <span className="ver">v2.0.0</span>
                     <span className="date">1 Juli 2026</span>
                   </div>
-                  <p>Integrasi compiler **esbuild** internal untuk mendukung pemuatan file **TypeScript (TS, TSX, JSX)** dan transpiler **ES Modules (ESM)** di memori secara otomatis.</p>
+                  <p>{t.change1}</p>
                 </div>
               </div>
             </div>
@@ -677,7 +781,7 @@ export default function App() {
       </main>
 
       <footer className="portal-footer">
-        <p>MIT License © 2026 Kilat. Dibuat seadanya untuk optimasi Termux Android.</p>
+        <p>{t.footer}</p>
       </footer>
     </div>
   )
