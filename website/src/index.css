@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
   --bg: #03010b;
@@ -16,7 +16,8 @@
   --radius-md: 14px;
   --radius-sm: 8px;
   
-  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -32,6 +33,10 @@ html {
   background-color: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6, .brand, .name {
+  font-family: var(--font-heading);
 }
 
 body {
