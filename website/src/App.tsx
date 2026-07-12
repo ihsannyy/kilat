@@ -9,7 +9,7 @@ interface PageItem {
 const dict = {
   id: {
     console: 'Console',
-    architecture: 'Arsitektur',
+    architecture: 'Arsitektur & FAQ',
     install: 'Instalasi',
     api: 'API Referensi',
     changelog: 'Changelog',
@@ -37,6 +37,13 @@ const dict = {
     compilerDesc: 'Dukungan instan untuk berkas .ts, .tsx, dan .jsx via esbuild memori tanpa transpiler eksternal.',
     cacheTitle: 'Bebas node_modules',
     cacheDesc: 'Dependency dipetakan langsung ke cache global tunggal untuk menghemat penyimpanan disk internal HP.',
+    
+    codeTitle: 'CONTOH KODE SEDERHANA',
+    codeSub: 'Melihat betapa mudahnya menulis berkas script menggunakan Kilat runtime.',
+    codeSample1Title: '1. Hello World (index.js)',
+    codeSample2Title: '2. HTTP Server Minimalis (server.ts)',
+    codeSample3Title: '3. Shell Command Executor (exec.js)',
+
     archTitle: 'Arsitektur & Logika Sistem',
     archSub: 'Analisis mendalam bagaimana biner tunggal Kilat mengeksekusi kode JavaScript secara asinkron.',
     arch1Title: '1. Runtime Mesin Virtual (Goja Engine)',
@@ -45,6 +52,17 @@ const dict = {
     arch2Desc: 'Ketika pengguna mengeksekusi berkas TypeScript, Kilat tidak menulis ulang file JavaScript sementara ke dalam penyimpanan disk HP (yang lambat dan mengurangi masa pakai memori flash). Biner esbuild internal diintegrasikan secara statis untuk melakukan kompilasi baris TypeScript menjadi string kode JavaScript langsung di dalam memori RAM sesaat sebelum diumpankan ke Goja VM.',
     arch3Title: '3. Asynchronous Event-Loop via Go Channels',
     arch3Desc: 'Untuk mendukung operasi I/O non-blocking (seperti fetch asinkron dan modul $ shell executor), Kilat mengimplementasikan event-loop asinkron menggunakan mekanisme internal Go channel dan goroutine. Setiap kali operasi asinkron dipicu dari JavaScript, Goja VM akan mendelegasikan tugas tersebut ke goroutine latar belakang dan mengembalikan Promise ke thread utama. Setelah goroutine menyelesaikan tugasnya, hasilnya akan dikirim kembali melalui Go channel ke event-loop untuk menyelesaikan status Promise.',
+    
+    personalTitle: 'Kenapa Kilat Dibuat?',
+    personalDesc: 'Kilat dibuat oleh ihsannyy karena keresahan pribadi saat mengembangkan script otomasi dan bot di HP Android menggunakan Termux. Node.js terlalu memakan penyimpanan internal HP dengan folder node_modules yang duplikat di setiap proyek, serta memakan RAM yang cukup besar saat dijalankan di perangkat berspesifikasi rendah. Kilat lahir sebagai solusi: minimalis, bertenaga Go, memuat dalam 2ms, dan menghemat memori internal dengan caching dependency global.',
+    faqTitle: 'Pertanyaan Umum (FAQ)',
+    faq1Quest: 'Apa bedanya Kilat dengan Node.js?',
+    faq1Ans: 'Node.js menggunakan V8 Engine dan memerlukan folder node_modules lokal di setiap proyek. Kilat menggunakan Goja VM (Go-based JS interpreter) dan esbuild untuk kompilasi memori, serta menggunakan cache global satu-satunya. Kilat jauh lebih hemat RAM (~8MB) dan penyimpanan disk (0B untuk dependensi lokal).',
+    faq2Quest: 'Apakah Kilat mendukung semua package npm?',
+    faq2Ans: 'Kilat mendukung modul standard CommonJS dan ES Modules murni. Namun, modul yang bergantung pada API native C++ milik Node.js atau API Node internal tingkat rendah (seperti beberapa bagian dgram/child_process yang spesifik) tidak didukung karena interpreter kami didesain ringan.',
+    faq3Quest: 'Bagaimana cara menghapus (uninstall) Kilat?',
+    faq3Ans: 'Sangat mudah. Anda hanya perlu menghapus biner kilat dan folder cachenya dengan menjalankan perintah: rm -f $PREFIX/bin/kilat && rm -rf ~/.kilat',
+
     instTitle: 'Instalasi Runtime',
     instSub: 'Panduan pemasangan biner statis Kilat di perangkat Anda.',
     instAuto: '1. Instalasi Skrip Otomatis',
@@ -58,11 +76,11 @@ const dict = {
     change3: 'Rilis major ini memperkenalkan **Global Shell Command Execution ($)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.',
     change2: 'Rilis minor ini memperkenalkan **Global Fetch API (fetch)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.',
     change1: 'Integrasi compiler esbuild internal untuk mendukung pemuatan file TypeScript (TS, TSX, JSX) dan transpiler ES Modules (ESM) di memori secara otomatis.',
-    footer: 'MIT License © 2026 Kilat. Dibuat seadanya untuk optimasi Termux Android.'
+    footer: 'Lisensi MIT © 2026 Kilat. Dibuat seadanya oleh ihsannyy untuk optimasi Termux Android.'
   },
   en: {
     console: 'Console',
-    architecture: 'Architecture',
+    architecture: 'Architecture & FAQ',
     install: 'Installation',
     api: 'API Reference',
     changelog: 'Changelog',
@@ -90,6 +108,13 @@ const dict = {
     compilerDesc: 'Instant support for .ts, .tsx, and .jsx files via in-memory esbuild without external transpilers.',
     cacheTitle: 'Zero node_modules',
     cacheDesc: 'Dependencies mapped directly to a global cache, saving internal storage on mobile devices.',
+    
+    codeTitle: 'SIMPLE CODE SAMPLES',
+    codeSub: 'See how simple it is to write script files using the Kilat runtime.',
+    codeSample1Title: '1. Hello World (index.js)',
+    codeSample2Title: '2. Minimalist HTTP Server (server.ts)',
+    codeSample3Title: '3. Shell Command Executor (exec.js)',
+
     archTitle: 'Architecture & System Logic',
     archSub: 'Deep dive into how Kilat\'s single static binary executes JavaScript code asynchronously.',
     arch1Title: '1. Virtual Machine Runtime (Goja Engine)',
@@ -98,6 +123,17 @@ const dict = {
     arch2Desc: 'When executing TypeScript files, Kilat does not write temporary JavaScript files to slow internal flash storage. An embedded esbuild compiler transpiles TypeScript source code to JS strings directly in RAM just before evaluation.',
     arch3Title: '3. Asynchronous Event-Loop via Go Channels',
     arch3Desc: 'To support non-blocking I/O operations (like async fetch and shell executing), Kilat implements an async event-loop using internal Go channels and goroutines. When an async task starts in JS, the Goja VM delegates it to a background goroutine and returns a Promise. Upon completion, the result is piped back through a Go channel to resolve the Promise.',
+    
+    personalTitle: 'Why was Kilat Created?',
+    personalDesc: 'Kilat was created by ihsannyy out of personal frustration when developing automation scripts and bots on Android devices using Termux. Node.js consumes too much internal phone storage with duplicate node_modules folders in every project, and demands high memory on low-spec devices. Kilat was born as a solution: minimalist, Go-powered, booting in 2ms, and preserving phone storage through global dependency caching.',
+    faqTitle: 'Frequently Asked Questions (FAQ)',
+    faq1Quest: 'How is Kilat different from Node.js?',
+    faq1Ans: 'Node.js runs on V8 Engine and requires a local node_modules folder for every project. Kilat runs on Goja VM (Go-based JS interpreter) with esbuild for in-memory compilation, mapping modules to a single global cache. Kilat uses less RAM (~8MB) and zero disk space for local project dependencies.',
+    faq2Quest: 'Does Kilat support all npm packages?',
+    faq2Ans: 'Kilat supports pure ES Modules and CommonJS packages. However, packages relying on Node.js native C++ bindings or complex low-level internal Node APIs (such as specific dgram/child_process wrappers) are not supported due to our lightweight design.',
+    faq3Quest: 'How do I uninstall Kilat?',
+    faq3Ans: 'It is very simple. Delete the kilat binary and its cache directory by running: rm -f $PREFIX/bin/kilat && rm -rf ~/.kilat',
+
     instTitle: 'Runtime Installation',
     instSub: 'Guide to install the static Kilat binary to your local environment.',
     instAuto: '1. Automated Script Installation',
@@ -111,7 +147,7 @@ const dict = {
     change3: 'This major release introduces **Global Shell Command Execution ($)**. Full async support using Go goroutines to run external binaries and CLI utilities on Termux / Linux.',
     change2: 'This minor release introduces the **Global Fetch API (fetch)**, asynchronously integrated with the event-loop for HTTP API requests.',
     change1: 'Integrated esbuild compiler for instant in-memory TypeScript (TS, TSX, JSX) and ES Modules (ESM) loading.',
-    footer: 'MIT License © 2026 Kilat. Built lightweight to optimize Termux Android.'
+    footer: 'MIT License © 2026 Kilat. Built lightweight by ihsannyy to optimize Termux Android.'
   }
 }
 
@@ -509,7 +545,7 @@ export default function App() {
             
             <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42( 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
               </svg>
             </a>
 
@@ -620,6 +656,45 @@ export default function App() {
                 </div>
               </section>
 
+              <section className="benchmarks-table-wrapper">
+                <h2 className="section-subtitle-technical">{t.codeTitle}</h2>
+                <p className="pane-subtitle" style={{ textAlign: 'center', marginBottom: '32px' }}>{t.codeSub}</p>
+                <div className="api-panel-grid">
+                  <div className="api-panel">
+                    <h3>{t.codeSample1Title}</h3>
+                    <p>Menampilkan pesan teks dasar ke output konsol.</p>
+                    <pre><code>console.log("Kilat runtime is active!");</code></pre>
+                    <button className="copy-bezel-btn" style={{ marginTop: '12px' }} onClick={() => handleCopy('c1', 'console.log("Kilat runtime is active!");')}>
+                      {copiedMap['c1'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+
+                  <div className="api-panel">
+                    <h3>{t.codeSample2Title}</h3>
+                    <p>Membuka port server HTTP menggunakan Bun-compatible API bawaan.</p>
+                    <pre><code>{`Bun.serve({
+  port: 8080,
+  fetch(req) {
+    return new Response("Hello from Kilat!");
+  }
+});`}</code></pre>
+                    <button className="copy-bezel-btn" style={{ marginTop: '12px' }} onClick={() => handleCopy('c2', `Bun.serve({ port: 8080, fetch(req) { return new Response("Hello from Kilat!"); } });`)}>
+                      {copiedMap['c2'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+
+                  <div className="api-panel">
+                    <h3>{t.codeSample3Title}</h3>
+                    <p>Memanggil perintah binary Linux secara asinkron menggunakan tagged template.</p>
+                    <pre><code>{`const out = await $\`free -h\`;
+console.log(out);`}</code></pre>
+                    <button className="copy-bezel-btn" style={{ marginTop: '12px' }} onClick={() => handleCopy('c3', `const out = await $\`free -h\`; console.log(out);`)}>
+                      {copiedMap['c3'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+                </div>
+              </section>
+
               <section className="features-glass-grid">
                 <div className="glass-card">
                   <div className="card-badge">ENGINE</div>
@@ -660,6 +735,23 @@ export default function App() {
               <div className="glass-panel">
                 <h3>{t.arch3Title}</h3>
                 <p>{t.arch3Desc}</p>
+              </div>
+
+              <h2 className="pane-title" style={{ marginTop: '48px' }}>{t.personalTitle}</h2>
+              <p className="pane-subtitle">{t.personalDesc}</p>
+
+              <h2 className="pane-title" style={{ marginTop: '48px' }}>{t.faqTitle}</h2>
+              <div className="glass-panel" style={{ marginTop: '16px' }}>
+                <h3 style={{ color: 'var(--secondary)' }}>Q: {t.faq1Quest}</h3>
+                <p style={{ marginTop: '8px' }}>A: {t.faq1Ans}</p>
+              </div>
+              <div className="glass-panel">
+                <h3 style={{ color: 'var(--secondary)' }}>Q: {t.faq2Quest}</h3>
+                <p style={{ marginTop: '8px' }}>A: {t.faq2Ans}</p>
+              </div>
+              <div className="glass-panel">
+                <h3 style={{ color: 'var(--secondary)' }}>Q: {t.faq3Quest}</h3>
+                <p style={{ marginTop: '8px' }}>A: {t.faq3Ans}</p>
               </div>
             </div>
           )}
@@ -782,6 +874,11 @@ export default function App() {
 
       <footer className="portal-footer">
         <p>{t.footer}</p>
+        <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', gap: '16px' }}>
+          <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>GitHub Repository</a>
+          <a href="https://github.com/ihsannyy/kilat/issues" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>Report Bugs</a>
+          <a href="https://github.com/ihsannyy/kilat/blob/main/LICENSE" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>MIT License</a>
+        </div>
       </footer>
     </div>
   )
