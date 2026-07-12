@@ -9,6 +9,7 @@ interface PageItem {
 const dict = {
   id: {
     console: 'Console',
+    playground: 'Contoh',
     architecture: 'Arsitektur & FAQ',
     install: 'Instalasi',
     api: 'API Referensi',
@@ -38,11 +39,14 @@ const dict = {
     cacheTitle: 'Bebas node_modules',
     cacheDesc: 'Dependency dipetakan langsung ke cache global tunggal untuk menghemat penyimpanan disk internal HP.',
     
-    codeTitle: 'CONTOH KODE SEDERHANA',
-    codeSub: 'Melihat betapa mudahnya menulis berkas script menggunakan Kilat runtime.',
-    codeSample1Title: '1. Hello World (index.js)',
-    codeSample2Title: '2. HTTP Server Minimalis (server.ts)',
-    codeSample3Title: '3. Shell Command Executor (exec.js)',
+    codeTitle: 'Cuplikan Kode & Contoh',
+    codeSub: 'Pelajari cara menulis skrip, server, dan script otomasi shell di runtime Kilat.',
+    codeSample1Title: 'Hello World dasar',
+    codeSample1Desc: 'Menulis teks keluaran standar ke terminal konsol.',
+    codeSample2Title: 'HTTP Server Asinkron',
+    codeSample2Desc: 'Membuat endpoint server HTTP non-blocking dengan API standard Bun.',
+    codeSample3Title: 'Shell Script Executor',
+    codeSample3Desc: 'Menjalankan utilitas Linux secara asinkron dari file Javascript.',
 
     archTitle: 'Arsitektur & Logika Sistem',
     archSub: 'Analisis mendalam bagaimana biner tunggal Kilat mengeksekusi kode JavaScript secara asinkron.',
@@ -80,6 +84,7 @@ const dict = {
   },
   en: {
     console: 'Console',
+    playground: 'Examples',
     architecture: 'Architecture & FAQ',
     install: 'Installation',
     api: 'API Reference',
@@ -109,11 +114,14 @@ const dict = {
     cacheTitle: 'Zero node_modules',
     cacheDesc: 'Dependencies mapped directly to a global cache, saving internal storage on mobile devices.',
     
-    codeTitle: 'SIMPLE CODE SAMPLES',
-    codeSub: 'See how simple it is to write script files using the Kilat runtime.',
-    codeSample1Title: '1. Hello World (index.js)',
-    codeSample2Title: '2. Minimalist HTTP Server (server.ts)',
-    codeSample3Title: '3. Shell Command Executor (exec.js)',
+    codeTitle: 'Code Snippets & Examples',
+    codeSub: 'Learn how to write scripts, servers, and shell automation scripts in the Kilat runtime.',
+    codeSample1Title: 'Basic Hello World',
+    codeSample1Desc: 'Print standard output text logs directly to the console terminal.',
+    codeSample2Title: 'Async HTTP Server',
+    codeSample2Desc: 'Spin up non-blocking HTTP endpoints using the built-in Bun-compatible API.',
+    codeSample3Title: 'Shell Script Executor',
+    codeSample3Desc: 'Execute external Linux CLI utilities asynchronously from JavaScript files.',
 
     archTitle: 'Architecture & System Logic',
     archSub: 'Deep dive into how Kilat\'s single static binary executes JavaScript code asynchronously.',
@@ -170,6 +178,16 @@ export default function App() {
           <line x1="7" y1="2" x2="7" y2="22" />
           <line x1="17" y1="2" x2="17" y2="22" />
           <line x1="2" y1="12" x2="22" y2="12" />
+        </svg>
+      )
+    },
+    {
+      key: 'examples',
+      title: dict[lang].playground,
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
         </svg>
       )
     },
@@ -656,45 +674,6 @@ export default function App() {
                 </div>
               </section>
 
-              <section className="benchmarks-table-wrapper">
-                <h2 className="section-subtitle-technical">{t.codeTitle}</h2>
-                <p className="pane-subtitle" style={{ textAlign: 'center', marginBottom: '32px' }}>{t.codeSub}</p>
-                <div className="api-panel-grid">
-                  <div className="api-panel">
-                    <h3>{t.codeSample1Title}</h3>
-                    <p>Menampilkan pesan teks dasar ke output konsol.</p>
-                    <pre><code>console.log("Kilat runtime is active!");</code></pre>
-                    <button className="copy-bezel-btn" style={{ marginTop: '12px' }} onClick={() => handleCopy('c1', 'console.log("Kilat runtime is active!");')}>
-                      {copiedMap['c1'] ? 'COPIED' : 'COPY'}
-                    </button>
-                  </div>
-
-                  <div className="api-panel">
-                    <h3>{t.codeSample2Title}</h3>
-                    <p>Membuka port server HTTP menggunakan Bun-compatible API bawaan.</p>
-                    <pre><code>{`Bun.serve({
-  port: 8080,
-  fetch(req) {
-    return new Response("Hello from Kilat!");
-  }
-});`}</code></pre>
-                    <button className="copy-bezel-btn" style={{ marginTop: '12px' }} onClick={() => handleCopy('c2', `Bun.serve({ port: 8080, fetch(req) { return new Response("Hello from Kilat!"); } });`)}>
-                      {copiedMap['c2'] ? 'COPIED' : 'COPY'}
-                    </button>
-                  </div>
-
-                  <div className="api-panel">
-                    <h3>{t.codeSample3Title}</h3>
-                    <p>Memanggil perintah binary Linux secara asinkron menggunakan tagged template.</p>
-                    <pre><code>{`const out = await $\`free -h\`;
-console.log(out);`}</code></pre>
-                    <button className="copy-bezel-btn" style={{ marginTop: '12px' }} onClick={() => handleCopy('c3', `const out = await $\`free -h\`; console.log(out);`)}>
-                      {copiedMap['c3'] ? 'COPIED' : 'COPY'}
-                    </button>
-                  </div>
-                </div>
-              </section>
-
               <section className="features-glass-grid">
                 <div className="glass-card">
                   <div className="card-badge">ENGINE</div>
@@ -714,6 +693,84 @@ console.log(out);`}</code></pre>
                   <p>{t.cacheDesc}</p>
                 </div>
               </section>
+            </div>
+          )}
+
+          {activeTab === 'examples' && (
+            <div className="pane-view animate-in">
+              <h2 className="pane-title">{t.codeTitle}</h2>
+              <p className="pane-subtitle">{t.codeSub}</p>
+
+              <div className="playground-code-grid">
+                <div className="vscode-editor-container">
+                  <div className="vscode-header">
+                    <div className="editor-dots">
+                      <span className="dot red"></span>
+                      <span className="dot yellow"></span>
+                      <span className="dot green"></span>
+                    </div>
+                    <span className="editor-file">index.js</span>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c1', 'console.log("Kilat runtime is active!");')}>
+                      {copiedMap['c1'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+                  <div className="vscode-body">
+                    <div className="editor-nums">
+                      <span>1</span><span>2</span>
+                    </div>
+                    <pre><code>{`console.log("Kilat runtime is active!");`}</code></pre>
+                  </div>
+                  <p className="editor-label-desc">{t.codeSample1Desc}</p>
+                </div>
+
+                <div className="vscode-editor-container">
+                  <div className="vscode-header">
+                    <div className="editor-dots">
+                      <span className="dot red"></span>
+                      <span className="dot yellow"></span>
+                      <span className="dot green"></span>
+                    </div>
+                    <span className="editor-file">server.ts</span>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c2', `Bun.serve({ port: 8080, fetch(req) { return new Response("Hello from Kilat!"); } });`)}>
+                      {copiedMap['c2'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+                  <div className="vscode-body">
+                    <div className="editor-nums">
+                      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+                    </div>
+                    <pre><code>{`Bun.serve({
+  port: 8080,
+  fetch(req) {
+    return new Response("Hello from Kilat!");
+  }
+});`}</code></pre>
+                  </div>
+                  <p className="editor-label-desc">{t.codeSample2Desc}</p>
+                </div>
+
+                <div className="vscode-editor-container">
+                  <div className="vscode-header">
+                    <div className="editor-dots">
+                      <span className="dot red"></span>
+                      <span className="dot yellow"></span>
+                      <span className="dot green"></span>
+                    </div>
+                    <span className="editor-file">exec.js</span>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c3', `const out = await $\`free -h\`; console.log(out);`)}>
+                      {copiedMap['c3'] ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+                  <div className="vscode-body">
+                    <div className="editor-nums">
+                      <span>1</span><span>2</span>
+                    </div>
+                    <pre><code>{`const out = await $\`free -h\`;
+console.log(out);`}</code></pre>
+                  </div>
+                  <p className="editor-label-desc">{t.codeSample3Desc}</p>
+                </div>
+              </div>
             </div>
           )}
 
