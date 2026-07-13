@@ -28,7 +28,7 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		repl.Start()
+		printHelp()
 		return
 	}
 
@@ -153,11 +153,13 @@ func printHelp() {
 	color.Yellow("  kilat run <file.js> [-w]   Jalankan file JavaScript (opsional: watch mode)")
 	color.Yellow("  kilat add <package>        Install package dari npm")
 	color.Yellow("  kilat remove <package>     Hapus package dependency")
+	color.Yellow("  kilat repl                 Mulai sesi REPL interaktif")
 	color.Yellow("  kilat --version            Tampilkan versi")
 	color.Yellow("  kilat --update             Perbarui Kilat ke versi terbaru")
 	fmt.Println()
 	color.White("Contoh:")
 	color.Cyan("  kilat init -y")
 	color.Cyan("  kilat run index.js --watch")
+	color.Cyan("  kilat repl")
 	color.Cyan("  kilat add lodash")
 }
