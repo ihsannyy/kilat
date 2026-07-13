@@ -49,7 +49,7 @@ func drawProgressBar(percent int, status string, elapsed time.Duration) {
 		color.WhiteString(status),
 		color.CyanString("→"),
 		percent,
-		color.CyanString(bar.String()),
+		color.MagentaString(bar.String()),
 		elapsedSec,
 	)
 }
@@ -87,7 +87,7 @@ func (ip *InstallProgress) stop(success bool, pkgName string, version string) {
 	fmt.Print("\r\033[K")
 	elapsed := time.Since(ip.startTime).Round(time.Second)
 	if success {
-		color.Green("✅ %s@%s berhasil diinstall (selesai dalam %s)", pkgName, version, elapsed)
+		color.Magenta("✨ %s@%s berhasil diinstall (selesai dalam %s)", pkgName, version, elapsed)
 		color.Cyan("   📦 Lokasi: .kilat/packages/%s", pkgName)
 	}
 }
@@ -97,7 +97,7 @@ func (ip *InstallProgress) stopRemove(success bool, pkgName string) {
 	fmt.Print("\r\033[K")
 	elapsed := time.Since(ip.startTime).Round(time.Second)
 	if success {
-		color.Green("✅ %s berhasil dihapus (selesai dalam %s)", pkgName, elapsed)
+		color.Magenta("✨ %s berhasil dihapus (selesai dalam %s)", pkgName, elapsed)
 	}
 }
 
