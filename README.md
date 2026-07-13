@@ -14,7 +14,7 @@ Kilat adalah runtime JavaScript CommonJS yang ringan dan efisien, dibangun di at
 [![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?logo=go&logoColor=white&style=for-the-badge)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#-lisensi)
 [![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Linux-brightgreen?style=for-the-badge)](#)
-[![Version](https://img.shields.io/badge/Version-3.0.0-blue?style=for-the-badge)](#)
+[![Version](https://img.shields.io/badge/Version-3.1.0-blue?style=for-the-badge)](#)
 
 </div>
 
@@ -69,15 +69,15 @@ mv kilat $PREFIX/bin/
 ## 🚀 Panduan Penggunaan
 
 ### Inisialisasi Proyek Baru
-Membuat file konfigurasi `package.json` dan entry point secara interaktif (atau gunakan `-y` untuk langsung menyetujui opsi default).
+Membuat file konfigurasi `package.json` secara interaktif (atau gunakan `-y` untuk langsung menyetujui opsi default).
 ```bash
 kilat init -y
 ```
 
 ### Menjalankan Berkas JavaScript
-Menjalankan skrip JS Anda menggunakan runtime Kilat.
+Menjalankan skrip JS Anda menggunakan runtime Kilat. Tambahkan opsi `--watch` atau `-w` untuk mendeteksi perubahan berkas dan memuat ulang secara otomatis.
 ```bash
-kilat run index.js
+kilat run index.js --watch
 ```
 
 ### Memasang Package NPM
@@ -86,10 +86,30 @@ Mengunduh package dan menyimpannya di direktori modul terpusat Kilat.
 kilat add lodash
 ```
 
+### Menghapus Package NPM
+Menghapus package dari direktori modul proyek aktif dan membersihkan `package.json`.
+```bash
+kilat remove lodash
+# atau menggunakan alias singkat:
+kilat rm lodash
+```
+
+### Menjalankan Sesi REPL Interaktif
+Membuka shell interaktif untuk menguji dan mengevaluasi kode JavaScript secara langsung.
+```bash
+kilat repl
+```
+
 ### Informasi Versi Kilat
 Menampilkan versi Kilat yang terpasang.
 ```bash
 kilat --version
+```
+
+### Memperbarui Kilat
+Memperbarui biner runtime Kilat ke versi rilis terbaru secara otomatis.
+```bash
+kilat --update
 ```
 
 ---
