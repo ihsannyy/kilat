@@ -57,6 +57,12 @@ func New(opts Options) *Runtime {
 	})
 
 	bootstrapJS := `
+		globalThis.process = {
+			env: {
+				NODE_ENV: 'development'
+			}
+		};
+
 		class Headers {
 			constructor(init) {
 				this._headers = {};
