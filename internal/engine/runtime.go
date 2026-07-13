@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -340,20 +341,44 @@ func resolvePath(currentDir, moduleName string) (string, error) {
 	} else if (len(moduleName) >= 2 && moduleName[:2] == "./") || (len(moduleName) >= 3 && moduleName[:3] == "../") {
 		targetPath = filepath.Join(currentDir, moduleName)
 	} else {
-		// Global package module resolution
 		baseDir := ".kilat/packages"
 		homeDir, _ := os.UserHomeDir()
 		globalDir := filepath.Join(homeDir, ".kilat", "packages")
 
 		possibleDirs := []string{baseDir, globalDir}
 		for _, dir := range possibleDirs {
-			p1 := filepath.Join(dir, moduleName, "index.js")
-			p2 := filepath.Join(dir, moduleName, moduleName+".js")
-			if _, err := os.Stat(p1); err == nil {
-				return filepath.Abs(p1)
-			}
-			if _, err := os.Stat(p2); err == nil {
-				return filepath.Abs(p2)
+			moduleDir := filepath.Join(dir, moduleName)
+			if info, err := os.Stat(moduleDir); err == nil && info.IsDir() {
+				pkgJsonPath := filepath.Join(moduleDir, "package.json")
+				if _, err := os.Stat(pkgJsonPath); err == nil {
+					data, err := ioutil.ReadFile(pkgJsonPath)
+					if err == nil {
+						var pkgInfo struct {
+							Main string `json:"main"`
+						}
+						if err := json.Unmarshal(data, &pkgInfo); err == nil && pkgInfo.Main != "" {
+							mainPath := filepath.Join(moduleDir, pkgInfo.Main)
+							pathsToTry := []string{
+								mainPath,
+								mainPath + ".js",
+								filepath.Join(mainPath, "index.js"),
+							}
+							for _, p := range pathsToTry {
+								if info, err := os.Stat(p); err == nil && !info.IsDir() {
+									return filepath.Abs(p)
+								}
+							}
+						}
+					}
+				}
+				p1 := filepath.Join(moduleDir, "index.js")
+				p2 := filepath.Join(moduleDir, moduleName+".js")
+				if _, err := os.Stat(p1); err == nil {
+					return filepath.Abs(p1)
+				}
+				if _, err := os.Stat(p2); err == nil {
+					return filepath.Abs(p2)
+				}
 			}
 		}
 		return "", fmt.Errorf("module '%s' tidak ditemukan", moduleName)
