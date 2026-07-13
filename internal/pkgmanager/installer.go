@@ -5,14 +5,16 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"net/http"
+	"kilat/internal/utils"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func downloadAndExtractLight(tarballURL, targetDir string) error {
-	resp, err := http.Get(tarballURL)
+	client := utils.NewHTTPClient(30 * time.Second)
+	resp, err := client.Get(tarballURL)
 	if err != nil {
 		return err
 	}

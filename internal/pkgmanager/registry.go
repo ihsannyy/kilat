@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
+	"kilat/internal/utils"
+	"time"
 )
 
 func fetchPackageInfo(pkg string) (map[string]interface{}, error) {
 	url := fmt.Sprintf("https://registry.npmjs.org/%s", pkg)
-	resp, err := http.Get(url)
+	client := utils.NewHTTPClient(15 * time.Second)
+	resp, err := client.Get(url)
 	if err != nil {
 		return nil, err
 	}

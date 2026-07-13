@@ -2,15 +2,19 @@ package modules
 
 import (
 	"io/ioutil"
+	"kilat/internal/utils"
 	"net/http"
 	"strings"
+	"time"
+
 	"github.com/dop251/goja"
 )
 
 func RegisterNet(vm *goja.Runtime, queueJob func(func()), incrementTasks func(), decrementTasks func()) {
 	net := vm.NewObject()
 	net.Set("fetch", func(url string) map[string]interface{} {
-		resp, err := http.Get(url)
+		client := utils.NewHTTPClient(30 * time.Second)
+		resp, err := client.Get(url)
 		if err != nil {
 			panic(vm.NewGoError(err))
 		}
@@ -35,7 +39,7 @@ func RegisterNet(vm *goja.Runtime, queueJob func(func()), incrementTasks func(),
 		incrementTasks()
 
 		go func() {
-			client := &http.Client{}
+			client := utils.NewHTTPClient(30 * time.Second)
 			req, err := http.NewRequest(method, url, strings.NewReader(body))
 			if err != nil {
 				queueJob(func() {

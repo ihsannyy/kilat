@@ -51,7 +51,7 @@ func CheckUpdate() {
 }
 
 func fetchLatestVersion(cacheFile string, cache UpdateCache) {
-	client := &http.Client{Timeout: 5 * time.Second}
+	client := NewHTTPClient(5 * time.Second)
 	req, err := http.NewRequest("GET", "https://api.github.com/repos/ihsannyy/kilat/releases/latest", nil)
 	if err != nil {
 		return
@@ -106,7 +106,7 @@ func isNewerVersion(current, latest string) bool {
 func SelfUpdate() {
 	color.Cyan("🔄 Memulai pencarian rilis terbaru di GitHub...")
 
-	client := &http.Client{Timeout: 15 * time.Second}
+	client := NewHTTPClient(15 * time.Second)
 	req, err := http.NewRequest("GET", "https://api.github.com/repos/ihsannyy/kilat/releases/latest", nil)
 	if err != nil {
 		color.Red("❌ Gagal membuat request: %v", err)
