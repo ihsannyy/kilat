@@ -81,7 +81,7 @@ func RegisterNet(vm *goja.Runtime, queueJob func(func()), incrementTasks func(),
 				resObj := vm.NewObject()
 				resObj.Set("status", resp.StatusCode)
 				resObj.Set("body", string(respBody))
-				
+
 				resHeadersObj := vm.NewObject()
 				for k, v := range respHeaders {
 					resHeadersObj.Set(k, v)

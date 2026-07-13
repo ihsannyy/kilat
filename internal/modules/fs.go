@@ -1,8 +1,8 @@
 package modules
 
 import (
-	"io/ioutil"
 	"github.com/dop251/goja"
+	"io/ioutil"
 )
 
 func RegisterFS(vm *goja.Runtime) {

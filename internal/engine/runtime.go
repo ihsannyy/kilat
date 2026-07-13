@@ -3,14 +3,14 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dop251/goja"
+	"github.com/evanw/esbuild/pkg/api"
 	"io/ioutil"
+	"kilat/internal/modules"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
-	"github.com/dop251/goja"
-	"github.com/evanw/esbuild/pkg/api"
-	"kilat/internal/modules"
 )
 
 type Runtime struct {
@@ -27,7 +27,7 @@ type moduleRecord struct {
 
 func New(opts Options) *Runtime {
 	vm := goja.New()
-	
+
 	r := &Runtime{
 		vm:    vm,
 		cache: make(map[string]*moduleRecord),
@@ -282,11 +282,11 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 			panic(r.vm.ToValue("require() expects 1 argument"))
 		}
 		moduleName := call.Arguments[0].String()
-		
+
 		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" {
 			return r.vm.Get(moduleName)
 		}
-		
+
 		resolved, err := resolvePath(currentDir, moduleName)
 		if err != nil {
 			panic(r.vm.NewGoError(err))
@@ -299,7 +299,7 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 	}
 
 	wrappedCode := "(function(exports, require, module, __filename, __dirname) {\n" + codeString + "\n})"
-	
+
 	prg, err := goja.Compile(absolutePath, wrappedCode, false)
 	if err != nil {
 		return nil, err
@@ -316,11 +316,11 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 	}
 
 	// Call the wrapped CommonJS function
-	_, err = wrapperFn(goja.Undefined(), 
-		exportsObj, 
-		r.vm.ToValue(requireFunc), 
-		moduleObj, 
-		r.vm.ToValue(absolutePath), 
+	_, err = wrapperFn(goja.Undefined(),
+		exportsObj,
+		r.vm.ToValue(requireFunc),
+		moduleObj,
+		r.vm.ToValue(absolutePath),
 		r.vm.ToValue(currentDir),
 	)
 	if err != nil {
@@ -414,11 +414,11 @@ func (r *Runtime) SetGlobalRequire(currentDir string) {
 			panic(r.vm.ToValue("require() expects 1 argument"))
 		}
 		moduleName := call.Arguments[0].String()
-		
+
 		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" {
 			return r.vm.Get(moduleName)
 		}
-		
+
 		resolved, err := resolvePath(currentDir, moduleName)
 		if err != nil {
 			panic(r.vm.NewGoError(err))

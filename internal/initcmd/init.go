@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"path/filepath"
 	"strings"
-	"github.com/fatih/color"
 )
 
 type PackageJSON struct {

@@ -2,10 +2,10 @@ package modules
 
 import (
 	"fmt"
+	"github.com/dop251/goja"
 	"io/ioutil"
 	"net"
 	"net/http"
-	"github.com/dop251/goja"
 )
 
 type responseData struct {
@@ -17,7 +17,7 @@ type responseData struct {
 
 func RegisterBun(vm *goja.Runtime, queueJob func(func()), setHasServer func(bool)) {
 	bun := vm.NewObject()
-	
+
 	bun.Set("serve", func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
 			panic(vm.ToValue("Bun.serve expects 1 argument"))

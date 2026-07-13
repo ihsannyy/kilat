@@ -2,9 +2,9 @@ package modules
 
 import (
 	"bytes"
+	"github.com/dop251/goja"
 	"os"
 	"os/exec"
-	"github.com/dop251/goja"
 )
 
 func RegisterOS(vm *goja.Runtime, queueJob func(func()), incrementTasks func(), decrementTasks func()) {

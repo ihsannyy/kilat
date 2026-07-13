@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/fatih/color"
+	"kilat/internal/engine"
+	"kilat/internal/initcmd"
+	"kilat/internal/pkgmanager"
+	"kilat/internal/repl"
+	"kilat/internal/utils"
 	"os"
 	"path/filepath"
 	"time"
-	"kilat/internal/engine"
-	"kilat/internal/pkgmanager"
-	"kilat/internal/utils"
-	"kilat/internal/initcmd"
-	"kilat/internal/repl"
-	"github.com/fatih/color"
 )
 
 func main() {
