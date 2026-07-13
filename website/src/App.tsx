@@ -242,12 +242,43 @@ export default function App() {
     }
   ]
 
+  const fallbackCopyText = (text: string) => {
+    const textArea = document.createElement("textarea")
+    textArea.value = text
+    textArea.style.top = "0"
+    textArea.style.left = "0"
+    textArea.style.position = "fixed"
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+    try {
+      document.execCommand('copy')
+    } catch (err) {
+      console.error('Fallback copy failed', err)
+    }
+    document.body.removeChild(textArea)
+  }
+
   const handleCopy = (id: string, text: string) => {
-    navigator.clipboard.writeText(text.trim())
-    setCopiedMap(prev => ({ ...prev, [id]: true }))
-    setTimeout(() => {
-      setCopiedMap(prev => ({ ...prev, [id]: false }))
-    }, 2000)
+    const trimmed = text.trim()
+    const onSuccess = () => {
+      setCopiedMap(prev => ({ ...prev, [id]: true }))
+      setTimeout(() => {
+        setCopiedMap(prev => ({ ...prev, [id]: false }))
+      }, 2000)
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(trimmed)
+        .then(onSuccess)
+        .catch(() => {
+          fallbackCopyText(trimmed)
+          onSuccess()
+        })
+    } else {
+      fallbackCopyText(trimmed)
+      onSuccess()
+    }
   }
 
   useEffect(() => {
