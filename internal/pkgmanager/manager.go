@@ -91,3 +91,43 @@ func Add(pkgName string) error {
 	color.Cyan("   📦 Lokasi: .kilat/packages/%s", pkgName)
 	return nil
 }
+
+func Remove(pkgName string) error {
+	pkgFile := "package.json"
+	data, err := ioutil.ReadFile(pkgFile)
+	if err != nil {
+		return fmt.Errorf("tidak menemukan package.json di folder aktif")
+	}
+
+	var pkg PackageJSON
+	if err := json.Unmarshal(data, &pkg); err != nil {
+		return fmt.Errorf("gagal parse package.json: %w", err)
+	}
+
+	if pkg.Dependencies == nil || pkg.Dependencies[pkgName] == "" {
+		return fmt.Errorf("package '%s' tidak ditemukan di daftar dependencies", pkgName)
+	}
+
+	startTime := time.Now()
+
+	dotChars := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+	s := spinner.New(dotChars, 80*time.Millisecond)
+	s.Suffix = fmt.Sprintf("  Menghapus %s...", pkgName)
+	s.Color("cyan")
+	s.Start()
+
+	targetDir := filepath.Join(installDir, pkgName)
+	if err := os.RemoveAll(targetDir); err != nil {
+		s.Stop()
+		return fmt.Errorf("gagal menghapus folder modul: %w", err)
+	}
+
+	delete(pkg.Dependencies, pkgName)
+	newData, _ := json.MarshalIndent(pkg, "", "  ")
+	_ = ioutil.WriteFile(pkgFile, newData, 0644)
+
+	s.Stop()
+	elapsed := time.Since(startTime).Round(time.Second)
+	color.Green("✅ %s berhasil dihapus (selesai dalam %s)", pkgName, elapsed)
+	return nil
+}

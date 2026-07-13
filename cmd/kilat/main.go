@@ -70,6 +70,16 @@ func main() {
 			color.Red("❌ Gagal install: %v", err)
 			os.Exit(1)
 		}
+	case "remove", "rm":
+		if len(os.Args) < 3 {
+			color.Red("❌ Gunakan: kilat remove <package>")
+			return
+		}
+		pkg := os.Args[2]
+		if err := pkgmanager.Remove(pkg); err != nil {
+			color.Red("❌ Gagal hapus: %v", err)
+			os.Exit(1)
+		}
 	case "repl":
 		repl.Start()
 	case "init":
@@ -142,6 +152,7 @@ func printHelp() {
 	color.Yellow("  kilat init [-y]            Inisialisasi proyek Kilat (opsional: auto-yes)")
 	color.Yellow("  kilat run <file.js> [-w]   Jalankan file JavaScript (opsional: watch mode)")
 	color.Yellow("  kilat add <package>        Install package dari npm")
+	color.Yellow("  kilat remove <package>     Hapus package dependency")
 	color.Yellow("  kilat --version            Tampilkan versi")
 	color.Yellow("  kilat --update             Perbarui Kilat ke versi terbaru")
 	fmt.Println()

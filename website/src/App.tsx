@@ -77,6 +77,7 @@ const dict = {
     apiSub: 'Daftar global API dan core module built-in bawaan Kilat.',
     changeTitle: 'Release Changelog',
     changeSub: 'Riwayat pembaruan biner statis Kilat.',
+    change4: 'Rilis ini memperkenalkan perintah **`kilat remove <package>`** (alias **`kilat rm`**) untuk menghapus dependency secara lokal dan otomatis membersihkan `package.json`. Ditambahkan juga **fallback DNS resolver** baru untuk memecahkan masalah koneksi internet di lingkungan Termux Android, serta peningkatan sistem resolusi modul NPM untuk membaca properti `"main"` berkas `package.json`.',
     change3: 'Rilis major ini memperkenalkan **Global Shell Command Execution ($)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.',
     change2: 'Rilis minor ini memperkenalkan **Global Fetch API (fetch)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.',
     change1: 'Integrasi compiler esbuild internal untuk mendukung pemuatan file TypeScript (TS, TSX, JSX) dan transpiler ES Modules (ESM) di memori secara otomatis.',
@@ -152,6 +153,7 @@ const dict = {
     apiSub: 'List of built-in global APIs and core modules available in Kilat.',
     changeTitle: 'Release Changelog',
     changeSub: 'Version release logs of the static Kilat binary.',
+    change4: 'This release introduces the **`kilat remove <package>`** command (alias **`kilat rm`**) to uninstall dependencies locally and automatically clean up `package.json`. Adds a new **fallback DNS resolver** to bypass network connection failures in Android/Termux environments, and enhances NPM module resolution by supporting `package.json` `"main"` property loading.',
     change3: 'This major release introduces **Global Shell Command Execution ($)**. Full async support using Go goroutines to run external binaries and CLI utilities on Termux / Linux.',
     change2: 'This minor release introduces the **Global Fetch API (fetch)**, asynchronously integrated with the event-loop for HTTP API requests.',
     change1: 'Integrated esbuild compiler for instant in-memory TypeScript (TS, TSX, JSX) and ES Modules (ESM) loading.',
@@ -535,7 +537,7 @@ export default function App() {
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
             </svg>
             <span className="name">kilat</span>
-            <span className="badge">v3.0.0</span>
+            <span className="badge">v3.1.0</span>
           </div>
 
           <nav className="navbar-links desktop-only">
@@ -954,9 +956,18 @@ console.log(out);`}</code></pre>
               <div className="changelog-timeline">
                 <div className="timeline-segment">
                   <div className="segment-hdr">
+                    <span className="ver">v3.1.0</span>
+                    <span className="date">13 Juli 2026</span>
+                    <span className="led green active"></span>
+                  </div>
+                  <p>{t.change4}</p>
+                </div>
+
+                <div className="timeline-segment">
+                  <div className="segment-hdr">
                     <span className="ver">v3.0.0</span>
                     <span className="date">11 Juli 2026</span>
-                    <span className="led green active"></span>
+                    <span className="led"></span>
                   </div>
                   <p>{t.change3}</p>
                 </div>
