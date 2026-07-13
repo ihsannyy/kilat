@@ -784,7 +784,7 @@ body {
     align-items: stretch;
     gap: 12px;
   }
-  .copy-bezel-btn {
+  .box-body .copy-bezel-btn {
     width: 100%;
     text-align: center;
   }
