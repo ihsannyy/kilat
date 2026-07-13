@@ -94,6 +94,12 @@ kilat remove lodash
 kilat rm lodash
 ```
 
+### Bundle & Minify Berkas Produksi
+Melakukan bundling seluruh berkas JS/TS (beserta modul lokal yang di-require) menjadi satu berkas JavaScript tunggal teroptimasi untuk produksi:
+```bash
+kilat build index.ts dist/bundle.js
+```
+
 ### Menjalankan Sesi REPL Interaktif
 Membuka shell interaktif untuk menguji dan mengevaluasi kode JavaScript secara langsung.
 ```bash

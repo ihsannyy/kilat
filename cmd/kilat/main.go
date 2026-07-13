@@ -80,6 +80,19 @@ func main() {
 			color.Red("❌ Gagal hapus: %v", err)
 			os.Exit(1)
 		}
+	case "build":
+		if len(os.Args) < 4 {
+			color.Red("❌ Gunakan: kilat build <input.ts/js> <output.js>")
+			return
+		}
+		input := os.Args[2]
+		output := os.Args[3]
+		color.Cyan("📦 Memulai bundling berkas...")
+		if err := engine.BuildFile(input, output); err != nil {
+			color.Red("❌ Gagal build: %v", err)
+			os.Exit(1)
+		}
+		color.Magenta("✨ Berkas berhasil di-build ke %s", output)
 	case "repl":
 		repl.Start()
 	case "init":
@@ -153,6 +166,7 @@ func printHelp() {
 	color.Yellow("  kilat run <file.js> [-w]   Jalankan file JavaScript (opsional: watch mode)")
 	color.Yellow("  kilat add <package>        Install package dari npm")
 	color.Yellow("  kilat remove <package>     Hapus package dependency")
+	color.Yellow("  kilat build <in> <out>     Bundle & minify berkas JS/TS untuk produksi")
 	color.Yellow("  kilat repl                 Mulai sesi REPL interaktif")
 	color.Yellow("  kilat --version            Tampilkan versi")
 	color.Yellow("  kilat --update             Perbarui Kilat ke versi terbaru")
@@ -162,4 +176,5 @@ func printHelp() {
 	color.Cyan("  kilat run index.js --watch")
 	color.Cyan("  kilat repl")
 	color.Cyan("  kilat add lodash")
+	color.Cyan("  kilat build index.ts dist/bundle.js")
 }
