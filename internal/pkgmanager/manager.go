@@ -6,8 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
-	"github.com/briandowns/spinner"
+
 	"github.com/fatih/color"
 )
 
@@ -22,6 +23,82 @@ type PackageJSON struct {
 	License         string            `json:"license"`
 	Dependencies    map[string]string `json:"dependencies"`
 	DevDependencies map[string]string `json:"devDependencies"`
+}
+
+type InstallProgress struct {
+	status    string
+	percent   int
+	startTime time.Time
+	done      chan struct{}
+}
+
+func drawProgressBar(percent int, status string, elapsed time.Duration) {
+	width := 20
+	completed := percent * width / 100
+	var bar strings.Builder
+	for i := 0; i < width; i++ {
+		if i < completed {
+			bar.WriteString("█")
+		} else {
+			bar.WriteString("░")
+		}
+	}
+	elapsedSec := int(elapsed.Seconds())
+	fmt.Printf("\r\033[K%s  %-40s %s [%3d%%] [%-20s] (%ds)",
+		color.CyanString("⚡"),
+		color.WhiteString(status),
+		color.CyanString("→"),
+		percent,
+		color.CyanString(bar.String()),
+		elapsedSec,
+	)
+}
+
+func startProgress(initialStatus string, initialPercent int) *InstallProgress {
+	ip := &InstallProgress{
+		status:    initialStatus,
+		percent:   initialPercent,
+		startTime: time.Now(),
+		done:      make(chan struct{}),
+	}
+	go func() {
+		ticker := time.NewTicker(100 * time.Millisecond)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ip.done:
+				return
+			case <-ticker.C:
+				drawProgressBar(ip.percent, ip.status, time.Since(ip.startTime))
+			}
+		}
+	}()
+	return ip
+}
+
+func (ip *InstallProgress) update(status string, percent int) {
+	ip.status = status
+	ip.percent = percent
+	drawProgressBar(percent, status, time.Since(ip.startTime))
+}
+
+func (ip *InstallProgress) stop(success bool, pkgName string, version string) {
+	close(ip.done)
+	fmt.Print("\r\033[K")
+	elapsed := time.Since(ip.startTime).Round(time.Second)
+	if success {
+		color.Green("✅ %s@%s berhasil diinstall (selesai dalam %s)", pkgName, version, elapsed)
+		color.Cyan("   📦 Lokasi: .kilat/packages/%s", pkgName)
+	}
+}
+
+func (ip *InstallProgress) stopRemove(success bool, pkgName string) {
+	close(ip.done)
+	fmt.Print("\r\033[K")
+	elapsed := time.Since(ip.startTime).Round(time.Second)
+	if success {
+		color.Green("✅ %s berhasil dihapus (selesai dalam %s)", pkgName, elapsed)
+	}
 }
 
 func Add(pkgName string) error {
@@ -49,46 +126,35 @@ func Add(pkgName string) error {
 		pkg.Dependencies = make(map[string]string)
 	}
 
-	startTime := time.Now()
-
-	dotChars := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
-	s := spinner.New(dotChars, 80*time.Millisecond)
-	s.Suffix = "  Mengambil info package..."
-	s.Color("cyan")
-	s.Start()
+	ip := startProgress("Mengambil info package...", 10)
 
 	info, err := fetchPackageInfo(pkgName)
 	if err != nil {
-		s.Stop()
+		ip.stop(false, "", "")
 		return err
 	}
 	latestVersion := info["dist-tags"].(map[string]interface{})["latest"].(string)
 	versionInfo := info["versions"].(map[string]interface{})[latestVersion].(map[string]interface{})
 	tarballURL := versionInfo["dist"].(map[string]interface{})["tarball"].(string)
 
-	s.Suffix = fmt.Sprintf("  Download %s@%s... (%s)", pkgName, latestVersion, time.Since(startTime).Round(time.Second))
-	s.Restart()
+	ip.update(fmt.Sprintf("Mengunduh %s@%s...", pkgName, latestVersion), 50)
 
 	targetDir := filepath.Join(installDir, pkgName)
 	os.MkdirAll(targetDir, 0755)
 
 	if err := downloadAndExtractLight(tarballURL, targetDir); err != nil {
-		s.Stop()
+		ip.stop(false, "", "")
 		return err
 	}
 
-	s.Suffix = fmt.Sprintf("  Menyimpan konfigurasi... (%s)", time.Since(startTime).Round(time.Second))
-	s.Restart()
-	time.Sleep(500 * time.Millisecond)
+	ip.update("Menyimpan konfigurasi...", 90)
+	time.Sleep(200 * time.Millisecond)
 
 	pkg.Dependencies[pkgName] = latestVersion
 	data, _ := json.MarshalIndent(pkg, "", "  ")
 	ioutil.WriteFile(pkgFile, data, 0644)
 
-	s.Stop()
-	elapsed := time.Since(startTime).Round(time.Second)
-	color.Green("✅ %s@%s berhasil diinstall (selesai dalam %s)", pkgName, latestVersion, elapsed)
-	color.Cyan("   📦 Lokasi: .kilat/packages/%s", pkgName)
+	ip.stop(true, pkgName, latestVersion)
 	return nil
 }
 
@@ -108,26 +174,19 @@ func Remove(pkgName string) error {
 		return fmt.Errorf("package '%s' tidak ditemukan di daftar dependencies", pkgName)
 	}
 
-	startTime := time.Now()
-
-	dotChars := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
-	s := spinner.New(dotChars, 80*time.Millisecond)
-	s.Suffix = fmt.Sprintf("  Menghapus %s...", pkgName)
-	s.Color("cyan")
-	s.Start()
+	ip := startProgress(fmt.Sprintf("Menghapus %s...", pkgName), 30)
 
 	targetDir := filepath.Join(installDir, pkgName)
 	if err := os.RemoveAll(targetDir); err != nil {
-		s.Stop()
+		ip.stopRemove(false, "")
 		return fmt.Errorf("gagal menghapus folder modul: %w", err)
 	}
 
+	ip.update("Membersihkan konfigurasi...", 80)
 	delete(pkg.Dependencies, pkgName)
 	newData, _ := json.MarshalIndent(pkg, "", "  ")
 	_ = ioutil.WriteFile(pkgFile, newData, 0644)
 
-	s.Stop()
-	elapsed := time.Since(startTime).Round(time.Second)
-	color.Green("✅ %s berhasil dihapus (selesai dalam %s)", pkgName, elapsed)
+	ip.stopRemove(true, pkgName)
 	return nil
 }
