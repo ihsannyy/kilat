@@ -36,6 +36,7 @@ func New(opts Options) *Runtime {
 
 	modules.RegisterConsole(vm)
 	modules.RegisterFS(vm)
+	modules.RegisterCrypto(vm)
 	modules.RegisterNet(vm, func(job func()) {
 		r.jobs <- job
 	}, func() {
@@ -289,7 +290,7 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		}
 		moduleName := call.Arguments[0].String()
 
-		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" {
+		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" || moduleName == "crypto" {
 			return r.vm.Get(moduleName)
 		}
 
