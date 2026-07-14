@@ -7,6 +7,7 @@ import (
 	"kilat/internal/initcmd"
 	"kilat/internal/pkgmanager"
 	"kilat/internal/repl"
+	"kilat/internal/scripts"
 	"kilat/internal/utils"
 	"os"
 	"path/filepath"
@@ -57,7 +58,14 @@ func main() {
 		if watchMode {
 			runAndWatch(filePath)
 		} else {
-			executeFile(filePath)
+			executed, err := scripts.RunScript(filePath)
+			if err != nil {
+				color.Red("❌ Script failed: %v", err)
+				os.Exit(1)
+			}
+			if !executed {
+				executeFile(filePath)
+			}
 		}
 
 	case "add":
@@ -103,6 +111,27 @@ func main() {
 		if err := initcmd.RunInit(autoYes); err != nil {
 			color.Red("❌ Gagal init: %v", err)
 			os.Exit(1)
+		}
+	case "start":
+		executed, err := scripts.RunScript("start")
+		if err != nil {
+			color.Red("❌ Script failed: %v", err)
+			os.Exit(1)
+		}
+		if !executed {
+			files := []string{"index.ts", "index.js", "server.ts", "server.js"}
+			found := false
+			for _, f := range files {
+				if _, err := os.Stat(f); err == nil {
+					executeFile(f)
+					found = true
+					break
+				}
+			}
+			if !found {
+				color.Red("❌ Gagal: Tidak ada script 'start' di package.json dan tidak menemukan file index.js/server.js")
+				os.Exit(1)
+			}
 		}
 	default:
 		printHelp()
@@ -163,7 +192,8 @@ func printHelp() {
 	fmt.Println()
 	color.White("Penggunaan:")
 	color.Yellow("  kilat init [-y]            Inisialisasi proyek Kilat (opsional: auto-yes)")
-	color.Yellow("  kilat run <file.js> [-w]   Jalankan file JavaScript (opsional: watch mode)")
+	color.Yellow("  kilat run <file/script>    Jalankan berkas JS/TS atau script package.json (opsional: --watch)")
+	color.Yellow("  kilat start                Jalankan script 'start' dari package.json")
 	color.Yellow("  kilat add <package>        Install package dari npm")
 	color.Yellow("  kilat remove <package>     Hapus package dependency")
 	color.Yellow("  kilat build <in> <out>     Bundle & minify berkas JS/TS untuk produksi")
@@ -174,6 +204,7 @@ func printHelp() {
 	color.White("Contoh:")
 	color.Cyan("  kilat init -y")
 	color.Cyan("  kilat run index.js --watch")
+	color.Cyan("  kilat start")
 	color.Cyan("  kilat repl")
 	color.Cyan("  kilat add lodash")
 	color.Cyan("  kilat build index.ts dist/bundle.js")
