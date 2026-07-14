@@ -74,10 +74,19 @@ Membuat file konfigurasi `package.json` secara interaktif (atau gunakan `-y` unt
 kilat init -y
 ```
 
-### Menjalankan Berkas JavaScript
-Menjalankan skrip JS Anda menggunakan runtime Kilat. Tambahkan opsi `--watch` atau `-w` untuk mendeteksi perubahan berkas dan memuat ulang secara otomatis.
+### Menjalankan Berkas JS/TS atau Script Proyek
+Menjalankan skrip JS/TS Anda menggunakan runtime Kilat. Perintah ini juga dapat digunakan untuk menjalankan *user-defined scripts* di dalam berkas `package.json` (seperti `kilat run dev`).
+Tambahkan opsi `--watch` atau `-w` untuk mendeteksi perubahan berkas dan memuat ulang secara otomatis.
 ```bash
 kilat run index.js --watch
+# atau menjalankan script package.json:
+kilat run dev
+```
+
+### Menjalankan Script Start
+Mengeksekusi langsung *start script* yang dideklarasikan di dalam berkas `package.json`. Jika tidak ada script `"start"` yang dideklarasikan, perintah ini akan otomatis mencari dan menjalankan berkas `index.ts`/`index.js`/`server.ts`/`server.js` sebagai fallback default.
+```bash
+kilat start
 ```
 
 ### Memasang Package NPM
