@@ -21,8 +21,9 @@ type PackageJSON struct {
 	Main            string            `json:"main"`
 	Author          string            `json:"author"`
 	License         string            `json:"license"`
-	Dependencies    map[string]string `json:"dependencies"`
-	DevDependencies map[string]string `json:"devDependencies"`
+	Scripts         map[string]string `json:"scripts,omitempty"`
+	Dependencies    map[string]string `json:"dependencies,omitempty"`
+	DevDependencies map[string]string `json:"devDependencies,omitempty"`
 }
 
 type InstallProgress struct {

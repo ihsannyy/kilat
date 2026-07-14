@@ -17,8 +17,9 @@ type PackageJSON struct {
 	Main            string            `json:"main"`
 	Author          string            `json:"author"`
 	License         string            `json:"license"`
-	Dependencies    map[string]string `json:"dependencies"`
-	DevDependencies map[string]string `json:"devDependencies"`
+	Scripts         map[string]string `json:"scripts,omitempty"`
+	Dependencies    map[string]string `json:"dependencies,omitempty"`
+	DevDependencies map[string]string `json:"devDependencies,omitempty"`
 }
 
 func RunInit(autoYes bool) error {
@@ -95,6 +96,9 @@ func RunInit(autoYes bool) error {
 		Main:            main,
 		Author:          author,
 		License:         license,
+		Scripts:         map[string]string{
+			"start": "kilat run " + main,
+		},
 		Dependencies:    make(map[string]string),
 		DevDependencies: make(map[string]string),
 	}

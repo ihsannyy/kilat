@@ -347,11 +347,18 @@ func resolvePath(currentDir, moduleName string) (string, error) {
 	} else if (len(moduleName) >= 2 && moduleName[:2] == "./") || (len(moduleName) >= 3 && moduleName[:3] == "../") {
 		targetPath = filepath.Join(currentDir, moduleName)
 	} else {
-		baseDir := ".kilat/packages"
+		var possibleDirs []string
+		dir := currentDir
+		for {
+			possibleDirs = append(possibleDirs, filepath.Join(dir, ".kilat", "packages"))
+			parent := filepath.Dir(dir)
+			if parent == dir {
+				break
+			}
+			dir = parent
+		}
 		homeDir, _ := os.UserHomeDir()
-		globalDir := filepath.Join(homeDir, ".kilat", "packages")
-
-		possibleDirs := []string{baseDir, globalDir}
+		possibleDirs = append(possibleDirs, filepath.Join(homeDir, ".kilat", "packages"))
 		for _, dir := range possibleDirs {
 			moduleDir := filepath.Join(dir, moduleName)
 			if info, err := os.Stat(moduleDir); err == nil && info.IsDir() {
