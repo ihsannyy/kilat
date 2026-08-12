@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"runtime"
 
 	"github.com/fatih/color"
 )
@@ -31,12 +32,19 @@ func RunScript(scriptName string) (bool, error) {
 
 	color.Cyan("🏃 Running script %s: %s", scriptName, cmdStr)
 
-	shell := "sh"
-	if termuxShell := os.Getenv("SHELL"); termuxShell != "" {
-		shell = termuxShell
+	var shell, flag string
+	if customShell := os.Getenv("SHELL"); customShell != "" {
+		shell = customShell
+		flag = "-c"
+	} else if runtime.GOOS == "windows" {
+		shell = "cmd.exe"
+		flag = "/c"
+	} else {
+		shell = "sh"
+		flag = "-c"
 	}
 
-	cmd := exec.Command(shell, "-c", cmdStr)
+	cmd := exec.Command(shell, flag, cmdStr)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

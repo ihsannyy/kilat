@@ -176,7 +176,7 @@ func getMaxModTime() time.Time {
 			return nil
 		}
 		ext := filepath.Ext(path)
-		if ext == ".js" || ext == ".ts" || ext == ".jsx" || ext == ".tsx" || ext == ".json" {
+		if ext == ".js" || ext == ".cjs" || ext == ".mjs" || ext == ".ts" || ext == ".jsx" || ext == ".tsx" || ext == ".json" {
 			if info.ModTime().After(maxTime) {
 				maxTime = info.ModTime()
 			}

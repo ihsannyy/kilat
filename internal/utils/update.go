@@ -42,7 +42,7 @@ func CheckUpdate() {
 	current := Version
 	if cache.LatestVersion != "" && isNewerVersion(current, cache.LatestVersion) {
 		color.Yellow("\n✨ Versi baru Kilat tersedia: %s (Versi saat ini: %s)", "v"+cache.LatestVersion, "v"+current)
-		color.Cyan("👉 Perbarui dengan: curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash\n")
+		color.Cyan("👉 Perbarui dengan: curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash\n")
 	}
 
 	if time.Since(cache.LastChecked) > 24*time.Hour {
@@ -52,7 +52,7 @@ func CheckUpdate() {
 
 func fetchLatestVersion(cacheFile string, cache UpdateCache) {
 	client := NewHTTPClient(5 * time.Second)
-	req, err := http.NewRequest("GET", "https://api.github.com/repos/ihsannyy/kilat/releases/latest", nil)
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/cilldev/kilat/releases/latest", nil)
 	if err != nil {
 		return
 	}
@@ -107,7 +107,7 @@ func SelfUpdate() {
 	color.Cyan("🔄 Memulai pencarian rilis terbaru di GitHub...")
 
 	client := NewHTTPClient(15 * time.Second)
-	req, err := http.NewRequest("GET", "https://api.github.com/repos/ihsannyy/kilat/releases/latest", nil)
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/cilldev/kilat/releases/latest", nil)
 	if err != nil {
 		color.Red("❌ Gagal membuat request: %v", err)
 		return
@@ -150,7 +150,10 @@ func SelfUpdate() {
 	}
 
 	assetName := fmt.Sprintf("kilat-%s-%s", osName, archName)
-	downloadURL := fmt.Sprintf("https://github.com/ihsannyy/kilat/releases/download/%s/%s", result.TagName, assetName)
+	if osName == "windows" {
+		assetName += ".exe"
+	}
+	downloadURL := fmt.Sprintf("https://github.com/cilldev/kilat/releases/download/%s/%s", result.TagName, assetName)
 
 	color.Cyan("📡 Mengunduh biner: %s", downloadURL)
 

@@ -1,13 +1,13 @@
-#!/bin/bash
-# Kilat Installer - Fast JS Runtime for Termux
-
+#!/bin/sh
+# Kilat Installer - Fast JS Runtime for Termux, Linux, macOS, and Windows
 set -e
 
-REPO="ihsannyy/kilat"
+REPO="cilldev/kilat"
 BINARY="kilat"
 VERSION="v3.1.0"
 
 RED='\033[0;31m'
+GREEN='\033[0;32m'
 MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 WHITE='\033[0;37m'
@@ -20,8 +20,8 @@ draw_progress_bar() {
 	local width=20
 	local completed=$(( percent * width / 100 ))
 	local bar=""
-	for ((i=0; i<width; i++)); do
-		if [ $i -lt $completed ]; then
+	for i in $(seq 1 $width); do
+		if [ "$i" -le "$completed" ]; then
 			bar="${bar}█"
 		else
 			bar="${bar}░"
@@ -33,36 +33,70 @@ draw_progress_bar() {
 echo -e "${MAGENTA}${BOLD}⚡ Kilat Installer${NC}"
 echo ""
 
-OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-ARCH=$(uname -m)
+# Detect OS
+RAW_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+case "$RAW_OS" in
+	linux*)
+		OS="linux"
+		;;
+	darwin*)
+		OS="darwin"
+		;;
+	msys*|mingw*|cygwin*|windows*)
+		OS="windows"
+		;;
+	*)
+		OS="$RAW_OS"
+		;;
+esac
 
-case "$ARCH" in
+# Detect Architecture
+RAW_ARCH=$(uname -m)
+case "$RAW_ARCH" in
 	aarch64|arm64)   ARCH="arm64" ;;
 	x86_64|amd64)    ARCH="amd64" ;;
 	armv7l|armhf)    ARCH="armv7" ;;
+	i386|i686)       ARCH="386" ;;
 	*)
-		echo -e "${RED}❌ Arsitektur tidak didukung: $ARCH${NC}"
+		echo -e "${RED}❌ Arsitektur tidak didukung: $RAW_ARCH${NC}"
 		exit 1
 		;;
 esac
 
-if [ -d "$PREFIX/bin" ]; then
-	BINDIR="$PREFIX/bin"
-else
-	BINDIR="/usr/local/bin"
+# Determine binary file name and target bin directory
+TARGET_NAME="kilat"
+if [ "$OS" = "windows" ]; then
+	TARGET_NAME="kilat.exe"
 fi
 
-TMPDIR=$(mktemp -d)
+if [ -n "$PREFIX" ] && [ -d "$PREFIX/bin" ]; then
+	# Termux environment
+	BINDIR="$PREFIX/bin"
+elif [ -d "/usr/local/bin" ] && ( [ -w "/usr/local/bin" ] || command -v sudo >/dev/null 2>&1 ); then
+	BINDIR="/usr/local/bin"
+elif [ -d "$HOME/.local/bin" ]; then
+	BINDIR="$HOME/.local/bin"
+else
+	BINDIR="$HOME/.local/bin"
+	mkdir -p "$BINDIR"
+fi
+
+TMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'kilat')
 cd "$TMPDIR"
 
-URL="https://github.com/$REPO/releases/download/$VERSION/$BINARY-$OS-$ARCH"
+ASSET_NAME="$BINARY-$OS-$ARCH"
+if [ "$OS" = "windows" ]; then
+	ASSET_NAME="$ASSET_NAME.exe"
+fi
 
-curl -fsSL -o "$BINARY" "$URL" &
+URL="https://github.com/$REPO/releases/download/$VERSION/$ASSET_NAME"
+
+curl -fsSL -o "$TARGET_NAME" "$URL" &
 CURL_PID=$!
 
 percent=10
 while kill -0 $CURL_PID 2>/dev/null; do
-	draw_progress_bar $percent "Downloading kilat from GitHub..."
+	draw_progress_bar $percent "Downloading kilat ($OS/$ARCH)..."
 	sleep 0.1
 	if [ $percent -lt 90 ]; then
 		percent=$((percent + 3))
@@ -71,32 +105,45 @@ done
 
 wait $CURL_PID
 if [ $? -ne 0 ]; then
-	printf "\n${RED}❌ Gagal download binary. Pastikan release $VERSION tersedia.${NC}\n"
+	printf "\n${RED}❌ Gagal download binary ($ASSET_NAME). Pastikan rilis $VERSION tersedia.${NC}\n"
+	rm -rf "$TMPDIR"
 	exit 1
 fi
-draw_progress_bar 90 "Downloading kilat from GitHub..."
+draw_progress_bar 90 "Downloading kilat ($OS/$ARCH)..."
 sleep 0.1
 
-draw_progress_bar 95 "Installing binary to path..."
-chmod +x "$BINARY"
+draw_progress_bar 95 "Installing binary to $BINDIR..."
+chmod +x "$TARGET_NAME"
 sleep 0.1
 
 if [ -w "$BINDIR" ]; then
-	mv "$BINARY" "$BINDIR/"
+	mv "$TARGET_NAME" "$BINDIR/"
 else
 	if command -v sudo >/dev/null 2>&1; then
-		sudo mv "$BINARY" "$BINDIR/"
+		sudo mv "$TARGET_NAME" "$BINDIR/"
 	else
-		mv "$BINARY" "$BINDIR/"
+		mv "$TARGET_NAME" "$BINDIR/"
 	fi
 fi
 
-draw_progress_bar 100 "Installing binary to path..."
+draw_progress_bar 100 "Installing binary to $BINDIR..."
 echo ""
 
 cd - > /dev/null
 rm -rf "$TMPDIR"
 
 echo ""
-echo -e "${MAGENTA}✨ Kilat $VERSION berhasil diinstall!${NC}"
-echo -e "${CYAN}${BOLD}Gunakan:${NC} kilat --version"
+echo -e "${MAGENTA}✨ Kilat $VERSION berhasil diinstall ke ${BOLD}$BINDIR/$TARGET_NAME${NC}!"
+
+# Verify if BINDIR is in PATH
+case ":$PATH:" in
+	*":$BINDIR:"*)
+		;;
+	*)
+		echo -e "${RED}⚠️  Catatan: $BINDIR belum ada di PATH Anda.${NC}"
+		echo -e "${CYAN}Tambahkan baris ini ke file ~/.bashrc atau ~/.zshrc Anda:${NC}"
+		echo -e "   export PATH=\"$BINDIR:\$PATH\""
+		;;
+esac
+
+echo -e "${CYAN}${BOLD}Jalankan perintah:${NC} kilat --version"

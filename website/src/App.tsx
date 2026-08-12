@@ -58,7 +58,7 @@ const dict = {
     arch3Desc: 'Untuk mendukung operasi I/O non-blocking (seperti fetch asinkron dan modul $ shell executor), Kilat mengimplementasikan event-loop asinkron menggunakan mekanisme internal Go channel dan goroutine. Setiap kali operasi asinkron dipicu dari JavaScript, Goja VM akan mendelegasikan tugas tersebut ke goroutine latar belakang dan mengembalikan Promise ke thread utama. Setelah goroutine menyelesaikan tugasnya, hasilnya akan dikirim kembali melalui Go channel ke event-loop untuk menyelesaikan status Promise.',
     
     personalTitle: 'Kenapa Kilat Dibuat?',
-    personalDesc: 'Kilat dibuat oleh ihsannyy karena keresahan pribadi saat mengembangkan script otomasi dan bot di HP Android menggunakan Termux. Node.js terlalu memakan penyimpanan internal HP dengan folder node_modules yang duplikat di setiap proyek, serta memakan RAM yang cukup besar saat dijalankan di perangkat berspesifikasi rendah. Kilat lahir sebagai solusi: minimalis, bertenaga Go, memuat dalam 2ms, dan menghemat memori internal dengan caching dependency global.',
+    personalDesc: 'Kilat dibuat oleh cilldev karena keresahan pribadi saat mengembangkan script otomasi dan bot di HP Android menggunakan Termux. Node.js terlalu memakan penyimpanan internal HP dengan folder node_modules yang duplikat di setiap proyek, serta memakan RAM yang cukup besar saat dijalankan di perangkat berspesifikasi rendah. Kilat lahir sebagai solusi: minimalis, bertenaga Go, memuat dalam 2ms, dan menghemat memori internal dengan caching dependency global.',
     faqTitle: 'Pertanyaan Umum (FAQ)',
     faq1Quest: 'Apa bedanya Kilat dengan Node.js?',
     faq1Ans: 'Node.js menggunakan V8 Engine dan memerlukan folder node_modules lokal di setiap proyek. Kilat menggunakan Goja VM (Go-based JS interpreter) dan esbuild untuk kompilasi memori, serta menggunakan cache global satu-satunya. Kilat jauh lebih hemat RAM (~8MB) dan penyimpanan disk (0B untuk dependensi lokal).',
@@ -81,7 +81,7 @@ const dict = {
     change3: 'Rilis major ini memperkenalkan **Global Shell Command Execution ($)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.',
     change2: 'Rilis minor ini memperkenalkan **Global Fetch API (fetch)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.',
     change1: 'Integrasi compiler esbuild internal untuk mendukung pemuatan file TypeScript (TS, TSX, JSX) dan transpiler ES Modules (ESM) di memori secara otomatis.',
-    footer: 'Lisensi MIT © 2026 Kilat. Dibuat seadanya oleh ihsannyy untuk optimasi Termux Android.'
+    footer: 'Lisensi MIT © 2026 Kilat. Dibuat seadanya oleh cilldev untuk optimasi Termux Android.'
   },
   en: {
     console: 'Console',
@@ -134,7 +134,7 @@ const dict = {
     arch3Desc: 'To support non-blocking I/O operations (like async fetch and shell executing), Kilat implements an async event-loop using internal Go channels and goroutines. When an async task starts in JS, the Goja VM delegates it to a background goroutine and returns a Promise. Upon completion, the result is piped back through a Go channel to resolve the Promise.',
     
     personalTitle: 'Why was Kilat Created?',
-    personalDesc: 'Kilat was created by ihsannyy out of personal frustration when developing automation scripts and bots on Android devices using Termux. Node.js consumes too much internal phone storage with duplicate node_modules folders in every project, and demands high memory on low-spec devices. Kilat was born as a solution: minimalist, Go-powered, booting in 2ms, and preserving phone storage through global dependency caching.',
+    personalDesc: 'Kilat was created by cilldev out of personal frustration when developing automation scripts and bots on Android devices using Termux. Node.js consumes too much internal phone storage with duplicate node_modules folders in every project, and demands high memory on low-spec devices. Kilat was born as a solution: minimalist, Go-powered, booting in 2ms, and preserving phone storage through global dependency caching.',
     faqTitle: 'Frequently Asked Questions (FAQ)',
     faq1Quest: 'How is Kilat different from Node.js?',
     faq1Ans: 'Node.js runs on V8 Engine and requires a local node_modules folder for every project. Kilat runs on Goja VM (Go-based JS interpreter) with esbuild for in-memory compilation, mapping modules to a single global cache. Kilat uses less RAM (~8MB) and zero disk space for local project dependencies.',
@@ -157,7 +157,7 @@ const dict = {
     change3: 'This major release introduces **Global Shell Command Execution ($)**. Full async support using Go goroutines to run external binaries and CLI utilities on Termux / Linux.',
     change2: 'This minor release introduces the **Global Fetch API (fetch)**, asynchronously integrated with the event-loop for HTTP API requests.',
     change1: 'Integrated esbuild compiler for instant in-memory TypeScript (TS, TSX, JSX) and ES Modules (ESM) loading.',
-    footer: 'MIT License © 2026 Kilat. Built lightweight by ihsannyy to optimize Termux Android.'
+    footer: 'MIT License © 2026 Kilat. Built lightweight by cilldev to optimize Termux Android.'
   }
 }
 
@@ -594,7 +594,7 @@ export default function App() {
               <span className="time-val">&nbsp;[{clockText}]</span>
             </div>
             
-            <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
+            <a href="https://github.com/cilldev/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
               </svg>
@@ -627,7 +627,7 @@ export default function App() {
             <span className="drawer-lbl">{p.title}</span>
           </button>
         ))}
-        <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>
+        <a href="https://github.com/cilldev/kilat" target="_blank" rel="noreferrer" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>
           <span className="tab-icon-svg">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
@@ -656,9 +656,9 @@ export default function App() {
                   </div>
                   <div className="box-body">
                     <div className="code-scroll-wrapper">
-                      <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
+                      <code>curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash</code>
                     </div>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash')}>
                       {copiedMap['hero-inst'] ? 'COPIED' : (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -899,9 +899,9 @@ console.log(out);`}</code></pre>
                   </div>
                   <div className="box-body">
                     <div className="code-scroll-wrapper">
-                      <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
+                      <code>curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash</code>
                     </div>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash')}>
                       {copiedMap['inst-auto'] ? 'COPIED' : (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1027,9 +1027,9 @@ console.log(out);`}</code></pre>
       <footer className="portal-footer">
         <p>{t.footer}</p>
         <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', gap: '16px' }}>
-          <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>GitHub Repository</a>
-          <a href="https://github.com/ihsannyy/kilat/issues" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>Report Bugs</a>
-          <a href="https://github.com/ihsannyy/kilat/blob/main/LICENSE" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>MIT License</a>
+          <a href="https://github.com/cilldev/kilat" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>GitHub Repository</a>
+          <a href="https://github.com/cilldev/kilat/issues" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>Report Bugs</a>
+          <a href="https://github.com/cilldev/kilat/blob/main/LICENSE" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>MIT License</a>
         </div>
       </footer>
     </div>

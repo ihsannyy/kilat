@@ -1,0 +1,14 @@
+{
+  "name": "demo-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "start": "kilat run index.js"
+  },
+  "dependencies": {
+    "is-number": "7.0.0"
+  }
+}

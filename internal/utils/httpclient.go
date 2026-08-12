@@ -5,12 +5,13 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 )
 
 func NewHTTPClient(timeout time.Duration) *http.Client {
 	_, err := os.Stat("/etc/resolv.conf")
-	if os.IsNotExist(err) {
+	if runtime.GOOS == "linux" && os.IsNotExist(err) {
 		dialer := &net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,

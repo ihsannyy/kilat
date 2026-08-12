@@ -2,20 +2,41 @@ package modules
 
 import (
 	"crypto/hmac"
+	"crypto/md5"
 	"crypto/rand"
+	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"hash"
+	"strings"
 
 	"github.com/dop251/goja"
 )
+
+func getHashFunc(algorithm string) (func() hash.Hash, error) {
+	switch strings.ToLower(algorithm) {
+	case "sha256":
+		return sha256.New, nil
+	case "sha512":
+		return sha512.New, nil
+	case "sha1":
+		return sha1.New, nil
+	case "md5":
+		return md5.New, nil
+	default:
+		return nil, fmt.Errorf("unsupported algorithm: %s", algorithm)
+	}
+}
 
 func RegisterCrypto(vm *goja.Runtime) {
 	cryptoObj := vm.NewObject()
 
 	cryptoObj.Set("createHmac", func(algorithm string, key goja.Value) goja.Value {
-		if algorithm != "sha256" {
-			panic(vm.NewGoError(fmt.Errorf("unsupported algorithm: %s", algorithm)))
+		hFunc, err := getHashFunc(algorithm)
+		if err != nil {
+			panic(vm.NewGoError(err))
 		}
 
 		var keyBytes []byte
@@ -25,7 +46,7 @@ func RegisterCrypto(vm *goja.Runtime) {
 			keyBytes = []byte(key.String())
 		}
 
-		mac := hmac.New(sha256.New, keyBytes)
+		mac := hmac.New(hFunc, keyBytes)
 
 		hmacObj := vm.NewObject()
 		hmacObj.Set("update", func(data goja.Value) goja.Value {
@@ -50,11 +71,12 @@ func RegisterCrypto(vm *goja.Runtime) {
 	})
 
 	cryptoObj.Set("createHash", func(algorithm string) goja.Value {
-		if algorithm != "sha256" {
-			panic(vm.NewGoError(fmt.Errorf("unsupported algorithm: %s", algorithm)))
+		hFunc, err := getHashFunc(algorithm)
+		if err != nil {
+			panic(vm.NewGoError(err))
 		}
 
-		h := sha256.New()
+		h := hFunc()
 
 		hashObj := vm.NewObject()
 		hashObj.Set("update", func(data goja.Value) goja.Value {

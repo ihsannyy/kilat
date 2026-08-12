@@ -2,9 +2,11 @@ package modules
 
 import (
 	"bytes"
-	"github.com/dop251/goja"
 	"os"
 	"os/exec"
+	"runtime"
+
+	"github.com/dop251/goja"
 )
 
 func RegisterOS(vm *goja.Runtime, queueJob func(func()), incrementTasks func(), decrementTasks func()) {
@@ -14,6 +16,20 @@ func RegisterOS(vm *goja.Runtime, queueJob func(func()), incrementTasks func(), 
 	})
 	osModule.Set("args", func() []string {
 		return os.Args[1:]
+	})
+	osModule.Set("platform", func() string {
+		return runtime.GOOS
+	})
+	osModule.Set("arch", func() string {
+		return runtime.GOARCH
+	})
+	osModule.Set("homedir", func() string {
+		h, _ := os.UserHomeDir()
+		return h
+	})
+	osModule.Set("cwd", func() string {
+		dir, _ := os.Getwd()
+		return dir
 	})
 	vm.Set("os", osModule)
 
@@ -30,6 +46,9 @@ func RegisterOS(vm *goja.Runtime, queueJob func(func()), incrementTasks func(), 
 			if os.Getenv("SHELL") != "" {
 				shell = os.Getenv("SHELL")
 				flag = "-c"
+			} else if runtime.GOOS == "windows" {
+				shell = "cmd.exe"
+				flag = "/c"
 			} else {
 				shell = "sh"
 				flag = "-c"

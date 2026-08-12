@@ -43,7 +43,9 @@ func downloadAndExtractLight(tarballURL, targetDir string) error {
 		if path == "" {
 			continue
 		}
-		if !strings.HasSuffix(path, ".js") && path != "package.json" {
+		ext := strings.ToLower(filepath.Ext(path))
+		isPkgJson := strings.HasSuffix(path, "package.json")
+		if !isPkgJson && ext != ".js" && ext != ".cjs" && ext != ".mjs" && ext != ".json" && ext != ".ts" && ext != ".tsx" && ext != ".jsx" && ext != ".wasm" {
 			continue
 		}
 
