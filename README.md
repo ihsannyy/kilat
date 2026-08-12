@@ -241,7 +241,7 @@ Silakan buat Fork, lakukan perubahan, dan kirimkan Pull Request (PR) ke reposito
 ## 📜 Lisensi
 Proyek ini dilisensikan di bawah **MIT License**. Lihat berkas lisensi untuk detail selengkapnya.
 
-MIT © 2026 [cilldev](https://github.com/cilldev)
+MIT © 2026 [ihsannyy](https://github.com/ihsannyy)
 
 ---
 

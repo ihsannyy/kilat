@@ -81,7 +81,7 @@ const dict = {
     change3: 'Rilis major ini memperkenalkan **Global Shell Command Execution ($)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.',
     change2: 'Rilis minor ini memperkenalkan **Global Fetch API (fetch)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.',
     change1: 'Integrasi compiler esbuild internal untuk mendukung pemuatan file TypeScript (TS, TSX, JSX) dan transpiler ES Modules (ESM) di memori secara otomatis.',
-    footer: 'Lisensi MIT © 2026 Kilat. Dibuat seadanya oleh cilldev untuk optimasi Termux Android.'
+    footer: 'Lisensi MIT © 2026 Kilat. Dibuat seadanya oleh ihsannyy untuk optimasi Termux Android.'
   },
   en: {
     console: 'Console',
@@ -157,7 +157,7 @@ const dict = {
     change3: 'This major release introduces **Global Shell Command Execution ($)**. Full async support using Go goroutines to run external binaries and CLI utilities on Termux / Linux.',
     change2: 'This minor release introduces the **Global Fetch API (fetch)**, asynchronously integrated with the event-loop for HTTP API requests.',
     change1: 'Integrated esbuild compiler for instant in-memory TypeScript (TS, TSX, JSX) and ES Modules (ESM) loading.',
-    footer: 'MIT License © 2026 Kilat. Built lightweight by cilldev to optimize Termux Android.'
+    footer: 'MIT License © 2026 Kilat. Built lightweight by ihsannyy to optimize Termux Android.'
   }
 }
 
