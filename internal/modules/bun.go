@@ -182,4 +182,5 @@ func RegisterBun(vm *goja.Runtime, queueJob func(func()), setHasServer func(bool
 	})
 
 	vm.Set("Bun", bun)
+	vm.Set("Kilat", bun)
 }
