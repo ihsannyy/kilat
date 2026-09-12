@@ -2,9 +2,9 @@
 # Kilat Installer - Fast JS Runtime for Termux, Linux, macOS, and Windows
 set -e
 
-REPO="cilldev/kilat"
+REPO="ihsannyy/kilat"
 BINARY="kilat"
-VERSION="v3.1.0"
+VERSION="v4.0.0"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
