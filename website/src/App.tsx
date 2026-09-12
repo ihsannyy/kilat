@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface PageItem {
   key: string
@@ -62,7 +62,7 @@ const dict = {
     arch4Desc: 'Kilat v4.0.0 mengintegrasikan 6 modul native baru langsung ke dalam binary: Timers, Buffer, Path, Child Process, Streams, dan WebSocket Client. Setiap modul ditulis dalam Go dan di-bridge ke JavaScript menggunakan API Goja, sehingga eksekusi berlangsung di level native tanpa overhead interpretasi JavaScript. Timer menggunakan goroutine independen dengan done-channel untuk mencegah deadlock pada event-loop.',
     
     personalTitle: 'Kenapa Kilat Dibuat?',
-    personalDesc: 'Kilat dibuat oleh cilldev karena keresahan pribadi saat mengembangkan script otomasi dan bot di HP Android menggunakan Termux. Node.js terlalu memakan penyimpanan internal HP dengan folder node_modules yang duplikat di setiap proyek, serta memakan RAM yang cukup besar saat dijalankan di perangkat berspesifikasi rendah. Kilat lahir sebagai solusi: minimalis, bertenaga Go, memuat dalam 2ms, dan menghemat memori internal dengan caching dependency global.',
+    personalDesc: 'Kilat dibuat oleh ihsannyy karena keresahan pribadi saat mengembangkan script otomasi dan bot di HP Android menggunakan Termux. Node.js terlalu memakan penyimpanan internal HP dengan folder node_modules yang duplikat di setiap proyek, serta memakan RAM yang cukup besar saat dijalankan di perangkat berspesifikasi rendah. Kilat lahir sebagai solusi: minimalis, bertenaga Go, memuat dalam 2ms, dan menghemat memori internal dengan caching dependency global.',
     faqTitle: 'Pertanyaan Umum (FAQ)',
     faq1Quest: 'Apa bedanya Kilat dengan Node.js?',
     faq1Ans: 'Node.js menggunakan V8 Engine dan memerlukan folder node_modules lokal di setiap proyek. Kilat menggunakan Goja VM (Go-based JS interpreter) dan esbuild untuk kompilasi memori, serta menggunakan cache global satu-satunya. Kilat jauh lebih hemat RAM (~8MB) dan penyimpanan disk (0B untuk dependensi lokal).',
@@ -143,7 +143,7 @@ const dict = {
     arch4Desc: 'Kilat v4.0.0 integrates 6 new native modules directly into the binary: Timers, Buffer, Path, Child Process, Streams, and WebSocket Client. Each module is written in Go and bridged to JavaScript using the Goja API, enabling native-level execution without JavaScript interpretation overhead. Timers use independent goroutines with done-channel wakeup mechanism to prevent event-loop deadlocks.',
     
     personalTitle: 'Why was Kilat Created?',
-    personalDesc: 'Kilat was created by cilldev out of personal frustration when developing automation scripts and bots on Android devices using Termux. Node.js consumes too much internal phone storage with duplicate node_modules folders in every project, and demands high memory on low-spec devices. Kilat was born as a solution: minimalist, Go-powered, booting in 2ms, and preserving phone storage through global dependency caching.',
+    personalDesc: 'Kilat was created by ihsannyy out of personal frustration when developing automation scripts and bots on Android devices using Termux. Node.js consumes too much internal phone storage with duplicate node_modules folders in every project, and demands high memory on low-spec devices. Kilat was born as a solution: minimalist, Go-powered, booting in 2ms, and preserving phone storage through global dependency caching.',
     faqTitle: 'Frequently Asked Questions (FAQ)',
     faq1Quest: 'How is Kilat different from Node.js?',
     faq1Ans: 'Node.js runs on V8 Engine and requires a local node_modules folder for every project. Kilat runs on Goja VM (Go-based JS interpreter) with esbuild for in-memory compilation, mapping modules to a single global cache. Kilat uses less RAM (~8MB) and zero disk space for local project dependencies.',
@@ -178,7 +178,6 @@ export default function App() {
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
   const [timeMode, setTimeMode] = useState<string>('MALAM')
   const [clockText, setClockText] = useState<string>('')
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   const pages: PageItem[] = [
     {
@@ -314,262 +313,17 @@ export default function App() {
     return () => clearInterval(timeTimer)
   }, [])
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
 
-    let animId: number
-    let w = (canvas.width = window.innerWidth)
-    let h = (canvas.height = window.innerHeight)
-
-    const handleResize = () => {
-      w = canvas.width = window.innerWidth
-      h = canvas.height = window.innerHeight
-    }
-    window.addEventListener('resize', handleResize)
-
-    const maxDrops = 120
-    const rain: Array<{ x: number; y: number; speed: number; len: number }> = []
-    for (let i = 0; i < maxDrops; i++) {
-      rain.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        speed: 14 + Math.random() * 8,
-        len: 15 + Math.random() * 12
-      })
-    }
-
-    let flash = 0
-    let bolt: Array<{ x1: number; y1: number; x2: number; y2: number }> = []
-
-    const buildLightning = () => {
-      const segs = []
-      let cx = Math.random() * w
-      let cy = 0
-      for (let i = 0; i < 18; i++) {
-        const ny = cy + (h / 18) + Math.random() * 15
-        const nx = cx + (Math.random() - 0.5) * 35
-        segs.push({ x1: cx, y1: cy, x2: nx, y2: ny })
-        cx = nx
-        cy = ny
-        if (ny >= h) break
-      }
-      bolt = segs
-      flash = 0.6
-    }
-
-    const drawSilhouettes = () => {
-      ctx.fillStyle = 'rgba(8, 7, 24, 0.4)'
-      ctx.beginPath()
-      ctx.rect(0, h - 150, w * 0.15, 150)
-      ctx.rect(w * 0.15, h - 200, w * 0.12, 200)
-      ctx.rect(w * 0.32, h - 170, w * 0.14, 170)
-      ctx.rect(w * 0.5, h - 230, w * 0.1, 230)
-      ctx.rect(w * 0.65, h - 130, w * 0.12, 130)
-      ctx.rect(w * 0.8, h - 180, w * 0.15, 180)
-      ctx.fill()
-
-      ctx.fillStyle = '#020108'
-      ctx.beginPath()
-      ctx.arc(w - 320, h + 30, 240, 0, 2 * Math.PI)
-      ctx.fill()
-
-      ctx.beginPath()
-      ctx.arc(w - 140, h - 10, 220, 0, 2 * Math.PI)
-      ctx.fill()
-
-      ctx.beginPath()
-      ctx.rect(0, h - 60, w, 60)
-      ctx.fill()
-
-      const h1W = 150
-      const h1H = 95
-      const h1X = w - h1W - 50
-      const h1Y = h - h1H - 220
-
-      ctx.fillStyle = '#060416'
-      ctx.fillRect(h1X, h1Y, h1W, h1H)
-
-      ctx.fillStyle = '#03020a'
-      ctx.beginPath()
-      ctx.moveTo(h1X - 12, h1Y)
-      ctx.lineTo(h1X + h1W / 2, h1Y - 40)
-      ctx.lineTo(h1X + h1W + 12, h1Y)
-      ctx.closePath()
-      ctx.fill()
-
-      ctx.fillRect(h1X + 20, h1Y - 35, 15, 25)
-
-      ctx.fillStyle = '#020108'
-      ctx.fillRect(h1X + h1W / 2 - 14, h1Y + h1H - 45, 28, 45)
-
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.95)'
-      ctx.shadowColor = '#ffea79'
-      ctx.shadowBlur = 32
-      ctx.fillRect(h1X + 22, h1Y + 22, 22, 22)
-      ctx.fillRect(h1X + h1W - 44, h1Y + 22, 22, 22)
-      ctx.shadowBlur = 0
-
-      ctx.strokeStyle = '#060416'
-      ctx.lineWidth = 1.5
-      ctx.strokeRect(h1X + 22, h1Y + 22, 22, 22)
-      ctx.beginPath()
-      ctx.moveTo(h1X + 33, h1Y + 22)
-      ctx.lineTo(h1X + 33, h1Y + 44)
-      ctx.moveTo(h1X + 22, h1Y + 33)
-      ctx.lineTo(h1X + 44, h1Y + 33)
-      ctx.stroke()
-
-      ctx.strokeRect(h1X + h1W - 44, h1Y + 22, 22, 22)
-      ctx.beginPath()
-      ctx.moveTo(h1X + h1W - 33, h1Y + 22)
-      ctx.lineTo(h1X + h1W - 33, h1Y + 44)
-      ctx.moveTo(h1X + h1W - 44, h1Y + 33)
-      ctx.lineTo(h1X + h1W - 22, h1Y + 33)
-      ctx.stroke()
-
-      const h2W = 110
-      const h2H = 75
-      const h2X = w - h2W - 190
-      const h2Y = h - h2H - 170
-
-      ctx.fillStyle = '#050313'
-      ctx.fillRect(h2X, h2Y, h2W, h2H)
-
-      ctx.fillStyle = '#020108'
-      ctx.beginPath()
-      ctx.moveTo(h2X - 10, h2Y)
-      ctx.lineTo(h2X + h2W / 2, h2Y - 30)
-      ctx.lineTo(h2X + h2W + 10, h2Y)
-      ctx.closePath()
-      ctx.fill()
-
-      ctx.fillRect(h2X + h2W / 2 - 12, h2Y + h2H - 35, 24, 35)
-
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.95)'
-      ctx.shadowColor = '#ffea79'
-      ctx.shadowBlur = 32
-      ctx.fillRect(h2X + 18, h2Y + 18, 18, 18)
-      ctx.shadowBlur = 0
-
-      ctx.strokeStyle = '#050313'
-      ctx.strokeRect(h2X + 18, h2Y + 18, 18, 18)
-      ctx.beginPath()
-      ctx.moveTo(h2X + 27, h2Y + 18)
-      ctx.lineTo(h2X + 27, h2Y + 36)
-      ctx.moveTo(h2X + 18, h2Y + 27)
-      ctx.lineTo(h2X + 36, h2Y + 27)
-      ctx.stroke()
-
-      const h3W = 85
-      const h3H = 60
-      const h3X = w - h3W - 290
-      const h3Y = h - h3H - 110
-
-      ctx.fillStyle = '#040310'
-      ctx.fillRect(h3X, h3Y, h3W, h3H)
-
-      ctx.fillStyle = '#020108'
-      ctx.beginPath()
-      ctx.moveTo(h3X - 8, h3Y)
-      ctx.lineTo(h3X + h3W / 2, h3Y - 24)
-      ctx.lineTo(h3X + h3W + 8, h3Y)
-      ctx.closePath()
-      ctx.fill()
-
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.95)'
-      ctx.shadowColor = '#ffea79'
-      ctx.shadowBlur = 32
-      ctx.fillRect(h3X + h3W - 32, h3Y + 16, 16, 16)
-      ctx.shadowBlur = 0
-
-      ctx.strokeStyle = '#040310'
-      ctx.strokeRect(h3X + h3W - 32, h3Y + 16, 16, 16)
-      ctx.beginPath()
-      ctx.moveTo(h3X + h3W - 24, h3Y + 16)
-      ctx.lineTo(h3X + h3W - 24, h3Y + 32)
-      ctx.moveTo(h3X + h3W - 32, h3Y + 24)
-      ctx.lineTo(h3X + h3W - 16, h3Y + 24)
-      ctx.stroke()
-    }
-
-    const render = () => {
-      ctx.clearRect(0, 0, w, h)
-
-      const grad = ctx.createLinearGradient(0, 0, 0, h)
-      if (timeMode === 'PAGI') {
-        grad.addColorStop(0, '#0c0b1d')
-        grad.addColorStop(1, '#a64f2e')
-      } else if (timeMode === 'SIANG') {
-        grad.addColorStop(0, '#171822')
-        grad.addColorStop(1, '#484f61')
-      } else if (timeMode === 'SORE') {
-        grad.addColorStop(0, '#191225')
-        grad.addColorStop(1, '#5b224c')
-      } else {
-        grad.addColorStop(0, '#010106')
-        grad.addColorStop(1, '#08051c')
-      }
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, w, h)
-
-      if (flash > 0) {
-        ctx.fillStyle = `rgba(255, 255, 255, ${flash})`
-        ctx.fillRect(0, 0, w, h)
-
-        ctx.strokeStyle = `rgba(255, 255, 255, ${flash + 0.45})`
-        ctx.lineWidth = 3
-        ctx.beginPath()
-        bolt.forEach(s => {
-          ctx.moveTo(s.x1, s.y1)
-          ctx.lineTo(s.x2, s.y2)
-        })
-        ctx.stroke()
-
-        flash -= 0.05
-      }
-
-      if (Math.random() < 0.007 && flash <= 0) {
-        buildLightning()
-      }
-
-      drawSilhouettes()
-
-      ctx.strokeStyle = 'rgba(174, 194, 224, 0.32)'
-      ctx.lineWidth = 1
-      for (let i = 0; i < maxDrops; i++) {
-        const d = rain[i]
-        ctx.beginPath()
-        ctx.moveTo(d.x, d.y)
-        ctx.lineTo(d.x - 1, d.y + d.len)
-        ctx.stroke()
-
-        d.y += d.speed
-        d.x -= 0.5
-        if (d.y > h) {
-          d.y = -d.len
-          d.x = Math.random() * w
-        }
-      }
-
-      animId = requestAnimationFrame(render)
-    }
-
-    render()
-
-    return () => {
-      cancelAnimationFrame(animId)
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [timeMode])
 
   const t = dict[lang]
 
   return (
     <div className="weather-runtime-portal">
-      <canvas ref={canvasRef} className="storm-backdrop" />
+      <div className="aurora-backdrop">
+        <div className="aurora-orb aurora-orb-1"></div>
+        <div className="aurora-orb aurora-orb-2"></div>
+        <div className="aurora-orb aurora-orb-3"></div>
+      </div>
 
       <header className="glass-navbar">
         <div className="navbar-inner">
@@ -604,7 +358,7 @@ export default function App() {
               <span className="time-val">&nbsp;[{clockText}]</span>
             </div>
             
-            <a href="https://github.com/cilldev/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
+            <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
               </svg>
@@ -637,7 +391,7 @@ export default function App() {
             <span className="drawer-lbl">{p.title}</span>
           </button>
         ))}
-        <a href="https://github.com/cilldev/kilat" target="_blank" rel="noreferrer" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>
+        <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>
           <span className="tab-icon-svg">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
@@ -666,9 +420,9 @@ export default function App() {
                   </div>
                   <div className="box-body">
                     <div className="code-scroll-wrapper">
-                      <code>curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash</code>
+                      <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
                     </div>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash')}>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
                       {copiedMap['hero-inst'] ? 'COPIED' : (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -918,9 +672,9 @@ console.log(result.stdout);`}</code></pre>
                   </div>
                   <div className="box-body">
                     <div className="code-scroll-wrapper">
-                      <code>curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash</code>
+                      <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
                     </div>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/cilldev/kilat/main/install.sh | bash')}>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
                       {copiedMap['inst-auto'] ? 'COPIED' : (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1094,9 +848,9 @@ console.log(result.stdout);`}</code></pre>
       <footer className="portal-footer">
         <p>{t.footer}</p>
         <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', gap: '16px' }}>
-          <a href="https://github.com/cilldev/kilat" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>GitHub Repository</a>
-          <a href="https://github.com/cilldev/kilat/issues" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>Report Bugs</a>
-          <a href="https://github.com/cilldev/kilat/blob/main/LICENSE" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>MIT License</a>
+          <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>GitHub Repository</a>
+          <a href="https://github.com/ihsannyy/kilat/issues" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>Report Bugs</a>
+          <a href="https://github.com/ihsannyy/kilat/blob/main/LICENSE" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>MIT License</a>
         </div>
       </footer>
     </div>
