@@ -4,7 +4,7 @@
 
 ### Runtime JavaScript untuk Termux & Linux
 
-<img src="website/public/kilat.png" alt="Kilat" width="400"/>
+<img src="docs/kilat.png" alt="Kilat" width="400"/>
 
 Runtime JS ringan yang dibuat buat developer Termux yang capek sama Node.js yang berat. Pakai Go + Goja engine, jalan di Android dan Linux.
 
