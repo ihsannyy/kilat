@@ -134,9 +134,39 @@ func Add(pkgName string) error {
 		ip.stop(false, "", "")
 		return err
 	}
-	latestVersion := info["dist-tags"].(map[string]interface{})["latest"].(string)
-	versionInfo := info["versions"].(map[string]interface{})[latestVersion].(map[string]interface{})
-	tarballURL := versionInfo["dist"].(map[string]interface{})["tarball"].(string)
+
+	distTags, ok := info["dist-tags"].(map[string]interface{})
+	if !ok {
+		ip.stop(false, "", "")
+		return fmt.Errorf("invalid package info format")
+	}
+	latestVersion, ok := distTags["latest"].(string)
+	if !ok {
+		ip.stop(false, "", "")
+		return fmt.Errorf("cannot find latest version")
+	}
+
+	versions, ok := info["versions"].(map[string]interface{})
+	if !ok {
+		ip.stop(false, "", "")
+		return fmt.Errorf("invalid versions format")
+	}
+	versionInfo, ok := versions[latestVersion].(map[string]interface{})
+	if !ok {
+		ip.stop(false, "", "")
+		return fmt.Errorf("version %s not found", latestVersion)
+	}
+
+	dist, ok := versionInfo["dist"].(map[string]interface{})
+	if !ok {
+		ip.stop(false, "", "")
+		return fmt.Errorf("invalid dist info")
+	}
+	tarballURL, ok := dist["tarball"].(string)
+	if !ok {
+		ip.stop(false, "", "")
+		return fmt.Errorf("cannot find tarball URL")
+	}
 
 	ip.update(fmt.Sprintf("Mengunduh %s@%s...", pkgName, latestVersion), 50)
 
@@ -152,8 +182,15 @@ func Add(pkgName string) error {
 	time.Sleep(200 * time.Millisecond)
 
 	pkg.Dependencies[pkgName] = latestVersion
-	data, _ := json.MarshalIndent(pkg, "", "  ")
-	ioutil.WriteFile(pkgFile, data, 0644)
+	data, err := json.MarshalIndent(pkg, "", "  ")
+	if err != nil {
+		ip.stop(false, "", "")
+		return fmt.Errorf("gagal marshal package.json: %w", err)
+	}
+	if err := ioutil.WriteFile(pkgFile, data, 0644); err != nil {
+		ip.stop(false, "", "")
+		return fmt.Errorf("gagal menulis package.json: %w", err)
+	}
 
 	ip.stop(true, pkgName, latestVersion)
 	return nil
@@ -185,8 +222,15 @@ func Remove(pkgName string) error {
 
 	ip.update("Membersihkan konfigurasi...", 80)
 	delete(pkg.Dependencies, pkgName)
-	newData, _ := json.MarshalIndent(pkg, "", "  ")
-	_ = ioutil.WriteFile(pkgFile, newData, 0644)
+	newData, err := json.MarshalIndent(pkg, "", "  ")
+	if err != nil {
+		ip.stopRemove(false, "")
+		return fmt.Errorf("gagal marshal package.json: %w", err)
+	}
+	if err := ioutil.WriteFile(pkgFile, newData, 0644); err != nil {
+		ip.stopRemove(false, "")
+		return fmt.Errorf("gagal menulis package.json: %w", err)
+	}
 
 	ip.stopRemove(true, pkgName)
 	return nil

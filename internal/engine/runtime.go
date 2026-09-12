@@ -26,7 +26,7 @@ type moduleRecord struct {
 	exports goja.Value
 }
 
-var builtInModules = []string{"os", "fs", "net", "console", "bun", "crypto", "path", "child_process"}
+var builtInModules = []string{"os", "fs", "net", "console", "bun", "crypto", "path", "child_process", "buffer", "stream", "websocket", "timers"}
 
 func New(opts Options) *Runtime {
 	vm := goja.New()
@@ -80,8 +80,8 @@ func New(opts Options) *Runtime {
 			uptime: function() { return Date.now() / 1000; },
 			platform: os.platform(),
 			arch: os.arch(),
-			version: 'v' + os.platform() + '/v4.0.0',
-		 Versions: function() { return { node: '4.0.0' }; },
+			version: 'v' + os.platform() + '/v4.1.0',
+		 versions: function() { return { node: '4.1.0' }; },
 			nextTick: function(fn) {
 				setTimeout(fn, 0);
 			}
@@ -257,36 +257,44 @@ func New(opts Options) *Runtime {
 			set(name, value) {
 				this._params[name] = String(value);
 			}
-			has(name) {
-				return name in this._params;
+		has(name) {
+			return name in this._params;
+		}
+		delete(name) {
+			delete this._params[name];
+		}
+		append(name, value) {
+			if (this._params[name]) {
+				this._params[name].push(String(value));
+			} else {
+				this._params[name] = [String(value)];
 			}
-			delete(name) {
-				delete this._params[name];
+		}
+		getAll(name) {
+			return this._params[name] ? this._params[name].slice() : [];
+		}
+		keys() {
+			return Object.keys(this._params);
+		}
+		values() {
+			var result = [];
+			for (var k of Object.keys(this._params)) {
+				result.push(this._params[k].join(','));
 			}
-			append(name, value) {
-				if (this._params[name]) {
-					this._params[name] += ',' + String(value);
-				} else {
-					this._params[name] = String(value);
-				}
+			return result;
+		}
+		entries() {
+			var result = [];
+			for (var k of Object.keys(this._params)) {
+				result.push([k, this._params[k].join(',')]);
 			}
-			getAll(name) {
-				return this._params[name] ? [this._params[name]] : [];
+			return result;
+		}
+		forEach(callback) {
+			for (var [k, v] of Object.entries(this._params)) {
+				callback(v.join(','), k);
 			}
-			keys() {
-				return Object.keys(this._params);
-			}
-			values() {
-				return Object.values(this._params);
-			}
-			entries() {
-				return Object.entries(this._params);
-			}
-			forEach(callback) {
-				for (const [k, v] of Object.entries(this._params)) {
-					callback(v, k);
-				}
-			}
+		}
 			toString() {
 				const parts = [];
 				for (const [k, v] of Object.entries(this._params)) {

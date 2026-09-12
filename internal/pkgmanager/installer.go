@@ -50,6 +50,10 @@ func downloadAndExtractLight(tarballURL, targetDir string) error {
 		}
 
 		fullPath := filepath.Join(targetDir, path)
+		cleanTarget := filepath.Clean(targetDir) + string(filepath.Separator)
+		if !strings.HasPrefix(filepath.Clean(fullPath)+string(filepath.Separator), cleanTarget) {
+			continue
+		}
 		switch header.Typeflag {
 		case tar.TypeDir:
 			os.MkdirAll(fullPath, 0755)

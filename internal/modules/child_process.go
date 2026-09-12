@@ -2,7 +2,6 @@ package modules
 
 import (
 	"bytes"
-	"io"
 	"os"
 	"os/exec"
 	"runtime"
@@ -60,10 +59,7 @@ func RegisterChildProcess(vm *goja.Runtime, queueJob func(func()), incrementTask
 			callback = call.Arguments[1]
 		}
 
-		cb, ok := goja.AssertFunction(callback)
-		if !ok {
-			panic(vm.ToValue("exec callback must be a function"))
-		}
+		cb, _ := goja.AssertFunction(callback)
 
 		incrementTasks()
 
@@ -105,10 +101,12 @@ func RegisterChildProcess(vm *goja.Runtime, queueJob func(func()), incrementTask
 				resultObj.Set("stderr", stderr.String())
 				resultObj.Set("exitCode", exitCode)
 
-				if errStr != "" && exitCode == -1 {
-					cb(goja.Undefined(), vm.ToValue(errStr), resultObj)
-				} else {
-					cb(goja.Undefined(), goja.Null(), resultObj)
+				if cb != nil {
+					if errStr != "" {
+						cb(goja.Undefined(), vm.ToValue(errStr), resultObj)
+					} else {
+						cb(goja.Undefined(), goja.Null(), resultObj)
+					}
 				}
 			})
 		}()
@@ -301,6 +299,4 @@ func RegisterChildProcess(vm *goja.Runtime, queueJob func(func()), incrementTask
 	})
 
 	vm.Set("child_process", cpModule)
-
-	_ = io.EOF
 }

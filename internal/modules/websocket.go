@@ -27,13 +27,17 @@ func RegisterWebSocket(vm *goja.Runtime, queueJob func(func()), incrementTasks f
 				}
 			}
 		}
-		_ = protocols
 
 		dialer := websocket.Dialer{
 			HandshakeTimeout: 10 * time.Second,
 		}
 
-		conn, _, err := dialer.Dial(url, nil)
+		header := make(map[string][]string)
+		if len(protocols) > 0 {
+			header["Sec-WebSocket-Protocol"] = protocols
+		}
+
+		conn, _, err := dialer.Dial(url, header)
 		if err != nil {
 			wsObj := vm.NewObject()
 			wsObj.Set("readyState", 3)

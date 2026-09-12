@@ -15,6 +15,13 @@ func RegisterPath(vm *goja.Runtime) {
 	})
 
 	pathModule.Set("resolve", func(parts ...string) string {
+		if len(parts) == 0 {
+			cwd, err := filepath.Abs(".")
+			if err != nil {
+				return "."
+			}
+			return cwd
+		}
 		result := parts[0]
 		for i := 1; i < len(parts); i++ {
 			if filepath.IsAbs(parts[i]) {

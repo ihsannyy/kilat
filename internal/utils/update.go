@@ -81,7 +81,7 @@ func fetchLatestVersion(cacheFile string, cache UpdateCache) {
 
 	newData, err := json.Marshal(cache)
 	if err == nil {
-		ioutil.WriteFile(cacheFile, newData, 0644)
+		_ = ioutil.WriteFile(cacheFile, newData, 0644)
 	}
 }
 
