@@ -985,7 +985,7 @@ console.log(result.stdout);`}</code></pre>
 
                 <div className="api-panel">
                   <h3>Buffer</h3>
-                  <p>Encoding & decoding data biner (hex, base64, utf8).</p>
+                  <p>Encoding {'&'} decoding data biner (hex, base64, utf8).</p>
                   <pre><code>Buffer.from("hello").toString("hex")</code></pre>
                 </div>
 
@@ -997,7 +997,7 @@ console.log(result.stdout);`}</code></pre>
 
                 <div className="api-panel">
                   <h3>require('child_process')</h3>
-                  <p>Jalankan proses shell secara sinkron & asinkron dari JS.</p>
+                  <p>Jalankan proses shell secara sinkron {'&'} asinkron dari JS.</p>
                   <pre><code>child_process.execSync("ls -la");</code></pre>
                 </div>
 
@@ -1039,7 +1039,7 @@ console.log(result.stdout);`}</code></pre>
 
                 <div className="api-panel">
                   <h3>TextEncoder / TextDecoder</h3>
-                  <p>Encoding & decoding string ke/from Uint8Array format.</p>
+                  <p>Encoding {'&'} decoding string ke/from Uint8Array format.</p>
                   <pre><code>new TextEncoder().encode("utf-8 text");</code></pre>
                 </div>
               </div>
