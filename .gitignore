@@ -10,3 +10,4 @@
 # Logs & temp files
 *.log
 *.tmp
+dist/

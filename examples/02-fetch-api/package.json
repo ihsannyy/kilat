@@ -1,0 +1,7 @@
+{
+  "name": "02-fetch-api",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "kilat run index.js"
+  }
+}

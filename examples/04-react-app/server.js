@@ -1,5 +1,4 @@
 var fs = require('fs');
-
 var html = fs.readFileSync('index.html', 'utf8');
 
 Kilat.serve({

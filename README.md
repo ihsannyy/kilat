@@ -1,252 +1,216 @@
 <div align="center">
 
 # 🚀 KILAT
-### **Fast & Ultra-Lightweight JavaScript Runtime for Termux & Linux**
 
-<img src="website/public/kilat.png" alt="Kilat Banner" width="400" style="border-radius: 8px; margin: 15px 0; max-width: 100%;"/>
+### Runtime JavaScript untuk Termux & Linux
 
-Kilat adalah runtime JavaScript CommonJS yang ringan dan efisien, dibangun di atas **Go** menggunakan compiler engine **Goja**. Runtime ini dirancang khusus untuk perangkat mobile melalui **Termux (Android)** serta sistem operasi **Linux** (seperti Kali Linux, Ubuntu, dll.) guna memberikan performa tinggi dengan konsumsi daya dan penyimpanan yang minimal.
+<img src="website/public/kilat.png" alt="Kilat" width="400"/>
 
-*Bekerja mirip Node.js/Bun, tetapi dirancang tanpa beban folder raksasa `node_modules`.*
-
----
-
-[![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?logo=go&logoColor=white&style=for-the-badge)](https://golang.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#-lisensi)
-[![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Linux-brightgreen?style=for-the-badge)](#)
-[![Version](https://img.shields.io/badge/Version-3.1.1-blue?style=for-the-badge)](#)
+Runtime JS ringan yang dibuat buat developer Termux yang capek sama Node.js yang berat. Pakai Go + Goja engine, jalan di Android dan Linux.
 
 </div>
 
+---
 
+## Kenapa Kilat?
 
-## 💡 Kenapa Kilat?
-Pada perangkat mobile (seperti Android melalui Termux), performa V8 engine bawaan Node.js sering kali terlalu berat dan memakan banyak memori RAM. Selain itu, filesystem Android kurang optimal dalam menangani puluhan ribu file kecil bersarang di dalam folder `node_modules`.
+Node.js itu berat. V8 engine makan RAM banyak, `node_modules` duplikat di setiap proyek, dan startup-nya lambat. Kilat hadir sebagai alternatif yang lebih ringan.
 
-Kilat memecahkan masalah ini dengan:
-1. **Engine Goja**: Engine JavaScript berbasis Go murni yang jauh lebih ringan dan cepat saat startup.
-2. **Centralized Package Directory**: Semua package diunduh langsung ke `.kilat/packages/` secara global/terpusat, tidak ada lagi duplikasi ribuan file kecil di setiap folder proyek Anda.
-3. **Startup Instan**: Tanpa overhead pemuatan library V8.
+| | Node.js | Kilat |
+|--|---------|-------|
+| Startup | ~38ms | ~2ms |
+| RAM | ~31MB | ~8MB |
+| Storage | ~120MB/project | 0 (global cache) |
+| TypeScript | Perlu setup | Built-in |
 
 ---
 
-## ✨ Fitur Utama
-* ⚡ **Eksekusi JavaScript Cepat**: Dukungan penuh sintaks CommonJS (ES5/ES6 dasar).
-* 📦 **Package Manager Terintegrasi**: Pasang modul npm langsung menggunakan perintah `kilat add <package>`.
-* 🔌 **Modul Bawaan Intuitif**: API standar untuk menangani file (`fs`), jaringan (`net`), sistem (`os`), dan logging (`console`).
-* 🔄 **Sistem Caching Pintar**: Pemuatan `require()` otomatis dicache untuk kecepatan eksekusi maksimum.
-* 🛠️ **Inisialisasi Cepat**: Mulai proyek baru dalam hitungan detik dengan `kilat init`.
-* 🎨 **Visual CLI Indah**: Dilengkapi visualisasi progress bar dan animasi interaktif saat menginstal dependensi.
+## Fitur
+
+- **Startup instan** — 2ms, enggak pakai V8
+- **Global cache** — Package disimpan di `~/.kilat/packages/`, hemat storage
+- **TypeScript built-in** — Langsung jalan, enggak perlu ts-node
+- **Fetch API** — Request HTTP async
+- **Kilat.serve** — Bikin HTTP server (API-nya sama kayak Bun)
+- **Package manager** — `kilat add`, `kilat remove`
+- **Template system** — `kilat create` buat scaffolding project
+- **Watch mode** — Auto-restart kalau file berubah
 
 ---
 
-## 📥 Instalasi
+## Instalasi
 
-### 1. Instalasi Otomatis (Rekomendasi)
-Cara termudah dan tercepat untuk memasang Kilat. Skrip ini akan otomatis mendeteksi arsitektur perangkat Anda (ARM64, AMD64, atau ARMv7) dan memasang binary rilis yang sesuai:
-
+### Pakai Script (Recommended)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash
 ```
 
-### 2. Build Mandiri dari Source
-Jika ingin mengompilasi sendiri, pastikan sudah memasang Go v1.21 ke atas:
-
+### Build Sendiri
 ```bash
-# Clone repositori
 git clone https://github.com/ihsannyy/kilat
 cd kilat
-
-# Kompilasi source code
 go build -o kilat ./cmd/kilat
-
-# Pindahkan ke bin path Termux
-mv kilat $PREFIX/bin/
+cp kilat $PREFIX/bin/
 ```
 
 ---
 
-## 🚀 Panduan Penggunaan
+## Commands
 
-### Inisialisasi Proyek Baru
-Membuat file konfigurasi `package.json` secara interaktif (atau gunakan `-y` untuk langsung menyetujui opsi default).
-```bash
-kilat init -y
+```
+kilat init      Inisialisasi project
+kilat create    Bikin project dari template
+kilat run       Jalankan file JS/TS
+kilat start     Jalankan script start
+kilat add       Install package
+kilat remove    Hapus package
+kilat build     Bundle & minify
+kilat repl      REPL interaktif
+kilat info      Info runtime
 ```
 
-### Menjalankan Berkas JS/TS atau Script Proyek
-Menjalankan skrip JS/TS Anda menggunakan runtime Kilat. Perintah ini juga dapat digunakan untuk menjalankan *user-defined scripts* di dalam berkas `package.json` (seperti `kilat run dev`).
-Tambahkan opsi `--watch` atau `-w` untuk mendeteksi perubahan berkas dan memuat ulang secara otomatis.
-```bash
-kilat run index.js --watch
-# atau menjalankan script package.json:
-kilat run dev
+### Flags
 ```
-
-### Menjalankan Script Start
-Mengeksekusi langsung *start script* yang dideklarasikan di dalam berkas `package.json`. Jika tidak ada script `"start"` yang dideklarasikan, perintah ini akan otomatis mencari dan menjalankan berkas `index.ts`/`index.js`/`server.ts`/`server.js` sebagai fallback default.
-```bash
-kilat start
-```
-
-### Memasang Package NPM
-Mengunduh package dan menyimpannya di direktori modul terpusat Kilat.
-```bash
-kilat add lodash
-```
-
-### Menghapus Package NPM
-Menghapus package dari direktori modul proyek aktif dan membersihkan `package.json`.
-```bash
-kilat remove lodash
-# atau menggunakan alias singkat:
-kilat rm lodash
-```
-
-### Bundle & Minify Berkas Produksi
-Melakukan bundling seluruh berkas JS/TS (beserta modul lokal yang di-require) menjadi satu berkas JavaScript tunggal teroptimasi untuk produksi:
-```bash
-kilat build index.ts dist/bundle.js
-```
-
-### Menjalankan Sesi REPL Interaktif
-Membuka shell interaktif untuk menguji dan mengevaluasi kode JavaScript secara langsung.
-```bash
-kilat repl
-```
-
-### Informasi Versi Kilat
-Menampilkan versi Kilat yang terpasang.
-```bash
-kilat --version
-```
-
-### Memperbarui Kilat
-Memperbarui biner runtime Kilat ke versi rilis terbaru secara otomatis.
-```bash
-kilat --update
+--version    Versi Kilat
+--update     Update ke versi terbaru
+--watch      Auto-restart
+-y           Auto-yes (init)
 ```
 
 ---
 
-## 📝 Contoh Kode
+## Templates
 
-### 1. Membuat skrip `hello.js`
+```bash
+kilat create vanilla     # Plain JavaScript
+kilat create react       # React + Vite
+kilat create hono        # Hono web server
+kilat create vite        # Vite + vanilla TS
+kilat create api         # REST API server
+```
+
+Contoh:
+```bash
+kilat create hono my-api
+cd my-api
+kilat run src/index.js
+```
+
+---
+
+## Built-in Modules
+
+| Module | Fungsi |
+|--------|--------|
+| `fs` | Baca/tulis file |
+| `os` | Info sistem |
+| `path` | Manipulasi path |
+| `crypto` | Hashing, encrypt |
+| `child_process` | Jalankan shell command |
+| `buffer` | Data biner |
+| `stream` | Stream processing |
+| `timers` | setTimeout/setInterval |
+| `websocket` | WebSocket client |
+
+### Global API
+- `fetch()` — HTTP request
+- `Kilat.serve()` — Bikin server
+- `console` — Logging
+- `TextEncoder` / `TextDecoder`
+- `atob()` / `btoa()`
+- `process` — cwd, pid, exit
+
+---
+
+## Contoh
+
+### Hello World
 ```javascript
-console.log("🚀 Hello from Kilat!");
+console.log("Hello dari Kilat!");
 
-const fs = require('fs');
 const os = require('os');
-
-// Membaca Environment variable dan daftar file
-console.log("OS Platform:", os.getenv("OSTYPE") || "unknown");
-console.log("Files di direktori aktif:", fs.readdirSync("."));
+console.log("Platform:", os.platform());
 ```
 
-Jalankan dengan perintah:
-```bash
-kilat run hello.js
-```
-
-### 2. Memasang dan Menggunakan Lodash
-```bash
-kilat add lodash
-```
-
-Buat kode berikut:
+### HTTP Server
 ```javascript
-const _ = require('lodash');
+Kilat.serve({
+  port: 3000,
+  fetch: function(req) {
+    return new Response("Hello!");
+  }
+});
+```
 
-const data = [1, 2, 3, 4, 5];
-console.log("Hasil chunk:", _.chunk(data, 2));
-// Output: [[1, 2], [3, 4], [5]]
+### Fetch Data
+```javascript
+fetch('https://api.github.com/users/ihsannyy')
+  .then(r => r.json())
+  .then(d => console.log(d));
 ```
 
 ---
 
-## 📁 Struktur Proyek
-```text
+## Examples
+
+Contoh lengkap di folder [`examples/`](./examples):
+
+| Folder | Isi |
+|--------|-----|
+| `01-hello` | Basic script |
+| `02-fetch-api` | HTTP requests |
+| `03-web-server` | REST API |
+| `04-react-app` | React + Tailwind |
+| `05-hono-api` | Hono framework |
+
+```bash
+cd examples/03-web-server
+kilat run server.js
+```
+
+---
+
+## Struktur Project
+
+```
 kilat/
-├── cmd/kilat/main.go          # Entry point utama untuk aplikasi CLI
+├── cmd/kilat/main.go        # CLI
 ├── internal/
-│   ├── engine/               # Runtime Goja + mekanisme require()
-│   ├── modules/              # Core API bawaan (console, fs, net, os)
-│   ├── pkgmanager/           # Package manager engine (add, install, fetch)
-│   ├── init/                 # Implementasi perintah kilat init
-│   └── utils/                # Utility, Helper, dan Versioning
-├── examples/                 # Kumpulan contoh skrip JavaScript
-├── go.mod                    # Modul Go dependency
-└── README.md                 # Dokumentasi proyek
+│   ├── engine/              # Goja runtime
+│   ├── modules/             # Built-in modules
+│   ├── pkgmanager/          # Package manager
+│   ├── initcmd/             # kilat init
+│   ├── createcmd/           # kilat create
+│   ├── repl/                # REPL
+│   └── utils/               # Utilities
+├── examples/                # Contoh project
+├── website/                 # Dokumentasi
+├── install.sh               # Install script
+└── go.mod
 ```
 
 ---
 
-## 📦 Package Manager (Tanpa `node_modules`)
-Struktur penyimpanan dependensi Kilat berbeda dari runtime JS biasa:
-* **`package.json`**: Tetap menggunakan format berkas package standar industri.
-* **Folder `.kilat/packages/`**: Folder terpusat di direktori home pengguna tempat dependensi disimpan.
-* **Resolusi Path**: Ketika memanggil `require('lodash')`, Kilat secara otomatis mencari di `.kilat/packages/lodash`.
-* **Spesifikasi Versi**: Mendukung pemasangan versi tertentu seperti `kilat add lodash@4`.
+## Kontribusi
 
----
-
-## 🔌 Module Bawaan
-Kilat menyediakan beberapa API inti tanpa perlu instalasi pihak ketiga:
-
-| Module | Fungsi Utama | Contoh Penggunaan |
-| :--- | :--- | :--- |
-| `console` | Menampilkan log ke terminal dengan formatting warna. | `console.error("Gagal!")` *(teks merah)* |
-| `fs` | Akses berkas sinkron (Sync) pada filesystem. | `fs.readdirSync(".")` |
-| `net` | Melakukan HTTP request dengan ringkas. | `const res = net.fetch("https://api.github.com")` |
-| `os` | Berinteraksi dengan environment dan argumen sistem. | `const args = os.args()` |
-
----
-
-## 🧪 Pengujian (Testing)
-
-Untuk memastikan runtime berjalan lancar, Anda dapat mencoba memasang package yang membutuhkan formatting warna:
+Silakan Fork, ubah, kirim PR. Kalau ada bug atau fitur baru, langsung aja.
 
 ```bash
-kilat add chalk
-```
-
-Buat file `test.js`:
-```javascript
-const chalk = require('chalk');
-console.log(chalk.green('✔ Hore! chalk dan runtime Kilat berfungsi dengan sempurna!'));
-```
-
-Jalankan pengujian:
-```bash
-kilat run test.js
-```
-
----
-
-## 🤝 Kontribusi
-Setiap kontribusi berupa perbaikan bug, penambahan modul bawaan baru, maupun saran peningkatan fitur sangat dihargai!
-
-```bash
-# Langkah pengembangan lokal:
 git clone https://github.com/ihsannyy/kilat
 cd kilat
-go mod tidy
 go build -o kilat ./cmd/kilat
 ```
 
-Silakan buat Fork, lakukan perubahan, dan kirimkan Pull Request (PR) ke repositori ini.
-
 ---
 
-## 📜 Lisensi
-Proyek ini dilisensikan di bawah **MIT License**. Lihat berkas lisensi untuk detail selengkapnya.
+## Lisensi
 
-MIT © 2026 [ihsannyy](https://github.com/ihsannyy)
+MIT License © 2026 [ihsannyy](https://github.com/ihsannyy)
 
 ---
 
 <div align="center">
 
-**Dibuat seadanya. Modal sebatang rokok dan seglintir harapan user Termux**
+**Dibuat di Termux pake Go**
 
 </div>

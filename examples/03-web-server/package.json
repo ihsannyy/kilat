@@ -1,0 +1,8 @@
+{
+  "name": "03-web-server",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "kilat run server.js --watch",
+    "start": "kilat run server.js"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "04-react-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "kilat run server.js"
+  }
+}

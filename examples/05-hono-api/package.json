@@ -1,0 +1,12 @@
+{
+  "name": "05-hono-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "kilat run src/index.js --watch",
+    "start": "kilat run src/index.js"
+  },
+  "dependencies": {
+    "hono": "^4.0.0"
+  }
+}

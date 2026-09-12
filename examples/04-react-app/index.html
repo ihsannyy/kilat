@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kilat React App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <style>body{background:#0a0a0a;color:#e2e8f0}</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [count, setCount] = useState(0);
+      const [time, setTime] = useState(new Date());
+
+      useEffect(() => {
+        const t = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(t);
+      }, []);
+
+      return React.createElement('div', { className: 'min-h-screen p-8 max-w-xl mx-auto' },
+        React.createElement('h1', { className: 'text-3xl font-bold mb-4' }, 'Kilat + React'),
+        React.createElement('p', { className: 'text-gray-500 mb-6' }, time.toLocaleTimeString()),
+        React.createElement('div', { className: 'flex gap-2' },
+          React.createElement('button', { onClick: () => setCount(c => c - 1), className: 'px-4 py-2 bg-white/10 rounded' }, '-'),
+          React.createElement('span', { className: 'px-4 py-2 text-xl' }, count),
+          React.createElement('button', { onClick: () => setCount(c => c + 1), className: 'px-4 py-2 bg-white/10 rounded' }, '+')
+        )
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+</body>
+</html>
