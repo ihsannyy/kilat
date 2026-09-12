@@ -1,852 +1,280 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-interface PageItem {
-  key: string
-  title: string
-  icon: React.ReactNode
-}
-
-const dict = {
-  id: {
-    console: 'Console',
-    playground: 'Contoh',
-    architecture: 'Arsitektur & FAQ',
-    install: 'Instalasi',
-    api: 'API Referensi',
-    changelog: 'Changelog',
-    heroHeading: 'Runtime JavaScript untuk Termux',
-    heroLead: 'Kilat adalah runtime minimalis bertenaga Go untuk eksekusi script kilat di perangkat seluler. Tanpa beban direktori node_modules, memuat instan, dan siap pakai.',
-    installerChannel: 'installer channel',
-    benchmarkTitle: 'BENCHMARK KINERJA OBJEKTIF',
-    metricHeader: 'Metrik Uji',
-    nodeHeader: 'Node.js (v20.11)',
-    kilatHeader: 'Kilat Runtime',
-    gainHeader: 'Selisih Keuntungan',
-    startupMetric: 'Waktu Startup Terdingin',
-    ramMetric: 'Alokasi Memori Awal (RAM)',
-    depMetric: 'Beban Folder Dependency',
-    compMetric: 'Compiler TypeScript',
-    startupGain: '~18x Lebih Cepat',
-    ramGain: '~4x Lebih Hemat',
-    depGain: '100% Hemat Disk',
-    compGain: 'Tanpa Overhead Setup',
-    externalCompiler: 'Eksternal (ts-node)',
-    inMemoryCompiler: 'Bawaan (esbuild)',
-    engineTitle: 'Ringan & Kencang',
-    engineDesc: 'Inisialisasi engine Goja yang sangat cepat (~2ms), membebaskan RAM Termux dari overhead V8 Node.js.',
-    compilerTitle: 'TypeScript Bawaan',
-    compilerDesc: 'Dukungan instan untuk berkas .ts, .tsx, dan .jsx via esbuild memori tanpa transpiler eksternal.',
-    cacheTitle: 'Bebas node_modules',
-    cacheDesc: 'Dependency dipetakan langsung ke cache global tunggal untuk menghemat penyimpanan disk internal HP.',
-    newApiTitle: 'Built-in Modules Baru',
-    newApiDesc: 'Timers, Buffer, Path, Child Process, Streams, dan WebSocket client terintegrasi langsung ke runtime.',
-    
-    codeTitle: 'Cuplikan Kode & Contoh',
-    codeSub: 'Pelajari cara menulis skrip, server, dan script otomasi shell di runtime Kilat.',
-    codeSample1Title: 'Hello World dasar',
-    codeSample1Desc: 'Menulis teks keluaran standar ke terminal konsol.',
-    codeSample2Title: 'HTTP Server Asinkron',
-    codeSample2Desc: 'Membuat endpoint server HTTP non-blocking dengan API standard Bun.',
-    codeSample3Title: 'Shell Script Executor',
-    codeSample3Desc: 'Menjalankan utilitas Linux secara asinkron dari file Javascript.',
-
-    archTitle: 'Arsitektur & Logika Sistem',
-    archSub: 'Analisis mendalam bagaimana biner tunggal Kilat mengeksekusi kode JavaScript secara asinkron.',
-    arch1Title: '1. Runtime Mesin Virtual (Goja Engine)',
-    arch1Desc: 'Kilat tidak menggunakan V8 Engine milik Google yang berukuran besar dan membutuhkan alokasi RAM minimal ~30MB hanya untuk memuat lingkungan dasar. Sebagai gantinya, Kilat mengintegrasikan Goja VM, interpreter ECMAScript 5.1/6 yang ditulis murni dalam bahasa Go. Hal ini memungkinkan bytecode dievaluasi langsung di tingkat kernel memori dengan alokasi awal RAM yang sangat kecil (~7.8MB).',
-    arch2Title: '2. Transpilasi Memori TypeScript (esbuild integration)',
-    arch2Desc: 'Ketika pengguna mengeksekusi berkas TypeScript, Kilat tidak menulis ulang file JavaScript sementara ke dalam penyimpanan disk HP (yang lambat dan mengurangi masa pakai memori flash). Biner esbuild internal diintegrasikan secara statis untuk melakukan kompilasi baris TypeScript menjadi string kode JavaScript langsung di dalam memori RAM sesaat sebelum diumpankan ke Goja VM.',
-    arch3Title: '3. Asynchronous Event-Loop via Go Channels',
-    arch3Desc: 'Untuk mendukung operasi I/O non-blocking (seperti fetch asinkron dan modul $ shell executor), Kilat mengimplementasikan event-loop asinkron menggunakan mekanisme internal Go channel dan goroutine. Setiap kali operasi asinkron dipicu dari JavaScript, Goja VM akan mendelegasikan tugas tersebut ke goroutine latar belakang dan mengembalikan Promise ke thread utama. Setelah goroutine menyelesaikan tugasnya, hasilnya akan dikirim kembali melalui Go channel ke event-loop untuk menyelesaikan status Promise.',
-    arch4Title: '4. Built-in Modules via Go-JS Bridge',
-    arch4Desc: 'Kilat v4.0.0 mengintegrasikan 6 modul native baru langsung ke dalam binary: Timers, Buffer, Path, Child Process, Streams, dan WebSocket Client. Setiap modul ditulis dalam Go dan di-bridge ke JavaScript menggunakan API Goja, sehingga eksekusi berlangsung di level native tanpa overhead interpretasi JavaScript. Timer menggunakan goroutine independen dengan done-channel untuk mencegah deadlock pada event-loop.',
-    
-    personalTitle: 'Kenapa Kilat Dibuat?',
-    personalDesc: 'Kilat dibuat oleh ihsannyy karena keresahan pribadi saat mengembangkan script otomasi dan bot di HP Android menggunakan Termux. Node.js terlalu memakan penyimpanan internal HP dengan folder node_modules yang duplikat di setiap proyek, serta memakan RAM yang cukup besar saat dijalankan di perangkat berspesifikasi rendah. Kilat lahir sebagai solusi: minimalis, bertenaga Go, memuat dalam 2ms, dan menghemat memori internal dengan caching dependency global.',
-    faqTitle: 'Pertanyaan Umum (FAQ)',
-    faq1Quest: 'Apa bedanya Kilat dengan Node.js?',
-    faq1Ans: 'Node.js menggunakan V8 Engine dan memerlukan folder node_modules lokal di setiap proyek. Kilat menggunakan Goja VM (Go-based JS interpreter) dan esbuild untuk kompilasi memori, serta menggunakan cache global satu-satunya. Kilat jauh lebih hemat RAM (~8MB) dan penyimpanan disk (0B untuk dependensi lokal).',
-    faq2Quest: 'Apakah Kilat mendukung semua package npm?',
-    faq2Ans: 'Kilat mendukung modul standard CommonJS dan ES Modules murni. Namun, modul yang bergantung pada API native C++ milik Node.js atau API Node internal tingkat rendah (seperti beberapa bagian dgram/child_process yang spesifik) tidak didukung karena interpreter kami didesain ringan.',
-    faq3Quest: 'Bagaimana cara menghapus (uninstall) Kilat?',
-    faq3Ans: 'Sangat mudah. Anda hanya perlu menghapus biner kilat dan folder cachenya dengan menjalankan perintah: rm -f $PREFIX/bin/kilat && rm -rf ~/.kilat',
-
-    instTitle: 'Instalasi Runtime',
-    instSub: 'Panduan pemasangan biner statis Kilat di perangkat Anda.',
-    instAuto: '1. Instalasi Skrip Otomatis',
-    instAutoDesc: 'Mendeteksi arsitektur CPU dan memasang biner secara otomatis:',
-    instVerify: '2. Verifikasi Pemasangan',
-    instVerifyDesc: 'Jalankan perintah ini untuk memastikan biner Kilat aktif:',
-    apiTitle: 'API Referensi',
-    apiSub: 'Daftar global API dan core module built-in bawaan Kilat.',
-    changeTitle: 'Release Changelog',
-    changeSub: 'Riwayat pembaruan biner statis Kilat.',
-    change5: 'Rilis major ini memperkenalkan **6 built-in modules baru**: **Timers** (`setTimeout`/`setInterval`), **Buffer** (encoding/decoding data biner), **Path** (utilitas path filesystem), **Child Process** (`execSync`/`exec`/`spawn`), **Streams** (`Readable`/`Writable`/`Transform`), dan **WebSocket Client** untuk komunikasi real-time. Ditambahkan juga **TextEncoder**/**TextDecoder**, **`process`** object (cwd/pid/exit), **`atob`/`btoa`**, **`queueMicrotask`**, dan **`setImmediate`**. Event loop ditingkatkan dengan mekanisme wakeup via done channel untuk mencegah deadlock.',
-    change4: 'Rilis ini memperkenalkan perintah **`kilat remove <package>`** untuk menghapus dependency secara lokal, dan **`kilat build <in> <out>`** untuk membundel serta meminifikasi berkas JS/TS untuk produksi. Ditambahkan juga **fallback DNS resolver** baru untuk memecahkan masalah koneksi internet di lingkungan Termux Android, serta peningkatan sistem resolusi modul NPM untuk membaca properti `"main"` berkas `package.json`.',
-    change3: 'Rilis major ini memperkenalkan **Global Shell Command Execution ($)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.',
-    change2: 'Rilis minor ini memperkenalkan **Global Fetch API (fetch)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.',
-    change1: 'Integrasi compiler esbuild internal untuk mendukung pemuatan file TypeScript (TS, TSX, JSX) dan transpiler ES Modules (ESM) di memori secara otomatis.',
-    footer: 'MIT License © 2026 Kilat.',
+const versions = [
+  {
+    num: 'v4.1.0',
+    date: '12 Sep 2026',
+    title: 'Template System & CLI Improvements',
+    desc: 'Added kilat create with 5 templates (vanilla, react, hono, vite, api). New Kilat.serve() API. kilat info command. Humanized documentation.',
+    latest: true,
   },
-  en: {
-    console: 'Console',
-    playground: 'Examples',
-    architecture: 'Architecture & FAQ',
-    install: 'Installation',
-    api: 'API Reference',
-    changelog: 'Changelog',
-    heroHeading: 'JavaScript Runtime for Termux',
-    heroLead: 'Kilat is a minimalist Go-powered runtime built for lightning-fast script execution on mobile devices. Bypasses node_modules, boots instantly, and runs natively.',
-    installerChannel: 'installer channel',
-    benchmarkTitle: 'OBJECTIVE PERFORMANCE BENCHMARKS',
-    metricHeader: 'Benchmark Metric',
-    nodeHeader: 'Node.js (v20.11)',
-    kilatHeader: 'Kilat Runtime',
-    gainHeader: 'Net Advantage',
-    startupMetric: 'Cold Startup Latency',
-    ramMetric: 'Initial Memory Allocation (RAM)',
-    depMetric: 'Dependency Storage Burden',
-    compMetric: 'TypeScript Compiler Overhead',
-    startupGain: '~18x Faster',
-    ramGain: '~4x More Efficient',
-    depGain: '100% Storage Savings',
-    compGain: 'Zero Configuration Setup',
-    externalCompiler: 'External (ts-node)',
-    inMemoryCompiler: 'In-Memory (esbuild)',
-    engineTitle: 'Lightweight & Swift',
-    engineDesc: 'Blazing-fast Goja engine initialization (~2ms), freeing Termux RAM from heavy V8 Node.js overhead.',
-    compilerTitle: 'Native TypeScript',
-    compilerDesc: 'Instant support for .ts, .tsx, and .jsx files via in-memory esbuild without external transpilers.',
-    cacheTitle: 'Zero node_modules',
-    cacheDesc: 'Dependencies mapped directly to a global cache, saving internal storage on mobile devices.',
-    newApiTitle: 'New Built-in Modules',
-    newApiDesc: 'Timers, Buffer, Path, Child Process, Streams, and WebSocket client integrated directly into the runtime.',
-    
-    codeTitle: 'Code Snippets & Examples',
-    codeSub: 'Learn how to write scripts, servers, and shell automation scripts in the Kilat runtime.',
-    codeSample1Title: 'Basic Hello World',
-    codeSample1Desc: 'Print standard output text logs directly to the console terminal.',
-    codeSample2Title: 'Async HTTP Server',
-    codeSample2Desc: 'Spin up non-blocking HTTP endpoints using the built-in Bun-compatible API.',
-    codeSample3Title: 'Shell Script Executor',
-    codeSample3Desc: 'Execute external Linux CLI utilities asynchronously from JavaScript files.',
+  {
+    num: 'v4.0.0',
+    date: '12 Sep 2026',
+    title: '6 Built-in Modules',
+    desc: 'Timers, Buffer, Path, Child Process, Streams, WebSocket Client. TextEncoder/TextDecoder, process object, atob/btoa, queueMicrotask, setImmediate.',
+    latest: false,
+  },
+  {
+    num: 'v3.1.0',
+    date: '13 Jul 2026',
+    title: 'Build & Remove Commands',
+    desc: 'kilat remove for uninstalling packages. kilat build for bundling and minifying JS/TS. Fallback DNS resolver for Termux.',
+    latest: false,
+  },
+  {
+    num: 'v2.1.0',
+    date: '11 Jul 2026',
+    title: 'Global Shell Execution',
+    desc: 'Global $ command for async shell execution using Go goroutines.',
+    latest: false,
+  },
+  {
+    num: 'v2.0.0',
+    date: '1 Jul 2026',
+    title: 'Fetch API',
+    desc: 'Global fetch() for async HTTP requests integrated with event-loop.',
+    latest: false,
+  },
+  {
+    num: 'v1.0.0',
+    date: '20 Jun 2026',
+    title: 'Initial Release',
+    desc: 'esbuild integration for TypeScript and ES Modules loading.',
+    latest: false,
+  },
+]
 
-    archTitle: 'Architecture & System Logic',
-    archSub: 'Deep dive into how Kilat\'s single static binary executes JavaScript code asynchronously.',
-    arch1Title: '1. Virtual Machine Runtime (Goja Engine)',
-    arch1Desc: 'Kilat avoids Google\'s massive V8 Engine, which demands a minimum of ~30MB RAM just to initialize. Instead, it embeds the Goja VM, a pure Go ECMAScript 5.1/6 interpreter, enabling bytecode evaluation at the memory level with a tiny initial RAM footprint (~7.8MB).',
-    arch2Title: '2. In-Memory TypeScript Transpilation (esbuild)',
-    arch2Desc: 'When executing TypeScript files, Kilat does not write temporary JavaScript files to slow internal flash storage. An embedded esbuild compiler transpiles TypeScript source code to JS strings directly in RAM just before evaluation.',
-    arch3Title: '3. Asynchronous Event-Loop via Go Channels',
-    arch3Desc: 'To support non-blocking I/O operations (like async fetch and shell executing), Kilat implements an async event-loop using internal Go channels and goroutines. When an async task starts in JS, the Goja VM delegates it to a background goroutine and returns a Promise. Upon completion, the result is piped back through a Go channel to resolve the Promise.',
-    arch4Title: '4. Built-in Modules via Go-JS Bridge',
-    arch4Desc: 'Kilat v4.0.0 integrates 6 new native modules directly into the binary: Timers, Buffer, Path, Child Process, Streams, and WebSocket Client. Each module is written in Go and bridged to JavaScript using the Goja API, enabling native-level execution without JavaScript interpretation overhead. Timers use independent goroutines with done-channel wakeup mechanism to prevent event-loop deadlocks.',
-    
-    personalTitle: 'Why was Kilat Created?',
-    personalDesc: 'Kilat was created by ihsannyy out of personal frustration when developing automation scripts and bots on Android devices using Termux. Node.js consumes too much internal phone storage with duplicate node_modules folders in every project, and demands high memory on low-spec devices. Kilat was born as a solution: minimalist, Go-powered, booting in 2ms, and preserving phone storage through global dependency caching.',
-    faqTitle: 'Frequently Asked Questions (FAQ)',
-    faq1Quest: 'How is Kilat different from Node.js?',
-    faq1Ans: 'Node.js runs on V8 Engine and requires a local node_modules folder for every project. Kilat runs on Goja VM (Go-based JS interpreter) with esbuild for in-memory compilation, mapping modules to a single global cache. Kilat uses less RAM (~8MB) and zero disk space for local project dependencies.',
-    faq2Quest: 'Does Kilat support all npm packages?',
-    faq2Ans: 'Kilat supports pure ES Modules and CommonJS packages. However, packages relying on Node.js native C++ bindings or complex low-level internal Node APIs (such as specific dgram/child_process wrappers) are not supported due to our lightweight design.',
-    faq3Quest: 'How do I uninstall Kilat?',
-    faq3Ans: 'It is very simple. Delete the kilat binary and its cache directory by running: rm -f $PREFIX/bin/kilat && rm -rf ~/.kilat',
+const features = [
+  { icon: '⚡', title: '2ms Startup', desc: 'Goja engine, no V8 overhead.' },
+  { icon: '📦', title: 'Global Cache', desc: 'Packages in ~/.kilat/packages/, zero duplication.' },
+  { icon: '🔧', title: 'TypeScript Built-in', desc: '.ts/.tsx transpile in memory via esbuild.' },
+  { icon: '🌐', title: 'Fetch API', desc: 'Async HTTP requests with Promises.' },
+  { icon: '🔌', title: 'Kilat.serve', desc: 'HTTP server with Bun-compatible API.' },
+  { icon: '📋', title: 'Create Templates', desc: 'Scaffold projects with kilat create.' },
+  { icon: '👁️', title: 'Watch Mode', desc: 'Auto-restart on file changes.' },
+  { icon: '🧩', title: 'Package Manager', desc: 'kilat add, kilat remove commands.' },
+  { icon: '💻', title: 'REPL', desc: 'Interactive JavaScript shell.' },
+]
 
-    instTitle: 'Runtime Installation',
-    instSub: 'Guide to install the static Kilat binary to your local environment.',
-    instAuto: '1. Automated Script Installation',
-    instAutoDesc: 'Detects CPU architecture and installs the appropriate binary automatically:',
-    instVerify: '2. Verify Installation',
-    instVerifyDesc: 'Execute this command to verify the Kilat binary is active:',
-    apiTitle: 'API Reference',
-    apiSub: 'List of built-in global APIs and core modules available in Kilat.',
-    changeTitle: 'Release Changelog',
-    changeSub: 'Version release logs of the static Kilat binary.',
-    change5: 'This major release introduces **6 new built-in modules**: **Timers** (`setTimeout`/`setInterval`), **Buffer** (binary data encoding/decoding), **Path** (filesystem path utilities), **Child Process** (`execSync`/`exec`/`spawn`), **Streams** (`Readable`/`Writable`/`Transform`), and **WebSocket Client** for real-time communication. Also added **TextEncoder**/**TextDecoder**, **`process`** object (cwd/pid/exit), **`atob`/`btoa`**, **`queueMicrotask`**, and **`setImmediate`**. Event loop upgraded with done-channel wakeup mechanism to prevent deadlocks.',
-    change4: 'This release introduces the **`kilat remove <package>`** command to uninstall dependencies locally, and **`kilat build <in> <out>`** to bundle and minify JS/TS scripts for production. Adds a new **fallback DNS resolver** to bypass network connection failures in Android/Termux environments, and enhances NPM module resolution by supporting `package.json` `"main"` property loading.',
-    change3: 'This major release introduces **Global Shell Command Execution ($)**. Full async support using Go goroutines to run external binaries and CLI utilities on Termux / Linux.',
-    change2: 'This minor release introduces the **Global Fetch API (fetch)**, asynchronously integrated with the event-loop for HTTP API requests.',
-    change1: 'Integrated esbuild compiler for instant in-memory TypeScript (TS, TSX, JSX) and ES Modules (ESM) loading.',
-    footer: 'MIT License © 2026 Kilat.'
-  }
-}
+const modules = [
+  { name: 'fs', desc: 'File I/O' },
+  { name: 'os', desc: 'System info' },
+  { name: 'path', desc: 'Path utils' },
+  { name: 'crypto', desc: 'Hashing' },
+  { name: 'child_process', desc: 'Shell exec' },
+  { name: 'buffer', desc: 'Binary data' },
+  { name: 'stream', desc: 'Streams' },
+  { name: 'timers', desc: 'setTimeout' },
+  { name: 'websocket', desc: 'WS client' },
+]
 
 export default function App() {
-  const [lang, setLang] = useState<'id' | 'en'>('id')
-  const [activeTab, setActiveTab] = useState<string>('home')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
-  const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
-  const [timeMode, setTimeMode] = useState<string>('MALAM')
-  const [clockText, setClockText] = useState<string>('')
+  const [copied, setCopied] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-  const pages: PageItem[] = [
-    {
-      key: 'home',
-      title: dict[lang].console,
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
-          <line x1="7" y1="2" x2="7" y2="22" />
-          <line x1="17" y1="2" x2="17" y2="22" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-        </svg>
-      )
-    },
-    {
-      key: 'examples',
-      title: dict[lang].playground,
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
-      )
-    },
-    {
-      key: 'architecture',
-      title: dict[lang].architecture,
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="12 2 2 7 12 12 22 7 12 2" />
-          <polyline points="2 17 12 22 22 17" />
-          <polyline points="2 12 12 17 22 12" />
-        </svg>
-      )
-    },
-    {
-      key: 'install',
-      title: dict[lang].install,
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-      )
-    },
-    {
-      key: 'api',
-      title: dict[lang].api,
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="6" y1="3" x2="6" y2="15" />
-          <circle cx="18" cy="6" r="3" />
-          <circle cx="6" cy="18" r="3" />
-          <path d="M18 9a9 9 0 0 1-9 9" />
-        </svg>
-      )
-    },
-    {
-      key: 'changelog',
-      title: dict[lang].changelog,
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-          <polyline points="10 9 9 9 8 9" />
-        </svg>
-      )
-    }
-  ]
-
-  const fallbackCopyText = (text: string) => {
-    const textArea = document.createElement("textarea")
-    textArea.value = text
-    textArea.style.top = "0"
-    textArea.style.left = "0"
-    textArea.style.position = "fixed"
-    document.body.appendChild(textArea)
-    textArea.focus()
-    textArea.select()
-    try {
-      document.execCommand('copy')
-    } catch (err) {
-      console.error('Fallback copy failed', err)
-    }
-    document.body.removeChild(textArea)
+  const copyInstall = () => {
+    navigator.clipboard.writeText('curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
-
-  const handleCopy = (id: string, text: string) => {
-    const trimmed = text.trim()
-    const onSuccess = () => {
-      setCopiedMap(prev => ({ ...prev, [id]: true }))
-      setTimeout(() => {
-        setCopiedMap(prev => ({ ...prev, [id]: false }))
-      }, 2000)
-    }
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(trimmed)
-        .then(onSuccess)
-        .catch(() => {
-          fallbackCopyText(trimmed)
-          onSuccess()
-        })
-    } else {
-      fallbackCopyText(trimmed)
-      onSuccess()
-    }
-  }
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date()
-      const hrs = now.getHours()
-      const mins = String(now.getMinutes()).padStart(2, '0')
-      setClockText(`${String(hrs).padStart(2, '0')}:${mins}`)
-
-      if (hrs >= 5 && hrs < 11) {
-        setTimeMode('PAGI')
-      } else if (hrs >= 11 && hrs < 15) {
-        setTimeMode('SIANG')
-      } else if (hrs >= 15 && hrs < 18) {
-        setTimeMode('SORE')
-      } else {
-        setTimeMode('MALAM')
-      }
-    }
-    
-    updateTime()
-    const timeTimer = setInterval(updateTime, 10000)
-    return () => clearInterval(timeTimer)
-  }, [])
-
-
-
-  const t = dict[lang]
 
   return (
-    <div className="weather-runtime-portal">
-      <div className="grain-backdrop"></div>
-
-      <header className="glass-navbar">
-        <div className="navbar-inner">
-          <div className="brand">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="spark-svg">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
-            <span className="name">kilat</span>
-            <span className="badge">v4.0.0</span>
+    <div className="site">
+      <nav className="nav">
+        <div className="nav-inner">
+          <a href="#" className="nav-brand">
+            <img src="/kilat.png" alt="Kilat" />
+            <span>kilat</span>
+          </a>
+          <div className="nav-links">
+            <a href="#features" className="nav-link">Features</a>
+            <a href="#versions" className="nav-link">Changelog</a>
+            <a href="#modules" className="nav-link">Modules</a>
           </div>
-
-          <nav className="navbar-links desktop-only">
-            {pages.map(p => (
-              <button key={p.key} className={`nav-tab-btn ${activeTab === p.key ? 'active' : ''}`} onClick={() => setActiveTab(p.key)}>
-                {p.title}
-              </button>
-            ))}
-          </nav>
-
-          <div className="navbar-actions">
-            <button className="lang-toggle-btn" onClick={() => setLang(lang === 'id' ? 'en' : 'id')}>
-              {lang === 'id' ? 'EN' : 'ID'}
-            </button>
-
-            <div className="environment-clock">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="clock-svg">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              <span className="time-lbl">MODE:&nbsp;</span>
-              <span className="time-mode-name">{timeMode}</span>
-              <span className="time-val">&nbsp;[{clockText}]</span>
-            </div>
-            
-            <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="btn-github-link" aria-label="GitHub">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-              </svg>
-            </a>
-
-            <button className="menu-toggle mobile-only" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle Menu">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                {mobileMenuOpen ? (
-                  <>
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </>
+          <div className="nav-actions">
+            <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="nav-btn nav-btn-outline">GitHub</a>
+            <a href="#install" className="nav-btn">Install</a>
+            <button className="menu-btn" onClick={() => setMobileOpen(!mobileOpen)}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                {mobileOpen ? (
+                  <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
                 ) : (
-                  <>
-                    <line x1="3" y1="12" x2="21" y2="12" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <line x1="3" y1="18" x2="21" y2="18" />
-                  </>
+                  <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>
                 )}
               </svg>
             </button>
           </div>
         </div>
-      </header>
+      </nav>
 
-      <div className={`drawer-nav ${mobileMenuOpen ? 'open' : ''}`}>
-        {pages.map(p => (
-          <button key={p.key} className={`drawer-link ${activeTab === p.key ? 'active' : ''}`} onClick={() => { setActiveTab(p.key); setMobileMenuOpen(false); }}>
-            <span className="tab-icon-svg">{p.icon}</span>
-            <span className="drawer-lbl">{p.title}</span>
-          </button>
-        ))}
-        <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="drawer-link" onClick={() => setMobileMenuOpen(false)}>
-          <span className="tab-icon-svg">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-            </svg>
-          </span>
-          <span className="drawer-lbl">GitHub</span>
-        </a>
+      <div className={`mobile-nav ${mobileOpen ? 'open' : ''}`}>
+        <a href="#features" onClick={() => setMobileOpen(false)}>Features</a>
+        <a href="#versions" onClick={() => setMobileOpen(false)}>Changelog</a>
+        <a href="#modules" onClick={() => setMobileOpen(false)}>Modules</a>
+        <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer">GitHub</a>
       </div>
 
-      <main className="main-portal-content">
-        <div className="portal-page-pane">
-          {activeTab === 'home' && (
-            <div className="pane-view animate-in">
-              <section className="portal-hero">
-                <h1 className="hero-heading">{t.heroHeading}</h1>
-                <p className="hero-lead">{t.heroLead}</p>
+      <main className="main">
+        <section className="hero">
+          <div className="hero-badge">
+            <span className="dot"></span>
+            v4.1.0 — Latest Release
+          </div>
+          <h1>kilat</h1>
+          <p>JavaScript runtime untuk Termux & Linux. Ringan, cepat, tanpa node_modules.</p>
+          <div className="hero-actions">
+            <a href="#install" className="btn-primary">Get Started</a>
+            <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" className="btn-secondary">View on GitHub</a>
+          </div>
 
-                <div className="terminal-install-box">
-                  <div className="box-hdr">
-                    <div className="leds">
-                      <span className="led red"></span>
-                      <span className="led yellow"></span>
-                      <span className="led green"></span>
-                    </div>
-                    <span className="box-title">{t.installerChannel}</span>
-                  </div>
-                  <div className="box-body">
-                    <div className="code-scroll-wrapper">
-                      <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
-                    </div>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('hero-inst', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
-                      {copiedMap['hero-inst'] ? 'COPIED' : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                          COPY
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </section>
-
-              <section className="benchmarks-table-wrapper">
-                <h2 className="section-subtitle-technical">{t.benchmarkTitle}</h2>
-                <div className="glass-table-container">
-                  <table className="glass-table">
-                    <thead>
-                      <tr>
-                        <th>{t.metricHeader}</th>
-                        <th>{t.nodeHeader}</th>
-                        <th>{t.kilatHeader}</th>
-                        <th>{t.gainHeader}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><strong>{t.startupMetric}</strong></td>
-                        <td>38.2 ms</td>
-                        <td className="text-cyan">2.1 ms</td>
-                        <td className="text-green">{t.startupGain}</td>
-                      </tr>
-                      <tr>
-                        <td><strong>{t.ramMetric}</strong></td>
-                        <td>31.4 MB</td>
-                        <td className="text-cyan">7.8 MB</td>
-                        <td className="text-green">{t.ramGain}</td>
-                      </tr>
-                      <tr>
-                        <td><strong>{t.depMetric}</strong></td>
-                        <td>~120 MB / proj</td>
-                        <td className="text-cyan">0 B (Global Cache)</td>
-                        <td className="text-green">{t.depGain}</td>
-                      </tr>
-                      <tr>
-                        <td><strong>{t.compMetric}</strong></td>
-                        <td>{t.externalCompiler}</td>
-                        <td className="text-cyan">{t.inMemoryCompiler}</td>
-                        <td className="text-green">{t.compGain}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section className="features-glass-grid">
-                <div className="glass-card">
-                  <div className="card-badge">ENGINE</div>
-                  <h3>{t.engineTitle}</h3>
-                  <p>{t.engineDesc}</p>
-                </div>
-
-                <div className="glass-card">
-                  <div className="card-badge">COMPILER</div>
-                  <h3>{t.compilerTitle}</h3>
-                  <p>{t.compilerDesc}</p>
-                </div>
-
-                <div className="glass-card">
-                  <div className="card-badge">CACHE</div>
-                  <h3>{t.cacheTitle}</h3>
-                  <p>{t.cacheDesc}</p>
-                </div>
-
-                <div className="glass-card">
-                  <div className="card-badge">v4.0 MODULES</div>
-                  <h3>{t.newApiTitle}</h3>
-                  <p>{t.newApiDesc}</p>
-                </div>
-              </section>
+          <div className="terminal" id="install">
+            <div className="terminal-header">
+              <div className="terminal-dots">
+                <span className="terminal-dot red"></span>
+                <span className="terminal-dot yellow"></span>
+                <span className="terminal-dot green"></span>
+              </div>
+              <span className="terminal-title">terminal</span>
             </div>
-          )}
-
-          {activeTab === 'examples' && (
-            <div className="pane-view animate-in">
-              <h2 className="pane-title">{t.codeTitle}</h2>
-              <p className="pane-subtitle">{t.codeSub}</p>
-
-              <div className="playground-code-grid">
-                <div className="vscode-editor-container">
-                  <div className="vscode-header">
-                    <div className="editor-dots">
-                      <span className="dot red"></span>
-                      <span className="dot yellow"></span>
-                      <span className="dot green"></span>
-                    </div>
-                    <span className="editor-file">buffers.js</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c1', `const buf = Buffer.from("Hello Kilat!");\nconsole.log(buf.toString());\nconsole.log("hex:", buf.toString("hex"));\nconsole.log("base64:", buf.toString("base64"));`)}>
-                      {copiedMap['c1'] ? 'COPIED' : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                          COPY
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                  <div className="vscode-body">
-                    <div className="editor-nums">
-                      <span>1</span><span>2</span><span>3</span><span>4</span>
-                    </div>
-                    <pre><code>{`const buf = Buffer.from("Hello Kilat!");
-console.log(buf.toString());
-console.log("hex:", buf.toString("hex"));
-console.log("base64:", buf.toString("base64"));`}</code></pre>
-                  </div>
-                  <p className="editor-label-desc">{t.codeSample1Desc}</p>
-                </div>
-
-                <div className="vscode-editor-container">
-                  <div className="vscode-header">
-                    <div className="editor-dots">
-                      <span className="dot red"></span>
-                      <span className="dot yellow"></span>
-                      <span className="dot green"></span>
-                    </div>
-                    <span className="editor-file">timers.js</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c2', `let count = 0;\nconst id = setInterval(() => {\n  count++;\n  console.log("tick", count);\n  if (count >= 5) clearInterval(id);\n}, 1000);`)}>
-                      {copiedMap['c2'] ? 'COPIED' : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                          COPY
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                  <div className="vscode-body">
-                    <div className="editor-nums">
-                      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
-                    </div>
-                    <pre><code>{`let count = 0;
-const id = setInterval(() => {
-  count++;
-  console.log("tick", count);
-  if (count >= 5) clearInterval(id);
-}, 1000);`}</code></pre>
-                  </div>
-                  <p className="editor-label-desc">{t.codeSample2Desc}</p>
-                </div>
-
-                <div className="vscode-editor-container">
-                  <div className="vscode-header">
-                    <div className="editor-dots">
-                      <span className="dot red"></span>
-                      <span className="dot yellow"></span>
-                      <span className="dot green"></span>
-                    </div>
-                    <span className="editor-file">exec.js</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c3', `const result = child_process.execSync("uname -a");\nconsole.log(result.stdout);`)}>
-                      {copiedMap['c3'] ? 'COPIED' : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                          COPY
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                  <div className="vscode-body">
-                    <div className="editor-nums">
-                      <span>1</span><span>2</span>
-                    </div>
-                    <pre><code>{`const result = child_process.execSync("uname -a");
-console.log(result.stdout);`}</code></pre>
-                  </div>
-                  <p className="editor-label-desc">{t.codeSample3Desc}</p>
-                </div>
-              </div>
+            <div className="terminal-body">
+              <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
+              <button className="copy-btn" onClick={copyInstall}>
+                {copied ? 'COPIED' : 'COPY'}
+              </button>
             </div>
-          )}
+          </div>
+        </section>
 
-          {activeTab === 'architecture' && (
-            <div className="pane-view animate-in">
-              <h2 className="pane-title">{t.archTitle}</h2>
-              <p className="pane-subtitle">{t.archSub}</p>
+        <section className="section" id="features">
+          <div className="section-label">Features</div>
+          <h2 className="section-title">Kenapa Kilat?</h2>
+          <p className="section-desc">Node.js terlalu berat buat Termux. Kilat hadir sebagai alternatif yang lebih ringan.</p>
 
-              <div className="glass-panel">
-                <h3>{t.arch1Title}</h3>
-                <p>{t.arch1Desc}</p>
+          <div className="features-grid">
+            {features.map((f, i) => (
+              <div className="feature-card" key={i}>
+                <div className="feature-icon">{f.icon}</div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
               </div>
+            ))}
+          </div>
+        </section>
 
-              <div className="glass-panel">
-                <h3>{t.arch2Title}</h3>
-                <p>{t.arch2Desc}</p>
+        <section className="section" id="comparison">
+          <div className="section-label">Comparison</div>
+          <h2 className="section-title">Node.js vs Kilat</h2>
+          <p className="section-desc">Perbandingan langsung dengan Node.js di perangkat yang sama.</p>
+
+          <div className="comparison">
+            <table>
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Node.js v20</th>
+                  <th>Kilat v4</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Startup time</td>
+                  <td>~38ms</td>
+                  <td className="highlight">~2ms</td>
+                </tr>
+                <tr>
+                  <td>RAM usage</td>
+                  <td>~31MB</td>
+                  <td className="highlight">~8MB</td>
+                </tr>
+                <tr>
+                  <td>Storage per project</td>
+                  <td>~120MB</td>
+                  <td className="highlight">0B (global cache)</td>
+                </tr>
+                <tr>
+                  <td>TypeScript</td>
+                  <td>External (ts-node)</td>
+                  <td className="highlight">Built-in (esbuild)</td>
+                </tr>
+                <tr>
+                  <td>Module system</td>
+                  <td>node_modules/project</td>
+                  <td className="highlight">Global cache</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="section" id="versions">
+          <div className="section-label">Changelog</div>
+          <h2 className="section-title">Version History</h2>
+          <p className="section-desc">Semua rilis dari awal sampai sekarang.</p>
+
+          <div className="versions">
+            {versions.map((v, i) => (
+              <div className="version-item" key={i}>
+                <div>
+                  <div className="version-num">{v.num}</div>
+                  <div className="version-date">{v.date}</div>
+                </div>
+                <div className="version-content">
+                  <h3>{v.title}</h3>
+                  <p>{v.desc}</p>
+                </div>
+                {v.latest ? (
+                  <span className="version-tag latest">Latest</span>
+                ) : (
+                  <span className="version-tag">Release</span>
+                )}
               </div>
+            ))}
+          </div>
+        </section>
 
-              <div className="glass-panel">
-                <h3>{t.arch3Title}</h3>
-                <p>{t.arch3Desc}</p>
+        <section className="section" id="modules">
+          <div className="section-label">Modules</div>
+          <h2 className="section-title">Built-in Modules</h2>
+          <p className="section-desc">Modul yang sudah terintegrasi tanpa perlu install.</p>
+
+          <div className="modules-grid">
+            {modules.map((m, i) => (
+              <div className="module-card" key={i}>
+                <h4>{m.name}</h4>
+                <p>{m.desc}</p>
               </div>
+            ))}
+          </div>
+        </section>
 
-              <div className="glass-panel">
-                <h3>{t.arch4Title}</h3>
-                <p>{t.arch4Desc}</p>
+        <section className="section" id="quickstart">
+          <div className="section-label">Quick Start</div>
+          <h2 className="section-title">Mulai Dalam 30 Detik</h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+            {[
+              { step: '01', code: 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash' },
+              { step: '02', code: 'kilat create vanilla my-app' },
+              { step: '03', code: 'cd my-app && kilat run src/index.js' },
+            ].map((s, i) => (
+              <div key={i} style={{ background: 'var(--bg)', padding: '20px 24px', display: 'grid', gridTemplateColumns: '40px 1fr', gap: '16px', alignItems: 'center' }}>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: 'var(--text-muted)' }}>{s.step}</span>
+                <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '13px', color: 'var(--text-secondary)' }}>{s.code}</code>
               </div>
-
-              <h2 className="pane-title" style={{ marginTop: '48px' }}>{t.personalTitle}</h2>
-              <p className="pane-subtitle">{t.personalDesc}</p>
-
-              <h2 className="pane-title" style={{ marginTop: '48px' }}>{t.faqTitle}</h2>
-              <div className="glass-panel" style={{ marginTop: '16px' }}>
-                <h3 style={{ color: 'var(--secondary)' }}>Q: {t.faq1Quest}</h3>
-                <p style={{ marginTop: '8px' }}>A: {t.faq1Ans}</p>
-              </div>
-              <div className="glass-panel">
-                <h3 style={{ color: 'var(--secondary)' }}>Q: {t.faq2Quest}</h3>
-                <p style={{ marginTop: '8px' }}>A: {t.faq2Ans}</p>
-              </div>
-              <div className="glass-panel">
-                <h3 style={{ color: 'var(--secondary)' }}>Q: {t.faq3Quest}</h3>
-                <p style={{ marginTop: '8px' }}>A: {t.faq3Ans}</p>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'install' && (
-            <div className="pane-view animate-in">
-              <h2 className="pane-title">{t.instTitle}</h2>
-              <p className="pane-subtitle">{t.instSub}</p>
-
-              <div className="glass-panel">
-                <h3>{t.instAuto}</h3>
-                <p>{t.instAutoDesc}</p>
-                <div className="terminal-install-box">
-                  <div className="box-hdr">
-                    <div className="leds">
-                      <span className="led"></span>
-                    </div>
-                  </div>
-                  <div className="box-body">
-                    <div className="code-scroll-wrapper">
-                      <code>curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash</code>
-                    </div>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-auto', 'curl -fsSL https://raw.githubusercontent.com/ihsannyy/kilat/main/install.sh | bash')}>
-                      {copiedMap['inst-auto'] ? 'COPIED' : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                          COPY
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-panel">
-                <h3>{t.instVerify}</h3>
-                <p>{t.instVerifyDesc}</p>
-                <div className="terminal-install-box">
-                  <div className="box-hdr">
-                    <div className="leds">
-                      <span className="led"></span>
-                    </div>
-                  </div>
-                  <div className="box-body">
-                    <div className="code-scroll-wrapper">
-                      <code>kilat --version</code>
-                    </div>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('inst-verify', 'kilat --version')}>
-                      {copiedMap['inst-verify'] ? 'COPIED' : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                          COPY
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'api' && (
-            <div className="pane-view animate-in">
-              <h2 className="pane-title">{t.apiTitle}</h2>
-              <p className="pane-subtitle">{t.apiSub}</p>
-
-              <div className="api-panel-grid">
-                <div className="api-panel">
-                  <h3>globalThis.$</h3>
-                  <p>Mengeksekusi perintah shell linux/termux secara asinkron.</p>
-                  <pre><code>const out = await $`uname -a`;</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>globalThis.fetch</h3>
-                  <p>Melakukan network request asinkron berbasis standard Promise.</p>
-                  <pre><code>const res = await fetch(url);</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>Buffer</h3>
-                  <p>Encoding {'&'} decoding data biner (hex, base64, utf8).</p>
-                  <pre><code>Buffer.from("hello").toString("hex")</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>setTimeout / setInterval</h3>
-                  <p>Timer API dengan integrasi event-loop goroutine async.</p>
-                  <pre><code>{`setTimeout(() => console.log("!"), 1000);`}</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>require('child_process')</h3>
-                  <p>Jalankan proses shell secara sinkron {'&'} asinkron dari JS.</p>
-                  <pre><code>child_process.execSync("ls -la");</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>require('path')</h3>
-                  <p>Utilitas manipulasi path filesystem (join, resolve, dll).</p>
-                  <pre><code>path.join("/home", "user.js");</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>Readable / Writable / Transform</h3>
-                  <p>Stream API untuk pemrosesan data pipeline bertahap.</p>
-                  <pre><code>{`new Transform(s => s.toUpperCase());`}</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>WebSocket</h3>
-                  <p>Client WebSocket untuk komunikasi data real-time.</p>
-                  <pre><code>new WebSocket("ws://localhost:8080");</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>require('fs')</h3>
-                  <p>Menyediakan operasi filesystem sinkron (readFileSync, writeFileSync).</p>
-                  <pre><code>fs.writeFileSync('log.txt', 'OK');</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>require('os')</h3>
-                  <p>Mengambil data parameter CLI dan variabel lingkungan (getenv).</p>
-                  <pre><code>const user = os.getenv('USER');</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>require('crypto')</h3>
-                  <p>Hashing kriptografik (SHA256, SHA512, MD5) dan randomBytes.</p>
-                  <pre><code>crypto.createHash("sha256").update("x").digest("hex")</code></pre>
-                </div>
-
-                <div className="api-panel">
-                  <h3>TextEncoder / TextDecoder</h3>
-                  <p>Encoding {'&'} decoding string ke/from Uint8Array format.</p>
-                  <pre><code>new TextEncoder().encode("utf-8 text");</code></pre>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'changelog' && (
-            <div className="pane-view animate-in">
-              <h2 className="pane-title">{t.changeTitle}</h2>
-              <p className="pane-subtitle">{t.changeSub}</p>
-
-              <div className="changelog-timeline">
-                <div className="timeline-segment">
-                  <div className="segment-hdr">
-                    <span className="ver">v4.0.0</span>
-                    <span className="date">12 September 2026</span>
-                    <span className="led green active"></span>
-                  </div>
-                  <p>{t.change5}</p>
-                </div>
-
-                <div className="timeline-segment">
-                  <div className="segment-hdr">
-                    <span className="ver">v3.1.0</span>
-                    <span className="date">13 Juli 2026</span>
-                    <span className="led"></span>
-                  </div>
-                  <p>{t.change4}</p>
-                </div>
-
-                <div className="timeline-segment">
-                  <div className="segment-hdr">
-                    <span className="ver">v2.1.0</span>
-                    <span className="date">11 Juli 2026</span>
-                  </div>
-                  <p>{t.change2}</p>
-                </div>
-
-                <div className="timeline-segment">
-                  <div className="segment-hdr">
-                    <span className="ver">v2.0.0</span>
-                    <span className="date">1 Juli 2026</span>
-                  </div>
-                  <p>{t.change1}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        </section>
       </main>
 
-      <footer className="portal-footer">
-        <p>{t.footer}</p>
-        <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', gap: '16px' }}>
-          <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>GitHub Repository</a>
-          <a href="https://github.com/ihsannyy/kilat/issues" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>Report Bugs</a>
-          <a href="https://github.com/ihsannyy/kilat/blob/main/LICENSE" target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'var(--transition)' }} onMouseOver={(e) => (e.currentTarget.style.color = '#fff')} onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}>MIT License</a>
+      <footer className="footer">
+        <div className="footer-inner">
+          <span className="footer-text">MIT License © 2026 Kilat</span>
+          <div className="footer-links">
+            <a href="https://github.com/ihsannyy/kilat" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="https://github.com/ihsannyy/kilat/issues" target="_blank" rel="noreferrer">Issues</a>
+            <a href="https://github.com/ihsannyy/kilat/blob/main/LICENSE" target="_blank" rel="noreferrer">License</a>
+          </div>
         </div>
       </footer>
     </div>
