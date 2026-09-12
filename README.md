@@ -211,6 +211,6 @@ MIT License © 2026 [ihsannyy](https://github.com/ihsannyy)
 
 <div align="center">
 
-**Dibuat di Termux pake Go**
+MIT License © 2026 [ihsannyy](https://github.com/ihsannyy)
 
 </div>
