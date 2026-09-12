@@ -38,6 +38,8 @@ const dict = {
     compilerDesc: 'Dukungan instan untuk berkas .ts, .tsx, dan .jsx via esbuild memori tanpa transpiler eksternal.',
     cacheTitle: 'Bebas node_modules',
     cacheDesc: 'Dependency dipetakan langsung ke cache global tunggal untuk menghemat penyimpanan disk internal HP.',
+    newApiTitle: 'Built-in Modules Baru',
+    newApiDesc: 'Timers, Buffer, Path, Child Process, Streams, dan WebSocket client terintegrasi langsung ke runtime.',
     
     codeTitle: 'Cuplikan Kode & Contoh',
     codeSub: 'Pelajari cara menulis skrip, server, dan script otomasi shell di runtime Kilat.',
@@ -56,6 +58,8 @@ const dict = {
     arch2Desc: 'Ketika pengguna mengeksekusi berkas TypeScript, Kilat tidak menulis ulang file JavaScript sementara ke dalam penyimpanan disk HP (yang lambat dan mengurangi masa pakai memori flash). Biner esbuild internal diintegrasikan secara statis untuk melakukan kompilasi baris TypeScript menjadi string kode JavaScript langsung di dalam memori RAM sesaat sebelum diumpankan ke Goja VM.',
     arch3Title: '3. Asynchronous Event-Loop via Go Channels',
     arch3Desc: 'Untuk mendukung operasi I/O non-blocking (seperti fetch asinkron dan modul $ shell executor), Kilat mengimplementasikan event-loop asinkron menggunakan mekanisme internal Go channel dan goroutine. Setiap kali operasi asinkron dipicu dari JavaScript, Goja VM akan mendelegasikan tugas tersebut ke goroutine latar belakang dan mengembalikan Promise ke thread utama. Setelah goroutine menyelesaikan tugasnya, hasilnya akan dikirim kembali melalui Go channel ke event-loop untuk menyelesaikan status Promise.',
+    arch4Title: '4. Built-in Modules via Go-JS Bridge',
+    arch4Desc: 'Kilat v4.0.0 mengintegrasikan 6 modul native baru langsung ke dalam binary: Timers, Buffer, Path, Child Process, Streams, dan WebSocket Client. Setiap modul ditulis dalam Go dan di-bridge ke JavaScript menggunakan API Goja, sehingga eksekusi berlangsung di level native tanpa overhead interpretasi JavaScript. Timer menggunakan goroutine independen dengan done-channel untuk mencegah deadlock pada event-loop.',
     
     personalTitle: 'Kenapa Kilat Dibuat?',
     personalDesc: 'Kilat dibuat oleh cilldev karena keresahan pribadi saat mengembangkan script otomasi dan bot di HP Android menggunakan Termux. Node.js terlalu memakan penyimpanan internal HP dengan folder node_modules yang duplikat di setiap proyek, serta memakan RAM yang cukup besar saat dijalankan di perangkat berspesifikasi rendah. Kilat lahir sebagai solusi: minimalis, bertenaga Go, memuat dalam 2ms, dan menghemat memori internal dengan caching dependency global.',
@@ -77,6 +81,7 @@ const dict = {
     apiSub: 'Daftar global API dan core module built-in bawaan Kilat.',
     changeTitle: 'Release Changelog',
     changeSub: 'Riwayat pembaruan biner statis Kilat.',
+    change5: 'Rilis major ini memperkenalkan **6 built-in modules baru**: **Timers** (`setTimeout`/`setInterval`), **Buffer** (encoding/decoding data biner), **Path** (utilitas path filesystem), **Child Process** (`execSync`/`exec`/`spawn`), **Streams** (`Readable`/`Writable`/`Transform`), dan **WebSocket Client** untuk komunikasi real-time. Ditambahkan juga **TextEncoder**/**TextDecoder**, **`process`** object (cwd/pid/exit), **`atob`/`btoa`**, **`queueMicrotask`**, dan **`setImmediate`**. Event loop ditingkatkan dengan mekanisme wakeup via done channel untuk mencegah deadlock.',
     change4: 'Rilis ini memperkenalkan perintah **`kilat remove <package>`** untuk menghapus dependency secara lokal, dan **`kilat build <in> <out>`** untuk membundel serta meminifikasi berkas JS/TS untuk produksi. Ditambahkan juga **fallback DNS resolver** baru untuk memecahkan masalah koneksi internet di lingkungan Termux Android, serta peningkatan sistem resolusi modul NPM untuk membaca properti `"main"` berkas `package.json`.',
     change3: 'Rilis major ini memperkenalkan **Global Shell Command Execution ($)**. Dukungan asinkron penuh menggunakan goroutine untuk mengeksekusi biner eksternal dan CLI utilitas di Termux / Linux.',
     change2: 'Rilis minor ini memperkenalkan **Global Fetch API (fetch)** yang terintegrasi secara asinkron dengan event-loop untuk pemanggilan API dan transfer data HTTP.',
@@ -114,6 +119,8 @@ const dict = {
     compilerDesc: 'Instant support for .ts, .tsx, and .jsx files via in-memory esbuild without external transpilers.',
     cacheTitle: 'Zero node_modules',
     cacheDesc: 'Dependencies mapped directly to a global cache, saving internal storage on mobile devices.',
+    newApiTitle: 'New Built-in Modules',
+    newApiDesc: 'Timers, Buffer, Path, Child Process, Streams, and WebSocket client integrated directly into the runtime.',
     
     codeTitle: 'Code Snippets & Examples',
     codeSub: 'Learn how to write scripts, servers, and shell automation scripts in the Kilat runtime.',
@@ -132,6 +139,8 @@ const dict = {
     arch2Desc: 'When executing TypeScript files, Kilat does not write temporary JavaScript files to slow internal flash storage. An embedded esbuild compiler transpiles TypeScript source code to JS strings directly in RAM just before evaluation.',
     arch3Title: '3. Asynchronous Event-Loop via Go Channels',
     arch3Desc: 'To support non-blocking I/O operations (like async fetch and shell executing), Kilat implements an async event-loop using internal Go channels and goroutines. When an async task starts in JS, the Goja VM delegates it to a background goroutine and returns a Promise. Upon completion, the result is piped back through a Go channel to resolve the Promise.',
+    arch4Title: '4. Built-in Modules via Go-JS Bridge',
+    arch4Desc: 'Kilat v4.0.0 integrates 6 new native modules directly into the binary: Timers, Buffer, Path, Child Process, Streams, and WebSocket Client. Each module is written in Go and bridged to JavaScript using the Goja API, enabling native-level execution without JavaScript interpretation overhead. Timers use independent goroutines with done-channel wakeup mechanism to prevent event-loop deadlocks.',
     
     personalTitle: 'Why was Kilat Created?',
     personalDesc: 'Kilat was created by cilldev out of personal frustration when developing automation scripts and bots on Android devices using Termux. Node.js consumes too much internal phone storage with duplicate node_modules folders in every project, and demands high memory on low-spec devices. Kilat was born as a solution: minimalist, Go-powered, booting in 2ms, and preserving phone storage through global dependency caching.',
@@ -153,6 +162,7 @@ const dict = {
     apiSub: 'List of built-in global APIs and core modules available in Kilat.',
     changeTitle: 'Release Changelog',
     changeSub: 'Version release logs of the static Kilat binary.',
+    change5: 'This major release introduces **6 new built-in modules**: **Timers** (`setTimeout`/`setInterval`), **Buffer** (binary data encoding/decoding), **Path** (filesystem path utilities), **Child Process** (`execSync`/`exec`/`spawn`), **Streams** (`Readable`/`Writable`/`Transform`), and **WebSocket Client** for real-time communication. Also added **TextEncoder**/**TextDecoder**, **`process`** object (cwd/pid/exit), **`atob`/`btoa`**, **`queueMicrotask`**, and **`setImmediate`**. Event loop upgraded with done-channel wakeup mechanism to prevent deadlocks.',
     change4: 'This release introduces the **`kilat remove <package>`** command to uninstall dependencies locally, and **`kilat build <in> <out>`** to bundle and minify JS/TS scripts for production. Adds a new **fallback DNS resolver** to bypass network connection failures in Android/Termux environments, and enhances NPM module resolution by supporting `package.json` `"main"` property loading.',
     change3: 'This major release introduces **Global Shell Command Execution ($)**. Full async support using Go goroutines to run external binaries and CLI utilities on Termux / Linux.',
     change2: 'This minor release introduces the **Global Fetch API (fetch)**, asynchronously integrated with the event-loop for HTTP API requests.',
@@ -568,7 +578,7 @@ export default function App() {
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
             </svg>
             <span className="name">kilat</span>
-            <span className="badge">v3.1.0</span>
+            <span className="badge">v4.0.0</span>
           </div>
 
           <nav className="navbar-links desktop-only">
@@ -733,6 +743,12 @@ export default function App() {
                   <h3>{t.cacheTitle}</h3>
                   <p>{t.cacheDesc}</p>
                 </div>
+
+                <div className="glass-card">
+                  <div className="card-badge">v4.0 MODULES</div>
+                  <h3>{t.newApiTitle}</h3>
+                  <p>{t.newApiDesc}</p>
+                </div>
               </section>
             </div>
           )}
@@ -750,8 +766,8 @@ export default function App() {
                       <span className="dot yellow"></span>
                       <span className="dot green"></span>
                     </div>
-                    <span className="editor-file">index.js</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c1', 'console.log("Kilat runtime is active!");')}>
+                    <span className="editor-file">buffers.js</span>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c1', `const buf = Buffer.from("Hello Kilat!");\nconsole.log(buf.toString());\nconsole.log("hex:", buf.toString("hex"));\nconsole.log("base64:", buf.toString("base64"));`)}>
                       {copiedMap['c1'] ? 'COPIED' : (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -765,9 +781,12 @@ export default function App() {
                   </div>
                   <div className="vscode-body">
                     <div className="editor-nums">
-                      <span>1</span><span>2</span>
+                      <span>1</span><span>2</span><span>3</span><span>4</span>
                     </div>
-                    <pre><code>{`console.log("Kilat runtime is active!");`}</code></pre>
+                    <pre><code>{`const buf = Buffer.from("Hello Kilat!");
+console.log(buf.toString());
+console.log("hex:", buf.toString("hex"));
+console.log("base64:", buf.toString("base64"));`}</code></pre>
                   </div>
                   <p className="editor-label-desc">{t.codeSample1Desc}</p>
                 </div>
@@ -779,13 +798,8 @@ export default function App() {
                       <span className="dot yellow"></span>
                       <span className="dot green"></span>
                     </div>
-                    <span className="editor-file">server.ts</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c2', `Bun.serve({
-  port: 8080,
-  fetch(req) {
-    return new Response("Hello from Kilat!");
-  }
-});`)}>
+                    <span className="editor-file">timers.js</span>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c2', `let count = 0;\nconst id = setInterval(() => {\n  count++;\n  console.log("tick", count);\n  if (count >= 5) clearInterval(id);\n}, 1000);`)}>
                       {copiedMap['c2'] ? 'COPIED' : (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -801,12 +815,12 @@ export default function App() {
                     <div className="editor-nums">
                       <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
                     </div>
-                    <pre><code>{`Bun.serve({
-  port: 8080,
-  fetch(req) {
-    return new Response("Hello from Kilat!");
-  }
-});`}</code></pre>
+                    <pre><code>{`let count = 0;
+const id = setInterval(() => {
+  count++;
+  console.log("tick", count);
+  if (count >= 5) clearInterval(id);
+}, 1000);`}</code></pre>
                   </div>
                   <p className="editor-label-desc">{t.codeSample2Desc}</p>
                 </div>
@@ -819,7 +833,7 @@ export default function App() {
                       <span className="dot green"></span>
                     </div>
                     <span className="editor-file">exec.js</span>
-                    <button className="copy-bezel-btn" onClick={() => handleCopy('c3', `const out = await $\`free -h\`;\nconsole.log(out);`)}>
+                    <button className="copy-bezel-btn" onClick={() => handleCopy('c3', `const result = child_process.execSync("uname -a");\nconsole.log(result.stdout);`)}>
                       {copiedMap['c3'] ? 'COPIED' : (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -835,8 +849,8 @@ export default function App() {
                     <div className="editor-nums">
                       <span>1</span><span>2</span>
                     </div>
-                    <pre><code>{`const out = await $\`free -h\`;
-console.log(out);`}</code></pre>
+                    <pre><code>{`const result = child_process.execSync("uname -a");
+console.log(result.stdout);`}</code></pre>
                   </div>
                   <p className="editor-label-desc">{t.codeSample3Desc}</p>
                 </div>
@@ -862,6 +876,11 @@ console.log(out);`}</code></pre>
               <div className="glass-panel">
                 <h3>{t.arch3Title}</h3>
                 <p>{t.arch3Desc}</p>
+              </div>
+
+              <div className="glass-panel">
+                <h3>{t.arch4Title}</h3>
+                <p>{t.arch4Desc}</p>
               </div>
 
               <h2 className="pane-title" style={{ marginTop: '48px' }}>{t.personalTitle}</h2>
@@ -965,6 +984,42 @@ console.log(out);`}</code></pre>
                 </div>
 
                 <div className="api-panel">
+                  <h3>Buffer</h3>
+                  <p>Encoding & decoding data biner (hex, base64, utf8).</p>
+                  <pre><code>Buffer.from("hello").toString("hex")</code></pre>
+                </div>
+
+                <div className="api-panel">
+                  <h3>setTimeout / setInterval</h3>
+                  <p>Timer API dengan integrasi event-loop goroutine async.</p>
+                  <pre><code>setTimeout(() => console.log("!"), 1000);</code></pre>
+                </div>
+
+                <div className="api-panel">
+                  <h3>require('child_process')</h3>
+                  <p>Jalankan proses shell secara sinkron & asinkron dari JS.</p>
+                  <pre><code>child_process.execSync("ls -la");</code></pre>
+                </div>
+
+                <div className="api-panel">
+                  <h3>require('path')</h3>
+                  <p>Utilitas manipulasi path filesystem (join, resolve, dll).</p>
+                  <pre><code>path.join("/home", "user.js");</code></pre>
+                </div>
+
+                <div className="api-panel">
+                  <h3>Readable / Writable / Transform</h3>
+                  <p>Stream API untuk pemrosesan data pipeline bertahap.</p>
+                  <pre><code>new Transform(s => s.toUpperCase());</code></pre>
+                </div>
+
+                <div className="api-panel">
+                  <h3>WebSocket</h3>
+                  <p>Client WebSocket untuk komunikasi data real-time.</p>
+                  <pre><code>new WebSocket("ws://localhost:8080");</code></pre>
+                </div>
+
+                <div className="api-panel">
                   <h3>require('fs')</h3>
                   <p>Menyediakan operasi filesystem sinkron (readFileSync, writeFileSync).</p>
                   <pre><code>fs.writeFileSync('log.txt', 'OK');</code></pre>
@@ -974,6 +1029,18 @@ console.log(out);`}</code></pre>
                   <h3>require('os')</h3>
                   <p>Mengambil data parameter CLI dan variabel lingkungan (getenv).</p>
                   <pre><code>const user = os.getenv('USER');</code></pre>
+                </div>
+
+                <div className="api-panel">
+                  <h3>require('crypto')</h3>
+                  <p>Hashing kriptografik (SHA256, SHA512, MD5) dan randomBytes.</p>
+                  <pre><code>crypto.createHash("sha256").update("x").digest("hex")</code></pre>
+                </div>
+
+                <div className="api-panel">
+                  <h3>TextEncoder / TextDecoder</h3>
+                  <p>Encoding & decoding string ke/from Uint8Array format.</p>
+                  <pre><code>new TextEncoder().encode("utf-8 text");</code></pre>
                 </div>
               </div>
             </div>
@@ -987,20 +1054,20 @@ console.log(out);`}</code></pre>
               <div className="changelog-timeline">
                 <div className="timeline-segment">
                   <div className="segment-hdr">
-                    <span className="ver">v3.1.0</span>
-                    <span className="date">13 Juli 2026</span>
+                    <span className="ver">v4.0.0</span>
+                    <span className="date">12 September 2026</span>
                     <span className="led green active"></span>
                   </div>
-                  <p>{t.change4}</p>
+                  <p>{t.change5}</p>
                 </div>
 
                 <div className="timeline-segment">
                   <div className="segment-hdr">
-                    <span className="ver">v3.0.0</span>
-                    <span className="date">11 Juli 2026</span>
+                    <span className="ver">v3.1.0</span>
+                    <span className="date">13 Juli 2026</span>
                     <span className="led"></span>
                   </div>
-                  <p>{t.change3}</p>
+                  <p>{t.change4}</p>
                 </div>
 
                 <div className="timeline-segment">

@@ -19,11 +19,14 @@ type Runtime struct {
 	jobs        chan func()
 	hasServer   bool
 	activeTasks int32
+	done        chan struct{}
 }
 
 type moduleRecord struct {
 	exports goja.Value
 }
+
+var builtInModules = []string{"os", "fs", "net", "console", "bun", "crypto", "path", "child_process"}
 
 func New(opts Options) *Runtime {
 	vm := goja.New()
@@ -32,35 +35,87 @@ func New(opts Options) *Runtime {
 		vm:    vm,
 		cache: make(map[string]*moduleRecord),
 		jobs:  make(chan func(), 1024),
+		done:  make(chan struct{}),
+	}
+
+	queueJob := func(job func()) {
+		r.jobs <- job
+	}
+	incrementTasks := func() {
+		atomic.AddInt32(&r.activeTasks, 1)
+	}
+	decrementTasks := func() {
+		if atomic.AddInt32(&r.activeTasks, -1) <= 0 {
+			select {
+			case r.done <- struct{}{}:
+			default:
+			}
+		}
 	}
 
 	modules.RegisterConsole(vm)
 	modules.RegisterFS(vm)
 	modules.RegisterCrypto(vm)
-	modules.RegisterNet(vm, func(job func()) {
-		r.jobs <- job
-	}, func() {
-		atomic.AddInt32(&r.activeTasks, 1)
-	}, func() {
-		atomic.AddInt32(&r.activeTasks, -1)
-	})
-	modules.RegisterOS(vm, func(job func()) {
-		r.jobs <- job
-	}, func() {
-		atomic.AddInt32(&r.activeTasks, 1)
-	}, func() {
-		atomic.AddInt32(&r.activeTasks, -1)
-	})
-	modules.RegisterBun(vm, func(job func()) {
-		r.jobs <- job
-	}, func(hasServer bool) {
+	modules.RegisterPath(vm)
+	modules.RegisterBuffer(vm)
+	modules.RegisterTimers(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterNet(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterOS(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterBun(vm, queueJob, func(hasServer bool) {
 		r.hasServer = hasServer
 	})
+	modules.RegisterChildProcess(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterStreams(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterWebSocket(vm, queueJob, incrementTasks, decrementTasks)
 
 	bootstrapJS := `
 		globalThis.process = {
 			env: {
 				NODE_ENV: 'development'
+			},
+			cwd: function() { return os.cwd(); },
+			argv: os.args(),
+			pid: Math.floor(Math.random() * 100000),
+			exit: function(code) { os.exit(code || 0); },
+			uptime: function() { return Date.now() / 1000; },
+			platform: os.platform(),
+			arch: os.arch(),
+			version: 'v' + os.platform() + '/v4.0.0',
+		 Versions: function() { return { node: '4.0.0' }; },
+			nextTick: function(fn) {
+				setTimeout(fn, 0);
+			}
+		};
+
+		globalThis.TextEncoder = class TextEncoder {
+			constructor() {
+				this.encoding = 'utf-8';
+			}
+			encode(str) {
+				if (typeof str === 'undefined') str = '';
+				return __bufferFrom(String(str));
+			}
+			encodeInto(str, dest) {
+				var buf = this.encode(str);
+				var n = buf.length < dest.length ? buf.length : dest.length;
+				for (var i = 0; i < n; i++) {
+					dest[i] = buf[i];
+				}
+				return { read: n, written: n };
+			}
+		};
+
+		globalThis.TextDecoder = class TextDecoder {
+			constructor(label) {
+				this.encoding = (label || 'utf-8').toLowerCase();
+			}
+			decode(input) {
+				if (!input) return '';
+				if (typeof input === 'string') return input;
+				if (input.toString && typeof input.toString === 'function') {
+					return input.toString(this.encoding === 'hex' ? 'hex' : this.encoding === 'base64' ? 'base64' : 'utf8');
+				}
+				return String(input);
 			}
 		};
 
@@ -83,9 +138,32 @@ func New(opts Options) *Runtime {
 			set(name, value) {
 				this._headers[name.toLowerCase()] = String(value);
 			}
+			has(name) {
+				return name.toLowerCase() in this._headers;
+			}
+			delete(name) {
+				delete this._headers[name.toLowerCase()];
+			}
 			forEach(callback) {
 				for (const [key, val] of Object.entries(this._headers)) {
 					callback(val, key);
+				}
+			}
+			keys() {
+				return Object.keys(this._headers);
+			}
+			values() {
+				return Object.values(this._headers);
+			}
+			entries() {
+				return Object.entries(this._headers);
+			}
+			append(name, value) {
+				const key = name.toLowerCase();
+				if (this._headers[key]) {
+					this._headers[key] += ', ' + String(value);
+				} else {
+					this._headers[key] = String(value);
 				}
 			}
 		}
@@ -96,12 +174,26 @@ func New(opts Options) *Runtime {
 				this.method = options.method || 'GET';
 				this.headers = new Headers(options.headers);
 				this._body = options.body || '';
+				this.bodyUsed = false;
 			}
 			async text() {
+				this.bodyUsed = true;
 				return this._body;
 			}
 			async json() {
+				this.bodyUsed = true;
 				return JSON.parse(this._body);
+			}
+			async arrayBuffer() {
+				this.bodyUsed = true;
+				return this._body;
+			}
+			clone() {
+				return new Request(this.url, {
+					method: this.method,
+					headers: this.headers,
+					body: this._body
+				});
 			}
 		}
 
@@ -109,13 +201,31 @@ func New(opts Options) *Runtime {
 			constructor(body, options = {}) {
 				this._body = body === null || body === undefined ? '' : String(body);
 				this.status = options.status || 200;
+				this.statusText = options.statusText || 'OK';
 				this.headers = new Headers(options.headers);
+				this.ok = this.status >= 200 && this.status < 300;
+				this.bodyUsed = false;
+				this.type = 'basic';
+				this.url = '';
 			}
 			async text() {
+				this.bodyUsed = true;
 				return this._body;
 			}
 			async json() {
+				this.bodyUsed = true;
 				return JSON.parse(this._body);
+			}
+			async arrayBuffer() {
+				this.bodyUsed = true;
+				return this._body;
+			}
+			clone() {
+				return new Response(this._body, {
+					status: this.status,
+					statusText: this.statusText,
+					headers: this.headers
+				});
 			}
 		}
 
@@ -149,6 +259,33 @@ func New(opts Options) *Runtime {
 			}
 			has(name) {
 				return name in this._params;
+			}
+			delete(name) {
+				delete this._params[name];
+			}
+			append(name, value) {
+				if (this._params[name]) {
+					this._params[name] += ',' + String(value);
+				} else {
+					this._params[name] = String(value);
+				}
+			}
+			getAll(name) {
+				return this._params[name] ? [this._params[name]] : [];
+			}
+			keys() {
+				return Object.keys(this._params);
+			}
+			values() {
+				return Object.values(this._params);
+			}
+			entries() {
+				return Object.entries(this._params);
+			}
+			forEach(callback) {
+				for (const [k, v] of Object.entries(this._params)) {
+					callback(v, k);
+				}
 			}
 			toString() {
 				const parts = [];
@@ -242,9 +379,15 @@ func New(opts Options) *Runtime {
 				const method = options.method || 'GET';
 				const headers = {};
 				if (options.headers) {
-					new Headers(options.headers).forEach((value, key) => {
-						headers[key] = value;
-					});
+					if (options.headers instanceof Headers) {
+						options.headers.forEach((value, key) => {
+							headers[key] = value;
+						});
+					} else {
+						for (const [key, val] of Object.entries(options.headers)) {
+							headers[key] = String(val);
+						}
+					}
 				}
 				const body = options.body || '';
 
@@ -289,6 +432,20 @@ func New(opts Options) *Runtime {
 				});
 			});
 		};
+
+		globalThis.setImmediate = globalThis.setImmediate || function(fn) { return setTimeout(fn, 0); };
+		globalThis.clearImmediate = globalThis.clearImmediate || function(id) { clearTimeout(id); };
+
+		globalThis.atob = function(str) {
+			return __bufferFromBase64(str).toString('utf8');
+		};
+		globalThis.btoa = function(str) {
+			return __bufferFrom(str).toString('base64');
+		};
+
+		globalThis.queueMicrotask = function(fn) {
+			Promise.resolve().then(fn);
+		};
 	`
 	_, err := vm.RunString(bootstrapJS)
 	if err != nil {
@@ -316,14 +473,12 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		return record.exports, nil
 	}
 
-	// Create placeholder in cache to handle circular require()
 	moduleObj := r.vm.NewObject()
 	exportsObj := r.vm.NewObject()
 	moduleObj.Set("exports", exportsObj)
 	record := &moduleRecord{exports: exportsObj}
 	r.cache[absolutePath] = record
 
-	// Parse JSON files directly without wrapping
 	if filepath.Ext(absolutePath) == ".json" {
 		jsonData, err := ioutil.ReadFile(absolutePath)
 		if err != nil {
@@ -378,8 +533,10 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		}
 		moduleName := call.Arguments[0].String()
 
-		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" || moduleName == "crypto" {
-			return r.vm.GlobalObject().Get(moduleName)
+		for _, builtIn := range builtInModules {
+			if moduleName == builtIn {
+				return r.vm.GlobalObject().Get(moduleName)
+			}
 		}
 
 		resolved, err := resolvePath(currentDir, moduleName)
@@ -410,7 +567,6 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		return nil, fmt.Errorf("failed to compile module function")
 	}
 
-	// Call the wrapped CommonJS function
 	_, err = wrapperFn(goja.Undefined(),
 		exportsObj,
 		r.vm.ToValue(requireFunc),
@@ -422,7 +578,6 @@ func (r *Runtime) loadModule(absolutePath string) (goja.Value, error) {
 		return nil, err
 	}
 
-	// Fetch final module.exports value (in case the module overwrote module.exports)
 	finalExports := moduleObj.Get("exports")
 	record.exports = finalExports
 
@@ -533,8 +688,10 @@ func (r *Runtime) SetGlobalRequire(currentDir string) {
 		}
 		moduleName := call.Arguments[0].String()
 
-		if moduleName == "os" || moduleName == "fs" || moduleName == "net" || moduleName == "console" || moduleName == "bun" || moduleName == "crypto" {
-			return r.vm.GlobalObject().Get(moduleName)
+		for _, builtIn := range builtInModules {
+			if moduleName == builtIn {
+				return r.vm.GlobalObject().Get(moduleName)
+			}
 		}
 
 		resolved, err := resolvePath(currentDir, moduleName)
@@ -560,22 +717,20 @@ func (r *Runtime) SetHasServer(val bool) {
 
 func (r *Runtime) RunEventLoop() {
 	for {
-		select {
-		case job, ok := <-r.jobs:
-			if !ok {
-				return
-			}
-			job()
-		default:
-			if r.hasServer || atomic.LoadInt32(&r.activeTasks) > 0 {
-				job, ok := <-r.jobs
+		if r.hasServer || atomic.LoadInt32(&r.activeTasks) > 0 {
+			select {
+			case job, ok := <-r.jobs:
 				if !ok {
 					return
 				}
 				job()
-			} else {
-				return
+			case <-r.done:
+				if !r.hasServer && atomic.LoadInt32(&r.activeTasks) <= 0 {
+					return
+				}
 			}
+		} else {
+			return
 		}
 	}
 }
