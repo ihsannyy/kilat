@@ -11,6 +11,7 @@ import (
 	"kilat/internal/utils"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -103,6 +104,8 @@ func main() {
 		color.Magenta("✨ Berkas berhasil di-build ke %s", output)
 	case "repl":
 		repl.Start()
+	case "info":
+		printInfo()
 	case "init":
 		autoYes := false
 		if len(os.Args) >= 3 && (os.Args[2] == "-y" || os.Args[2] == "--yes") {
@@ -186,6 +189,37 @@ func getMaxModTime() time.Time {
 	return maxTime
 }
 
+func printInfo() {
+	cyan := color.New(color.FgCyan, color.Bold)
+	green := color.New(color.FgGreen)
+
+	cyan.Println("🚀 Kilat Runtime Info")
+	fmt.Println()
+
+	fmt.Print("  Version    ")
+	green.Println(utils.Version)
+
+	fmt.Print("  Go         ")
+	green.Println("1.25.0")
+
+	fmt.Print("  Platform   ")
+	green.Println(runtime.GOOS)
+
+	fmt.Print("  Arch       ")
+	green.Println(runtime.GOARCH)
+
+	fmt.Println()
+	cyan.Println("  Built-in Modules:")
+
+	modules := []string{
+		"fs", "os", "path", "crypto", "child_process",
+		"buffer", "stream", "timers", "websocket",
+	}
+	for _, m := range modules {
+		fmt.Printf("    %s\n", m)
+	}
+}
+
 func printHelp() {
 	cyan := color.New(color.FgCyan, color.Bold)
 	cyan.Printf("🚀 Kilat v%s\n", utils.Version)
@@ -198,6 +232,7 @@ func printHelp() {
 	fmt.Println("  remove    Hapus package")
 	fmt.Println("  build     Bundle & minify")
 	fmt.Println("  repl      REPL interaktif")
+	fmt.Println("  info      Tampilkan info runtime")
 	fmt.Println()
 	color.New(color.FgWhite).Println("Flags:")
 	fmt.Println("  --version    Versi Kilat")
