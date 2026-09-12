@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/fatih/color"
+	"kilat/internal/createcmd"
 	"kilat/internal/engine"
 	"kilat/internal/initcmd"
 	"kilat/internal/pkgmanager"
@@ -106,6 +107,11 @@ func main() {
 		repl.Start()
 	case "info":
 		printInfo()
+	case "create":
+		if err := createcmd.RunCreate(os.Args[2:]); err != nil {
+			color.Red("❌ Gagal create: %v", err)
+			os.Exit(1)
+		}
 	case "init":
 		autoYes := false
 		if len(os.Args) >= 3 && (os.Args[2] == "-y" || os.Args[2] == "--yes") {
@@ -226,6 +232,7 @@ func printHelp() {
 	fmt.Println()
 	color.New(color.FgWhite).Println("Commands:")
 	fmt.Println("  init      Inisialisasi proyek")
+	fmt.Println("  create    Buat project baru dari template")
 	fmt.Println("  run       Jalankan file JS/TS")
 	fmt.Println("  start     Jalankan script start")
 	fmt.Println("  add       Install package npm")
