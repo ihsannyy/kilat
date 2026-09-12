@@ -319,11 +319,7 @@ export default function App() {
 
   return (
     <div className="weather-runtime-portal">
-      <div className="aurora-backdrop">
-        <div className="aurora-orb aurora-orb-1"></div>
-        <div className="aurora-orb aurora-orb-2"></div>
-        <div className="aurora-orb aurora-orb-3"></div>
-      </div>
+      <div className="grain-backdrop"></div>
 
       <header className="glass-navbar">
         <div className="navbar-inner">
