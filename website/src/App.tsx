@@ -992,7 +992,7 @@ console.log(result.stdout);`}</code></pre>
                 <div className="api-panel">
                   <h3>setTimeout / setInterval</h3>
                   <p>Timer API dengan integrasi event-loop goroutine async.</p>
-                  <pre><code>setTimeout(() => console.log("!"), 1000);</code></pre>
+                  <pre><code>{`setTimeout(() => console.log("!"), 1000);`}</code></pre>
                 </div>
 
                 <div className="api-panel">
@@ -1010,7 +1010,7 @@ console.log(result.stdout);`}</code></pre>
                 <div className="api-panel">
                   <h3>Readable / Writable / Transform</h3>
                   <p>Stream API untuk pemrosesan data pipeline bertahap.</p>
-                  <pre><code>new Transform(s => s.toUpperCase());</code></pre>
+                  <pre><code>{`new Transform(s => s.toUpperCase());`}</code></pre>
                 </div>
 
                 <div className="api-panel">
