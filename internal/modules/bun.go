@@ -44,7 +44,7 @@ func RegisterBun(vm *goja.Runtime, queueJob func(func()), setHasServer func(bool
 			panic(vm.ToValue("options.fetch must be a function"))
 		}
 
-		listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
+		listener, err := net.Listen("tcp", net.JoinHostPort(hostname, fmt.Sprintf("%d", port)))
 		if err != nil {
 			panic(vm.NewGoError(err))
 		}

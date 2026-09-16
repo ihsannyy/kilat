@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"kilat/internal/utils"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -171,7 +172,7 @@ func RegisterHTTP(vm *goja.Runtime, queueJob func(func()), incrementTasks func()
 			})
 
 			server = &http.Server{
-				Addr:    fmt.Sprintf("%s:%d", host, port),
+				Addr:    net.JoinHostPort(host, fmt.Sprintf("%d", port)),
 				Handler: mux,
 			}
 

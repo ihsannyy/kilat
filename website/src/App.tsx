@@ -2,11 +2,18 @@ import { useState } from 'react'
 
 const versions = [
   {
+    num: 'v4.2.0',
+    date: '12 Sep 2026',
+    title: 'Node.js HTTP Compatibility Modules',
+    desc: 'Added events (EventEmitter), http (createServer, request, get), net TCP (createConnection, createServer), querystring, and util (promisify, inspect, format) modules.',
+    latest: true,
+  },
+  {
     num: 'v4.1.0',
     date: '12 Sep 2026',
     title: 'Template System & CLI Improvements',
     desc: 'Added kilat create with 5 templates (vanilla, react, hono, vite, api). New Kilat.serve() API. kilat info command. Humanized documentation.',
-    latest: true,
+    latest: false,
   },
   {
     num: 'v4.0.0',
@@ -119,7 +126,7 @@ export default function App() {
         <section className="hero">
           <div className="hero-badge">
             <span className="dot"></span>
-            v4.1.0 — Latest Release
+            v4.2.0 — Latest Release
           </div>
           <h1>kilat</h1>
           <p>JavaScript runtime untuk Termux & Linux. Ringan, cepat, tanpa node_modules.</p>

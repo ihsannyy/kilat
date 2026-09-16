@@ -54,7 +54,7 @@ func RegisterNetTCP(vm *goja.Runtime, queueJob func(func()), incrementTasks func
 
 			go func() {
 				var err error
-				conn, err = net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
+				conn, err = net.Dial("tcp", net.JoinHostPort(host, fmt.Sprintf("%d", port)))
 				if err != nil {
 					queueJob(func() {
 						defer decrementTasks()
@@ -239,7 +239,7 @@ func RegisterNetTCP(vm *goja.Runtime, queueJob func(func()), incrementTasks func
 			}
 
 			var err error
-			listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+			listener, err = net.Listen("tcp", net.JoinHostPort(host, fmt.Sprintf("%d", port)))
 			if err != nil {
 				panic(vm.NewGoError(err))
 			}
