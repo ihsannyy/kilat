@@ -26,7 +26,7 @@ type moduleRecord struct {
 	exports goja.Value
 }
 
-var builtInModules = []string{"os", "fs", "net", "console", "bun", "crypto", "path", "child_process", "buffer", "stream", "websocket", "timers"}
+var builtInModules = []string{"os", "fs", "net", "http", "console", "bun", "crypto", "path", "child_process", "buffer", "stream", "websocket", "timers", "events", "querystring", "util"}
 
 func New(opts Options) *Runtime {
 	vm := goja.New()
@@ -60,6 +60,7 @@ func New(opts Options) *Runtime {
 	modules.RegisterBuffer(vm)
 	modules.RegisterTimers(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterNet(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterNetTCP(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterOS(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterBun(vm, queueJob, func(hasServer bool) {
 		r.hasServer = hasServer
@@ -67,6 +68,10 @@ func New(opts Options) *Runtime {
 	modules.RegisterChildProcess(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterStreams(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterWebSocket(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterHTTP(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterEvents(vm)
+	modules.RegisterQueryString(vm)
+	modules.RegisterUtil(vm)
 
 	bootstrapJS := `
 		globalThis.process = {
@@ -80,8 +85,8 @@ func New(opts Options) *Runtime {
 			uptime: function() { return Date.now() / 1000; },
 			platform: os.platform(),
 			arch: os.arch(),
-version: 'v' + os.platform() + '/v4.1.1',
-			 versions: function() { return { node: '4.1.1' }; },
+version: 'v' + os.platform() + '/v4.2.0',
+			 versions: function() { return { node: '4.2.0' }; },
 			nextTick: function(fn) {
 				setTimeout(fn, 0);
 			}
