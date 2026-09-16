@@ -1035,7 +1035,7 @@ export default function App() {
         </div>
 
         <div className="footer-bottom">
-          <span>MIT License © 2026 ihsannyy</span>
+          <span>MIT License © 2026</span>
         </div>
       </footer>
     </div>
