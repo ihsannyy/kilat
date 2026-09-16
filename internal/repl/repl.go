@@ -67,25 +67,21 @@ func printValue(val goja.Value, green *color.Color) {
 		return
 	}
 
-	// Check type
 	switch val.ExportType().Kind() {
-	case 0: // Goja Undefined/Null/etc can be checked or generic fallback
+	case 0:
 		if val.String() == "undefined" {
 			return
 		}
 	}
 
-	// Format output nicely based on value type
 	strVal := val.String()
 	if val.ExportType() != nil && val.ExportType().String() == "string" {
 		green.Printf("'%s'\n", strVal)
 	} else if strings.HasPrefix(strVal, "function") {
 		color.New(color.FgCyan).Println("[Function]")
 	} else if strings.HasPrefix(strVal, "[object Object]") {
-		// Try to format object as JSON if possible
 		exportVal := val.Export()
 		if exportVal != nil {
-			// Print formatted object representation
 			fmt.Printf("%+v\n", exportVal)
 		} else {
 			fmt.Println(strVal)

@@ -18,17 +18,14 @@ func BuildFile(inputPath, outputPath string) error {
 		Name: "kilat-resolver",
 		Setup: func(build api.PluginBuild) {
 			build.OnResolve(api.OnResolveOptions{Filter: ".*"}, func(args api.OnResolveArgs) (api.OnResolveResult, error) {
-				// Mark Kilat built-in modules as external
 				if args.Path == "os" || args.Path == "fs" || args.Path == "net" || args.Path == "console" || args.Path == "bun" || args.Path == "crypto" {
 					return api.OnResolveResult{Path: args.Path, External: true}, nil
 				}
 
-				// Let esbuild handle relative/absolute file imports natively
 				if strings.HasPrefix(args.Path, ".") || strings.HasPrefix(args.Path, "/") || filepath.IsAbs(args.Path) {
 					return api.OnResolveResult{}, nil
 				}
 
-				// Resolve third-party packages from .kilat/packages
 				resolved, err := resolvePath(args.ResolveDir, args.Path)
 				if err == nil {
 					return api.OnResolveResult{Path: resolved}, nil

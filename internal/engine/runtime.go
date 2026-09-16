@@ -26,7 +26,7 @@ type moduleRecord struct {
 	exports goja.Value
 }
 
-var builtInModules = []string{"os", "fs", "net", "http", "console", "bun", "crypto", "path", "child_process", "buffer", "stream", "websocket", "timers", "events", "querystring", "util"}
+var builtInModules = []string{"os", "fs", "net", "http", "https", "console", "bun", "crypto", "path", "child_process", "buffer", "stream", "websocket", "timers", "events", "querystring", "util"}
 
 func New(opts Options) *Runtime {
 	vm := goja.New()
@@ -69,6 +69,7 @@ func New(opts Options) *Runtime {
 	modules.RegisterStreams(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterWebSocket(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterHTTP(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterHTTPS(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterEvents(vm)
 	modules.RegisterQueryString(vm)
 	modules.RegisterUtil(vm)

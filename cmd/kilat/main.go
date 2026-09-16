@@ -220,6 +220,7 @@ func printInfo() {
 	modules := []string{
 		"fs", "os", "path", "crypto", "child_process",
 		"buffer", "stream", "timers", "websocket",
+		"http", "https", "net", "events", "querystring", "util",
 	}
 	for _, m := range modules {
 		fmt.Printf("    %s\n", m)

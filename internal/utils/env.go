@@ -6,12 +6,9 @@ import (
 	"strings"
 )
 
-// LoadEnv reads a .env file from the current directory, parses it,
-// and sets the environment variables.
 func LoadEnv() {
 	file, err := os.Open(".env")
 	if err != nil {
-		// Skip silently if the file doesn't exist
 		return
 	}
 	defer file.Close()
@@ -31,7 +28,6 @@ func LoadEnv() {
 		key := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
 
-		// Strip double or single quotes around value
 		if len(value) >= 2 {
 			if (strings.HasPrefix(value, "\"") && strings.HasSuffix(value, "\"")) ||
 				(strings.HasPrefix(value, "'") && strings.HasSuffix(value, "'")) {
