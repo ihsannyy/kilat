@@ -1035,8 +1035,7 @@ export default function App() {
         </div>
 
         <div className="footer-bottom">
-          <span>MIT License © 2026 Kilat Engine. Developed by ihsannyy.</span>
-          <span>Google Stitch / Enterprise Standard Documentation • v5.0.0</span>
+          <span>MIT License © 2026 ihsannyy</span>
         </div>
       </footer>
     </div>
