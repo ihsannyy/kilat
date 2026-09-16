@@ -1,96 +1,98 @@
 package modules
 
 import (
+	"sync"
+
 	"github.com/dop251/goja"
 )
 
-func RegisterEvents(vm *goja.Runtime) {
-	vm.RunString(`
-class EventEmitter {
-	constructor() {
-		this._events = {};
-		this._eventsCount = 0;
-	}
-
-	on(event, listener) {
-		if (!this._events[event]) {
-			this._events[event] = [];
-			this._eventsCount++;
-		}
-		this._events[event].push(listener);
-		return this;
-	}
-
-	addListener(event, listener) {
-		return this.on(event, listener);
-	}
-
-	once(event, listener) {
-		const wrapper = (...args) => {
-			this.removeListener(event, wrapper);
-			listener.apply(this, args);
-		};
-		wrapper._original = listener;
-		return this.on(event, wrapper);
-	}
-
-	removeListener(event, listener) {
-		if (!this._events[event]) return this;
-		const list = this._events[event];
-		for (let i = list.length - 1; i >= 0; i--) {
-			if (list[i] === listener || list[i]._original === listener) {
-				list.splice(i, 1);
-				break;
-			}
-		}
-		if (list.length === 0) {
-			delete this._events[event];
-			this._eventsCount--;
-		}
-		return this;
-	}
-
-	off(event, listener) {
-		return this.removeListener(event, listener);
-	}
-
-	removeAllListeners(event) {
-		if (event) {
-			if (this._events[event]) {
-				delete this._events[event];
-				this._eventsCount--;
-			}
-		} else {
-			this._events = {};
-			this._eventsCount = 0;
-		}
-		return this;
-	}
-
-	emit(event, ...args) {
-		if (!this._events[event]) return false;
-		const list = this._events[event].slice();
-		for (const listener of list) {
-			listener.apply(this, args);
-		}
-		return true;
-	}
-
-	listenerCount(event) {
-		if (!this._events[event]) return 0;
-		return this._events[event].length;
-	}
-
-	listeners(event) {
-		if (!this._events[event]) return [];
-		return this._events[event].slice();
-	}
-
-	eventNames() {
-		return Object.keys(this._events);
-	}
+type EventEmitter struct {
+	vm       *goja.Runtime
+	mu       sync.RWMutex
+	handlers map[string][]func(goja.FunctionCall) goja.Value
 }
 
-globalThis.EventEmitter = EventEmitter;
-	`)
+func RegisterEvents(vm *goja.Runtime) {
+	em := &EventEmitter{
+		vm:       vm,
+		handlers: make(map[string][]func(goja.FunctionCall) goja.Value),
+	}
+
+	eventsModule := vm.NewObject()
+
+	eventsModule.Set("on", func(event string, handler goja.Value) goja.Value {
+		if fn, ok := goja.AssertFunction(handler); ok {
+			em.mu.Lock()
+			em.handlers[event] = append(em.handlers[event], func(call goja.FunctionCall) goja.Value {
+				fn(goja.Undefined(), call.Arguments...)
+				return goja.Undefined()
+			})
+			em.mu.Unlock()
+		}
+		return eventsModule
+	})
+
+	eventsModule.Set("off", func(event string, handler goja.Value) goja.Value {
+		em.mu.Lock()
+		defer em.mu.Unlock()
+
+		if handler == nil || goja.IsUndefined(handler) || goja.IsNull(handler) {
+			delete(em.handlers, event)
+			return eventsModule
+		}
+
+		if _, ok := goja.AssertFunction(handler); ok {
+			delete(em.handlers, event)
+		}
+		return eventsModule
+	})
+
+	eventsModule.Set("emit", func(event string, args ...goja.Value) goja.Value {
+		em.mu.RLock()
+		handlers := make([]func(goja.FunctionCall) goja.Value, len(em.handlers[event]))
+		copy(handlers, em.handlers[event])
+		em.mu.RUnlock()
+
+		for _, handler := range handlers {
+			handlerArgs := make([]goja.Value, len(args))
+			for i, arg := range args {
+				handlerArgs[i] = arg
+			}
+			handler(goja.FunctionCall{Arguments: handlerArgs})
+		}
+		return goja.Undefined()
+	})
+
+	eventsModule.Set("once", func(event string, handler goja.Value) goja.Value {
+		if fn, ok := goja.AssertFunction(handler); ok {
+			em.mu.Lock()
+			em.handlers[event] = append(em.handlers[event], func(call goja.FunctionCall) goja.Value {
+				fnArgs := make([]goja.Value, len(call.Arguments))
+				for i, arg := range call.Arguments {
+					fnArgs[i] = arg
+				}
+				fn(goja.Undefined(), fnArgs...)
+				return goja.Undefined()
+			})
+			em.mu.Unlock()
+		}
+		return eventsModule
+	})
+
+	eventsModule.Set("listeners", func(event string) goja.Value {
+		em.mu.RLock()
+		defer em.mu.RUnlock()
+
+		count := len(em.handlers[event])
+		return vm.ToValue(count)
+	})
+
+	eventsModule.Set("clear", func() goja.Value {
+		em.mu.Lock()
+		em.handlers = make(map[string][]func(goja.FunctionCall) goja.Value)
+		em.mu.Unlock()
+		return goja.Undefined()
+	})
+
+	vm.Set("events", eventsModule)
 }

@@ -50,7 +50,7 @@ func RegisterChildProcess(vm *goja.Runtime, queueJob func(func()), incrementTask
 
 	cpModule.Set("exec", func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
-			panic(vm.ToValue("exec requires at least 1 argument"))
+			throwTypeError(vm, "exec requires at least 1 argument")
 		}
 		command := call.Arguments[0].String()
 
@@ -116,7 +116,7 @@ func RegisterChildProcess(vm *goja.Runtime, queueJob func(func()), incrementTask
 
 	cpModule.Set("spawn", func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
-			panic(vm.ToValue("spawn requires at least 1 argument"))
+			throwTypeError(vm, "spawn requires at least 1 argument")
 		}
 		command := call.Arguments[0].String()
 
@@ -237,7 +237,7 @@ func RegisterChildProcess(vm *goja.Runtime, queueJob func(func()), incrementTask
 
 	cpModule.Set("execFile", func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
-			panic(vm.ToValue("execFile requires at least 1 argument"))
+			throwTypeError(vm, "execFile requires at least 1 argument")
 		}
 		file := call.Arguments[0].String()
 

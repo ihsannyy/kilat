@@ -12,7 +12,7 @@ import (
 func RegisterWebSocket(vm *goja.Runtime, queueJob func(func()), incrementTasks func(), decrementTasks func()) {
 	wsConstructor := func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
-			panic(vm.ToValue("WebSocket requires 1 argument"))
+			throwTypeError(vm, "WebSocket requires 1 argument")
 		}
 		url := call.Arguments[0].String()
 

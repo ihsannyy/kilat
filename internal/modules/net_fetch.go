@@ -33,7 +33,7 @@ func RegisterNet(vm *goja.Runtime, queueJob func(func()), incrementTasks func(),
 	vm.Set("__nativeFetch", func(url string, method string, headers map[string]string, body string, callback goja.Value) goja.Value {
 		cb, ok := goja.AssertFunction(callback)
 		if !ok {
-			panic(vm.ToValue("callback must be a function"))
+			throwTypeError(vm, "callback must be a function")
 		}
 
 		incrementTasks()

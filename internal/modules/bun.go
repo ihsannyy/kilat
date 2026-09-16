@@ -20,7 +20,7 @@ func RegisterBun(vm *goja.Runtime, queueJob func(func()), setHasServer func(bool
 
 	bun.Set("serve", func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
-			panic(vm.ToValue("Bun.serve expects 1 argument"))
+			throwTypeError(vm, "Kilat.serve expects 1 argument")
 		}
 		optsVal := call.Arguments[0]
 		opts := optsVal.ToObject(vm)
@@ -37,11 +37,11 @@ func RegisterBun(vm *goja.Runtime, queueJob func(func()), setHasServer func(bool
 
 		fetchVal := opts.Get("fetch")
 		if fetchVal == nil || goja.IsUndefined(fetchVal) {
-			panic(vm.ToValue("options.fetch is required"))
+			throwTypeError(vm, "options.fetch is required")
 		}
 		_, ok := goja.AssertFunction(fetchVal)
 		if !ok {
-			panic(vm.ToValue("options.fetch must be a function"))
+			throwTypeError(vm, "options.fetch must be a function")
 		}
 
 		listener, err := net.Listen("tcp", net.JoinHostPort(hostname, fmt.Sprintf("%d", port)))

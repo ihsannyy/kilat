@@ -26,7 +26,7 @@ type moduleRecord struct {
 	exports goja.Value
 }
 
-var builtInModules = []string{"os", "fs", "net", "http", "https", "console", "bun", "crypto", "path", "child_process", "buffer", "stream", "websocket", "timers", "events", "querystring", "util"}
+var builtInModules = []string{"os", "fs", "net", "console", "kilat", "crypto", "path", "child_process", "buffer", "stream", "websocket", "timers", "log", "events", "cache", "cron", "sql"}
 
 func New(opts Options) *Runtime {
 	vm := goja.New()
@@ -60,7 +60,6 @@ func New(opts Options) *Runtime {
 	modules.RegisterBuffer(vm)
 	modules.RegisterTimers(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterNet(vm, queueJob, incrementTasks, decrementTasks)
-	modules.RegisterNetTCP(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterOS(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterBun(vm, queueJob, func(hasServer bool) {
 		r.hasServer = hasServer
@@ -68,11 +67,11 @@ func New(opts Options) *Runtime {
 	modules.RegisterChildProcess(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterStreams(vm, queueJob, incrementTasks, decrementTasks)
 	modules.RegisterWebSocket(vm, queueJob, incrementTasks, decrementTasks)
-	modules.RegisterHTTP(vm, queueJob, incrementTasks, decrementTasks)
-	modules.RegisterHTTPS(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterLog(vm)
 	modules.RegisterEvents(vm)
-	modules.RegisterQueryString(vm)
-	modules.RegisterUtil(vm)
+	modules.RegisterCache(vm)
+	modules.RegisterCron(vm, queueJob, incrementTasks, decrementTasks)
+	modules.RegisterSQL(vm, queueJob, incrementTasks, decrementTasks)
 
 	bootstrapJS := `
 		globalThis.process = {
@@ -86,8 +85,8 @@ func New(opts Options) *Runtime {
 			uptime: function() { return Date.now() / 1000; },
 			platform: os.platform(),
 			arch: os.arch(),
-version: 'v' + os.platform() + '/v4.2.1',
-			 versions: function() { return { node: '4.2.1' }; },
+version: 'v' + os.platform() + '/v5.0.0',
+			 versions: function() { return { node: '5.0.0' }; },
 			nextTick: function(fn) {
 				setTimeout(fn, 0);
 			}

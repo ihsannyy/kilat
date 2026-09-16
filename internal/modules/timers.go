@@ -68,11 +68,11 @@ func RegisterTimers(vm *goja.Runtime, queueJob func(func()), incrementTasks func
 
 	setTimeout := func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
-			panic(vm.ToValue("setTimeout requires at least 1 argument"))
+			throwTypeError(vm, "setTimeout requires at least 1 argument")
 		}
 		callback, ok := goja.AssertFunction(call.Arguments[0])
 		if !ok {
-			panic(vm.ToValue("setTimeout first argument must be a function"))
+			throwTypeError(vm, "setTimeout first argument must be a function")
 		}
 
 		delay := int64(0)
@@ -119,11 +119,11 @@ func RegisterTimers(vm *goja.Runtime, queueJob func(func()), incrementTasks func
 
 	setInterval := func(call goja.FunctionCall) goja.Value {
 		if len(call.Arguments) < 1 {
-			panic(vm.ToValue("setInterval requires at least 1 argument"))
+			throwTypeError(vm, "setInterval requires at least 1 argument")
 		}
 		callback, ok := goja.AssertFunction(call.Arguments[0])
 		if !ok {
-			panic(vm.ToValue("setInterval first argument must be a function"))
+			throwTypeError(vm, "setInterval first argument must be a function")
 		}
 
 		interval := int64(0)
