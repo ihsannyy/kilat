@@ -1,12 +1,12 @@
 <div align="center">
 
-# 🚀 KILAT
+# KILAT
 
-### Runtime JavaScript untuk Termux & Linux
+### Runtime JavaScript buat Termux & Linux
 
 <img src="docs/kilat.png" alt="Kilat" width="400"/>
 
-Runtime JS ringan yang dibuat buat developer Termux yang capek sama Node.js yang berat. Pakai Go + Goja engine, jalan di Android dan Linux.
+Buat kamu yang males nunggu Node.js startup lama. Kilat alternatif yang ringan, cepat, gak ribet.
 
 </div>
 
@@ -14,10 +14,10 @@ Runtime JS ringan yang dibuat buat developer Termux yang capek sama Node.js yang
 
 ## Kenapa Kilat?
 
-Node.js itu berat. V8 engine makan RAM banyak, `node_modules` duplikat di setiap proyek, dan startup-nya lambat. Kilat hadir sebagai alternatif yang lebih ringan.
+Node.js berat. V8 makan RAM banyak, `node_modules` duplikat tiap proyek, startup lambat. Kilat beda.
 
-| | Node.js | Kilat |
-|--|---------|-------|
+| | Node.js v20 | Kilat v5.0.0 |
+|--|-------------|--------------|
 | Startup | ~38ms | ~2ms |
 | RAM | ~31MB | ~8MB |
 | Storage | ~120MB/project | 0 (global cache) |
@@ -27,13 +27,13 @@ Node.js itu berat. V8 engine makan RAM banyak, `node_modules` duplikat di setiap
 
 ## Fitur
 
-- **Startup instan** — 2ms, enggak pakai V8
+- **Startup cepat** — 2ms, enggak pakai V8
 - **Global cache** — Package disimpan di `~/.kilat/packages/`, hemat storage
-- **TypeScript built-in** — Langsung jalan, enggak perlu ts-node
+- **TypeScript built-in** — `.ts` langsung jalan, gak perlu ts-node
 - **Fetch API** — Request HTTP async
-- **Kilat.serve** — Bikin HTTP server (API-nya sama kayak Bun)
+- **Kilat.serve** — Bikin HTTP server
 - **Package manager** — `kilat add`, `kilat remove`
-- **Template system** — `kilat create` buat scaffolding project
+- **Template system** — `kilat create` buat scaffolding
 - **Watch mode** — Auto-restart kalau file berubah
 
 ---
@@ -111,6 +111,12 @@ kilat run src/index.js
 | `stream` | Stream processing |
 | `timers` | setTimeout/setInterval |
 | `websocket` | WebSocket client |
+| `net` | HTTP fetch |
+| `log` | Structured logging |
+| `events` | Simple pub/sub |
+| `cache` | Key-value cache |
+| `cron` | Scheduled tasks |
+| `sql` | SQLite database |
 
 ### Global API
 - `fetch()` — HTTP request
@@ -147,6 +153,40 @@ Kilat.serve({
 fetch('https://api.github.com/users/ihsannyy')
   .then(r => r.json())
   .then(d => console.log(d));
+```
+
+### Database
+```javascript
+const db = sql.open("app.db");
+db.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)");
+db.execute("INSERT INTO users (name) VALUES (?)", ["Budi"]);
+const users = db.query("SELECT * FROM users");
+```
+
+### Logging
+```javascript
+log.info("Server started on port 3000");
+log.error("Failed to connect:", err);
+log.warn("Low memory");
+log.debug("Debug info");
+```
+
+### Cache
+```javascript
+cache.set("token", "abc123", 3600); // TTL 1 jam
+const token = cache.get("token");
+```
+
+### Events
+```javascript
+events.on("data", (msg) => log.info(msg));
+events.emit("data", "Hello");
+```
+
+### Cron
+```javascript
+cron.every("5s", () => log.debug("heartbeat"));
+cron.after("10s", () => log.info("delayed task"));
 ```
 
 ---
@@ -206,11 +246,3 @@ go build -o kilat ./cmd/kilat
 ## Lisensi
 
 MIT License © 2026 [ihsannyy](https://github.com/ihsannyy)
-
----
-
-<div align="center">
-
-MIT License © 2026 [ihsannyy](https://github.com/ihsannyy)
-
-</div>
