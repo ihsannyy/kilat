@@ -86,8 +86,8 @@ func New(opts Options) *Runtime {
 			uptime: function() { return Date.now() / 1000; },
 			platform: os.platform(),
 			arch: os.arch(),
-version: 'v' + os.platform() + '/v4.2.0',
-			 versions: function() { return { node: '4.2.0' }; },
+version: 'v' + os.platform() + '/v4.2.1',
+			 versions: function() { return { node: '4.2.1' }; },
 			nextTick: function(fn) {
 				setTimeout(fn, 0);
 			}
