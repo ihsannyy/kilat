@@ -261,8 +261,12 @@ func RunCreate(args []string) error {
 		return fmt.Errorf("template '%s' tidak ditemukan", templateName)
 	}
 
+	if _, err := os.Stat(projectName); err == nil {
+		return fmt.Errorf("folder '%s' sudah ada", projectName)
+	}
+
 	if err := os.MkdirAll(projectName, 0755); err != nil {
-		return err
+		return fmt.Errorf("gagal bikin folder: %w", err)
 	}
 
 	cyan := color.New(color.FgCyan, color.Bold)
@@ -277,11 +281,13 @@ func RunCreate(args []string) error {
 		dir := filepath.Dir(fullPath)
 
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			return err
+			os.RemoveAll(projectName)
+			return fmt.Errorf("gagal bikin folder %s: %w", dir, err)
 		}
 
 		if err := os.WriteFile(fullPath, []byte(content), 0644); err != nil {
-			return err
+			os.RemoveAll(projectName)
+			return fmt.Errorf("gagal tulis file %s: %w", path, err)
 		}
 
 		fmt.Printf("  %s %s\n", color.New(color.FgYellow).Sprint("Created:"), path)

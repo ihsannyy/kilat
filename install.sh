@@ -4,7 +4,7 @@ set -e
 
 REPO="ihsannyy/kilat"
 BINARY="kilat"
-VERSION="v4.2.0"
+VERSION="v5.0.0"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
